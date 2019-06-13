@@ -4,6 +4,6 @@
 cmake_minimum_required (VERSION 3.8)
 
 # Add source to this project's library.
-add_library (CAGE "CAGE.cpp" "CAGE.h")
+add_library (CAGE STATIC "Glad/glad.c" "CAGE.cpp" "CAGE.h")
 
 # TODO: Add tests and install targets if needed.
