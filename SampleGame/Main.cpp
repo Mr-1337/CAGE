@@ -2,7 +2,11 @@
 #include <Glad/glad/glad.h>
 #include <SDL2/SDL.h>
 #include <GLM/glm/glm.hpp>
-#include "../CAGE/CAGE.h"
+#include <GLM/glm/gtc/matrix_transform.hpp>
+#include "../CAGE/CAGE.hpp"
+#include "../CAGE/Graphics/Vertex/Vertex.hpp"
+#include "../CAGE/Graphics/VertexArrays/VertexArray.hpp"
+#include "../CAGE/Graphics/ShaderProgram/ShaderProgram.hpp"
 
 void GLAPIENTRY
 MessageCallback(GLenum source,
@@ -20,6 +24,7 @@ MessageCallback(GLenum source,
 
 int main(int argc, char** argv)
 {
+	std::cout << sizeof(cage::Vertex3) << std::endl;
 	SDL_Init(SDL_INIT_EVERYTHING);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 6);
@@ -45,47 +50,41 @@ int main(int argc, char** argv)
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
 
-	unsigned int vbo;
-	glCreateBuffers(1, &vbo);
+	cage::VertexBuffer<cage::Vertex3> vbo;
 
-	float data[] = {
-		-0.5,-0.5,
-		0.5,-0.5,
-		0,0.5
+	std::vector<cage::Vertex3> data = {
+		{-0.5f, -0.5f, 0.5f },
+		{ 0.5f, -0.5f, 0.5f },
+		{ 0.0f,  0.366f, 0.5f }
 	};
 
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	vbo.Fill(data);
 
-	glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STREAM_DRAW);
-
-	unsigned int vao;
-	glCreateVertexArrays(1, &vao);
-
-	glBindVertexArray(vao);
-
-	glVertexAttribPointer(0, 2, GL_FLOAT, false, 8, 0);
-
-	glEnableVertexAttribArray(0);
-
+	cage::VertexArray<cage::Vertex3> vao;
 
 	glViewport(0, 0, 640, 480);
 
-	std::string verShader = R"REE(
+	cage::Shader vertexShader(cage::Shader::VERTEX);
+	cage::Shader fragShader(cage::Shader::FRAGMENT);
+
+	std::string vsString = R"REE(
 	#version 460 core
 
-	layout (location = 0) in vec2 pos;
+	layout (location = 0) in vec3 pos;
+
+	uniform mat4 u_projection;
+	uniform mat4 u_model;
+
 	out vec2 pos_o;
 
 	void main()
 	{
-		pos_o = pos;
-		gl_Position = vec4(pos.x, pos.y, 0, 1);
+		pos_o = (u_projection * u_model * vec4(pos, 1.0)).xy;
+		gl_Position = vec4(pos_o, 0, 1);
 	}
 	)REE";
 
-	std::cout << verShader.c_str() << std::endl;
-
-	std::string fragShader = R"REE(
+	std::string fsString = R"REE(
 	#version 460 core
 
 	in vec2 pos_o;
@@ -94,74 +93,30 @@ int main(int argc, char** argv)
 	void main()
 	{
 		colorOut = vec4(pos_o.x, pos_o.y, pos_o.x, 1.0) + vec4(1.0, 1.0, 1.0, 0);
-		colorOut *= vec4(0.5, 0.5, 0.5, 1.0);
+		colorOut *= vec4(0.7, 0.7, 0.7, 1.0);
 	}
 	)REE";
 
-	unsigned int program = glCreateProgram();
-	unsigned int ver = glCreateShader(GL_VERTEX_SHADER);
-	unsigned int frag = glCreateShader(GL_FRAGMENT_SHADER);
+	vertexShader.CompileFromSrcString(vsString);
+	fragShader.CompileFromSrcString(fsString);
 
-	auto vs = verShader.c_str();
-	auto fs = fragShader.c_str();
-	glShaderSource(ver, 1, &vs, nullptr);
-	glShaderSource(frag, 1, &fs, nullptr);
+	cage::ShaderProgram program(vertexShader, fragShader);
+	program.Use();
 	
-	glCompileShader(ver);
-	glCompileShader(frag);
 
-	glAttachShader(program, ver);
-	glAttachShader(program, frag);
+	program.Projection->value = glm::ortho(-2.f, 2.f, -1.5f, 1.5f, 0.1f, 100.0f);
+	program.Projection->ForwardToShader();
 
-	glLinkProgram(program);
-
-	//Check for errors
-	GLint programSuccess = GL_TRUE;
-	glGetProgramiv(program, GL_LINK_STATUS, &programSuccess);
-	if (programSuccess != GL_TRUE)
-	{
-		printf("Error linking program %d!\n", program);
-		if (glIsProgram(program))
-		{
-			//Program log length
-			int infoLogLength = 0;
-			int maxLength = infoLogLength;
-
-			//Get info string length
-			glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
-
-			//Allocate string
-			char* infoLog = new char[maxLength];
-
-			//Get info log
-			glGetProgramInfoLog(program, maxLength, &infoLogLength, infoLog);
-			if (infoLogLength > 0)
-			{
-				//Print Log
-				printf("%s\n", infoLog);
-			}
-
-			//Deallocate string
-			delete[] infoLog;
-		}
-		else
-		{
-			printf("Name %d is not a program\n", program);
-		}
-	}
-
-	glUseProgram(program);
-
-	glBindVertexArray(vao);
+	vao.Bind();
 
 	SDL_Event e;
 	bool running = true;
 	float t = 0;
 	
 	const float data2[] = {
-	-0.5,-0.5,
-	0.5,-0.5,
-	0,0.5
+		-0.5,-0.5,
+		 0.5,-0.5,
+		 0.0, 0.366
 	};
 
 	while (running)
@@ -173,24 +128,16 @@ int main(int argc, char** argv)
 				running = false;
 			}
 		}
-		for (int i = 0; i < 6; i++)
-		{
-			if (i % 2 == 0)
-			{
-				//data[i] = data2[i] + glm::sin(t / 2) / 3.0f;
-				data[i] = data2[i] * glm::cos(glm::atan(data[i+1]/data[i]) + t / 5);
-			}
-			else
-			{
-				data[i] = -data2[i] * glm::sin(glm::atan(data[i] / data[i-1]) + t / 5);
-			}
-		}
+
 		//SDL_SetWindowOpacity(w, 0.5f* (glm::sin(SDL_GetTicks() / 5000.f) + 1.0));
-		t += 0.1;
+		t += 0.03;
+
+		program.Model->value = glm::rotate(glm::identity<glm::mat4>(), t, glm::vec3(0, 0, 1));
+		program.Model->ForwardToShader();
 		//SDL_SetWindowPosition(w, 400 + 200.f * sin(t), 300 + 100.f* cos(t));
-		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(data), data);
+		
 		SDL_GL_SwapWindow(w);
-		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+		glClearColor(0.3f, 0.5f, 0.2f, 0.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 	}

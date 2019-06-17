@@ -1,7 +1,7 @@
 ﻿// CAGE.cpp : Defines the entry point for the application.
 //
 
-#include "CAGE.h"
+#include "CAGE.hpp"
 
 using namespace std;
 
