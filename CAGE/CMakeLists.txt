@@ -12,6 +12,7 @@ set(SRC_FILES
 	"Graphics/Uniforms/Uniforms.cpp"
 	"Graphics/ShaderProgram/ShaderProgram.cpp"
 	"Graphics/Shaders/Shader.cpp"
+	"IO/MeshLoader.cpp"
 )
 
 # Add source to this project's library.

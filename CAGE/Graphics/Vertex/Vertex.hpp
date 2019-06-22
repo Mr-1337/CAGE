@@ -10,7 +10,6 @@ namespace cage
 	template <class T>
 	std::vector<VertexAttribute> GetLayout()
 	{
-		T t;
 	}
 
 	// Each vertex must be able to return its layout
@@ -24,11 +23,11 @@ namespace cage
 	};
 
 	template<>
-	std::vector<VertexAttribute> GetLayout<Vertex3>()
+	inline std::vector<VertexAttribute> GetLayout<Vertex3>()
 	{
 		std::vector<VertexAttribute> layout;
 
-		layout.emplace_back(3, VertexAttribute::Type::FLOAT, false, 0);
+		layout.emplace_back(3, VertexAttribute::Type::FLOAT, false, offsetof(Vertex3, position));
 
 		return layout;
 	}
@@ -40,31 +39,34 @@ namespace cage
 	};
 
 	template<>
-	std::vector<VertexAttribute> GetLayout<Vertex3Color>()
+	inline std::vector<VertexAttribute> GetLayout<Vertex3Color>()
 	{
 		std::vector<VertexAttribute> layout;
 
-		layout.emplace_back(3, VertexAttribute::Type::FLOAT, false, 0);
-		layout.emplace_back(4, VertexAttribute::Type::FLOAT, false, 12);
+		layout.emplace_back(3, VertexAttribute::Type::FLOAT, false, offsetof(Vertex3Color, position));
+		layout.emplace_back(4, VertexAttribute::Type::FLOAT, false, offsetof(Vertex3Color, color));
 
 		return layout;
 	}
 
 	struct Vertex3UVNormal
 	{
-		glm::vec3 positon;
+
+		Vertex3UVNormal(const glm::vec3& position, const glm::vec2& uv, const glm::vec3& normal) : position(position), uv(uv), normal(normal) {};
+
+		glm::vec3 position;
 		glm::vec2 uv;
 		glm::vec3 normal;
 	};
 
 	template<>
-	std::vector<VertexAttribute> GetLayout<Vertex3UVNormal>()
+	inline std::vector<VertexAttribute> GetLayout<Vertex3UVNormal>()
 	{
 		std::vector<VertexAttribute> layout;
 
-		layout.emplace_back(3, VertexAttribute::Type::FLOAT, false, 0);
-		layout.emplace_back(2, VertexAttribute::Type::FLOAT, false, 12);
-		layout.emplace_back(3, VertexAttribute::Type::FLOAT, false, 20);
+		layout.emplace_back(3, VertexAttribute::Type::FLOAT, false, offsetof(Vertex3UVNormal, position));
+		layout.emplace_back(2, VertexAttribute::Type::FLOAT, false, offsetof(Vertex3UVNormal, uv));
+		layout.emplace_back(3, VertexAttribute::Type::FLOAT, false, offsetof(Vertex3UVNormal, normal));
 
 		return layout;
 	}

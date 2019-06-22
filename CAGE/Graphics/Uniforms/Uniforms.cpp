@@ -42,7 +42,7 @@ namespace cage
 	Mat4Uniform::Mat4Uniform(unsigned int program, const std::string& name)
 		: Uniform<glm::mat4>(program, name)
 	{
-
+		value = glm::identity<glm::mat4>();
 	}
 
 	void Mat4Uniform::ForwardToShader()
