@@ -10,12 +10,13 @@ namespace cage
 		std::vector<std::string> items;
 		while (std::getline(stream, item, delim))
 		{
-			items.push_back(item);
+			if (item != "")
+				items.emplace_back(item);
 		}
 		return items;
 	}
 
-	std::vector<Vertex3UVNormal> loadObjVertices(const std::string& path)
+	std::vector<Vertex3UVNormal> LoadObjVertices(const std::string& path)
 	{
 
 		std::ifstream file(path);
@@ -78,7 +79,7 @@ namespace cage
 					else
 					{
 						posIndex = std::stoi(indicesStr[0]) - 1;
-						normIndex = std::stoi(indicesStr[2]) - 1;
+						normIndex = std::stoi(indicesStr[1]) - 1;
 
 						verticesOut.emplace_back(positions[posIndex], glm::vec2(0.f), normals[normIndex]);
 					}

@@ -1,0 +1,72 @@
+#include <iostream>
+#include <exception>
+#include <Glad/glad/glad.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_mixer.h>
+#include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_net.h>
+#include "Game.hpp"
+
+namespace cage
+{
+	Game::Game(const char* title, int argc, char** argv)
+	{
+		try
+		{
+			initSDL();
+			m_window = new Window(title, 1000, 800);
+			gladLoadGLLoader(SDL_GL_GetProcAddress);
+		}
+		catch (const std::exception& e)
+		{
+			std::cout << e.what() << std::endl;
+		}
+	}
+
+	Game::~Game()
+	{
+		delete m_window;
+	}
+
+	void Game::initSDL()
+	{
+
+		// Base SDL
+
+		if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
+			throw std::exception("Failed to initialize SDL.");
+
+		// SDL_image
+
+		int imgFlags = IMG_INIT_PNG | IMG_INIT_JPG;
+		if ((IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG) & imgFlags) != imgFlags)
+			throw std::exception("Failed to initialize SDL_image.");
+
+		// SDL_mixer
+
+		if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 2048) == -1)
+			throw std::exception("Failed to OpenAudio with SDL_mixer.");
+
+		int sndFlags = MIX_INIT_MP3 | MIX_INIT_OGG;
+		if ((Mix_Init(sndFlags) & sndFlags) != sndFlags)
+			throw std::exception("Failed to initialize SDL_mixer.");
+
+		// SDL_ttf
+
+		if (TTF_Init() != 0)
+			throw std::exception("Failed to initialize SDL_ttf.");
+
+		// SDL_net
+
+		if (SDLNet_Init() != 0)
+			throw std::exception("Failed to initialize SDL_net.");
+	}
+
+	void Game::unloadSDL()
+	{
+		Mix_CloseAudio();
+		Mix_Quit();
+		IMG_Quit();
+		SDL_Quit();
+	}
+}

@@ -30,7 +30,7 @@ namespace cage
 
 		~VertexArray()
 		{
-			glDeleteBuffers(1, &m_id);
+			glDeleteVertexArrays(1, &m_id);
 		}
 
 		inline unsigned int GetID() const { return m_id; }

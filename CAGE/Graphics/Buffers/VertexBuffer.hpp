@@ -30,9 +30,19 @@ namespace cage
 			glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(VertexType), &data[0], GL_DYNAMIC_DRAW);
 		}
 
+		inline void Rebuffer()
+		{
+			glBufferSubData(GL_ARRAY_BUFFER, 0, m_localData.size() * sizeof(VertexType), &m_localData[0]);
+		}
+
 		~VertexBuffer()
 		{
 			glDeleteBuffers(1, &m_id);
+		}
+
+		VertexType& operator[](int i)
+		{
+			return m_localData[i];
 		}
 
 		inline unsigned int GetID() const { return m_id; }

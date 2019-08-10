@@ -9,5 +9,5 @@
 
 namespace cage
 {
-	std::vector<Vertex3UVNormal> loadObjVertices(const std::string& path);
+	std::vector<Vertex3UVNormal> LoadObjVertices(const std::string& path);
 }

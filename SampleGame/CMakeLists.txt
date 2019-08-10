@@ -2,7 +2,7 @@
 
 cmake_minimum_required (VERSION 3.8)
 
-add_executable (SampleGame Main.cpp)
+add_executable (SampleGame Main.cpp Shrektris.cpp Shrektris.hpp STR.cpp STR.hpp Perlin.cpp Perlin.hpp)
 
 #install (DIRECTORY Assets/ DESTINATION ${CMAKE_BINARY_DIR}/Assets/)
 
@@ -15,7 +15,7 @@ add_custom_command(TARGET SampleGame PRE_BUILD
                        ${CMAKE_SOURCE_DIR}/lib/Dlls $<TARGET_FILE_DIR:SampleGame>)
 
 # SDL libraries
-set (SDL_LIBS SDL2/SDL2 SDL2/SDL2main SDL2/SDL2_mixer SDL2/SDL2_image SDL2/SDL2_net)
+set (SDL_LIBS SDL2/SDL2 SDL2/SDL2main SDL2/SDL2_mixer SDL2/SDL2_image SDL2/SDL2_ttf SDL2/SDL2_net)
 
 # link against CAGE, SDL and its extensions
 target_link_libraries (SampleGame PUBLIC CAGE ${SDL_LIBS})

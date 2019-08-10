@@ -3,6 +3,6 @@
 
 #pragma once
 
-int stuff();
+#include "Core/Game.hpp""
 
 // TODO: Reference additional headers your program requires here.
