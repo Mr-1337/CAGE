@@ -22,13 +22,15 @@ namespace cage
 			pitch = 89.0f;
 		if (pitch < -89.0f)
 			pitch = -89.0f;
-		front.x = cos(glm::radians(pitch)) * cos(glm::radians(yaw));
-		front.y = sin(glm::radians(pitch));
-		front.z = cos(glm::radians(pitch)) * sin(glm::radians(yaw));
-		cameraFront = glm::normalize(front);
-		right = glm::normalize(glm::cross(cameraFront, { 0.f, 1.0f, 0. }));
 		if (!m_thirdPerson)
+		{
+			front.x = cos(glm::radians(pitch)) * cos(glm::radians(yaw));
+			front.y = sin(glm::radians(pitch));
+			front.z = cos(glm::radians(pitch)) * sin(glm::radians(yaw));
+			cameraFront = glm::normalize(front);
+			right = glm::normalize(glm::cross(cameraFront, { 0.f, 1.0f, 0. }));
 			m_program.View->value = glm::lookAt(m_position, m_position + cameraFront, cameraUp);
+		}
 		else
 		{
 			glm::vec3 offset;

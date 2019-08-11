@@ -25,6 +25,8 @@ set(SRC_FILES
 	"Graphics/ShaderProgram/ShaderProgram.cpp"
 	"Graphics/Shaders/Shader.hpp"
 	"Graphics/Shaders/Shader.cpp"
+	"Graphics/Models/Mesh.hpp"
+	"Graphics/Models/Mesh.cpp"
 	"IO/Networking/Endpoint.hpp"
 	"IO/Networking/Endpoint.cpp"
 	"IO/MeshLoader.hpp"

@@ -58,11 +58,10 @@ STR::STR(int argc, char** argv) : Game("STR", argc, argv), m_running(true), us(2
 	)REE";
 
 	vbo.Fill(shrek);
-	vao = new cage::VertexArray<cage::Vertex3UVNormal>();
+	vao = new cage::VertexArray<cage::Vertex3UVNormal>(vbo);
 	vbo.Bind();
 
-	worldvbo.Bind();
-	vao2 = new cage::VertexArray<cage::Vertex3UVNormal>();
+	vao2 = new cage::VertexArray<cage::Vertex3UVNormal>(worldvbo);
 	worldvbo.Fill(genTerrain());
 
 	verShader.CompileFromSrcString(vsString);
@@ -169,15 +168,15 @@ void STR::update(float delta)
 	}
 	//camera->Move({ 0.0f, -0.2f, 0.0f });
 	auto v = camera->GetPosition() + glm::vec3{ 0.0f, -0.7f, 3.0f };
-	std::cout << v.x << ", " << v.z << std::endl;
+	//std::cout << v.x << ", " << v.z << std::endl;
 	int xIndex = std::floorf(v.x / 5.f), zIndex = std::floorf(v.z / 5.f);
 	float dx = v.x / 5.f - xIndex;
 	float dz = v.z / 5.f - zIndex;
-	std::cout << dx << ", " << dz << std::endl;
+	//std::cout << dx << ", " << dz << std::endl;
 	float yInterp1 = (1.0f - dx) * worldvbo[xIndex + (100 * zIndex)].position.y +     dx * worldvbo[xIndex + 1 + (100 * zIndex)].position.y;
 	float yInterp2 = (1.0f - dx) * worldvbo[xIndex + (100 * (zIndex+1))].position.y + dx * worldvbo[xIndex + 1 + (100 * (zIndex + 1))].position.y;
 	float yInterp = dz * yInterp2 + (1.0f - dz) * yInterp1;
-	std::cout << yInterp1 << ", " << yInterp2 << ", " << yInterp << std::endl;
+	//std::cout << yInterp1 << ", " << yInterp2 << ", " << yInterp << std::endl;
 	auto diff = v.y - yInterp;
 	if (diff < 0)
 	{

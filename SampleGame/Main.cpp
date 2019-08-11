@@ -20,8 +20,8 @@ MessageCallback(GLenum source,
 int main(int argc, char** argv)
 {
 
-	Shrektris game(argc, argv);
-	//STR game(argc, argv);
+	//Shrektris game(argc, argv);
+	STR game(argc, argv);
 
 	printf("Vendor:   %s\n", glGetString(GL_VENDOR));
 	printf("Renderer: %s\n", glGetString(GL_RENDERER));

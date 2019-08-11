@@ -57,7 +57,7 @@ Shrektris::Shrektris(int argc, char** argv) :
 	)REE";
 	
 	vbo.Fill(shrek);
-	vao = new cage::VertexArray<cage::Vertex3UVNormal>();
+	vao = new cage::VertexArray<cage::Vertex3UVNormal>(vbo);
 
 	vertexShader.CompileFromSrcString(vsString);
 	fragShader.CompileFromSrcString(fsString);
