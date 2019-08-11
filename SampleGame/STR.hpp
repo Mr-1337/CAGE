@@ -32,4 +32,6 @@ private:
 	cage::networking::Endpoint us, *them;
 	cage::Camera *camera;
 
+	SDL_GameController* controller;
+
 };

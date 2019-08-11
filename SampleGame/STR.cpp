@@ -15,6 +15,9 @@ STR::STR(int argc, char** argv) : Game("STR", argc, argv), m_running(true), us(2
 	them = new cage::networking::Endpoint(ip);
 	shrek = cage::LoadObjVertices("Assets/shrek.obj");
 
+	controller = SDL_GameControllerOpen(0);
+	SDL_assert(controller != nullptr);
+
 	std::string vsString = R"REE(
 	#version 460 core
 
@@ -166,6 +169,25 @@ void STR::update(float delta)
 	{
 		i = 0;
 	}
+
+	short controllerY = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTY);
+	short controllerX = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTX);
+	if (-1000 < controllerY && controllerY < 1000)
+		controllerY = 0;
+	if (-1000 < controllerX && controllerX < 1000)
+		controllerX = 0;
+	camera->MoveForward(-(float)controllerY / 65535.f / 5);
+	camera->MoveLeftRight((float)controllerX / 65535.f / 5);
+	controllerY = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_RIGHTY);
+	controllerX = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_RIGHTX);
+	if (-1000 < controllerY && controllerY < 1000)
+		controllerY = 0;
+	if (-1000 < controllerX && controllerX < 1000)
+		controllerX = 0;
+	camera->pitch -= (float)controllerY / 65535.f * 10.f;
+	camera->yaw += (float)controllerX / 65535.f * 10.f;
+
+	std::cout << SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) << std::endl;
 	//camera->Move({ 0.0f, -0.2f, 0.0f });
 	auto v = camera->GetPosition() + glm::vec3{ 0.0f, -0.7f, 3.0f };
 	//std::cout << v.x << ", " << v.z << std::endl;

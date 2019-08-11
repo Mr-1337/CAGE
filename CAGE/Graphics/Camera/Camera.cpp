@@ -18,10 +18,10 @@ namespace cage
 
 	void Camera::Apply()
 	{
-		if (pitch > 89.0f)
-			pitch = 89.0f;
-		if (pitch < -89.0f)
-			pitch = -89.0f;
+		if (pitch > 89.0f * ((float)m_thirdPerson * (1.0f/5.f) + !m_thirdPerson))
+			pitch = 89.0f * ((float)m_thirdPerson * (1.0f / 5.f) + !m_thirdPerson);
+		if (pitch < -89.0f * ((float)m_thirdPerson * (1.0f / 5.f) + !m_thirdPerson))
+			pitch = -89.0f * ((float)m_thirdPerson * (1.0f / 5.f) + !m_thirdPerson);
 		if (!m_thirdPerson)
 		{
 			front.x = cos(glm::radians(pitch)) * cos(glm::radians(yaw));
