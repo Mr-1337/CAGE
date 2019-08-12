@@ -5,14 +5,15 @@ Shrektris::Shrektris(int argc, char** argv) :
 	Game("Shrektris", argc, argv),
 	m_running(true), 
 	vertexShader(cage::Shader::VERTEX), 
-	fragShader(cage::Shader::FRAGMENT)
+	fragShader(cage::Shader::FRAGMENT),
+	shrek("Shrektromino!")
 {
 	glViewport(0, 0, 500, 800);
 
 	glEnable(GL_DEPTH_TEST);
 	//glDisable(GL_CULL_FACE);
 
-	shrek = cage::LoadObjVertices("Assets/shrekt.obj");
+	shrek.SetGeometry(cage::LoadObjVertices("Assets/shrek.obj"));
 
 	std::string vsString = R"REE(
 	#version 460 core
@@ -55,9 +56,6 @@ Shrektris::Shrektris(int argc, char** argv) :
 		colorOut = vec4(diffuse, diffuse, diffuse, 1.0);
 	}
 	)REE";
-	
-	vbo.Fill(shrek);
-	vao = new cage::VertexArray<cage::Vertex3UVNormal>(vbo);
 
 	vertexShader.CompileFromSrcString(vsString);
 	fragShader.CompileFromSrcString(fsString);
@@ -217,7 +215,7 @@ void Shrektris::draw()
 			{
 				program->Model->value = glm::translate(glm::identity<glm::mat4>(), { x - 5, -(y - 10), 0.f });
 				program->Model->ForwardToShader();
-				glDrawArrays(GL_TRIANGLES, 0, shrek.size());
+				shrek.Draw();
 			}
 		}
 	}

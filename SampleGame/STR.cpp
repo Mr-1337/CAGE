@@ -4,68 +4,68 @@
 #include "STR.hpp"
 #include "Perlin.hpp"
 
-STR::STR(int argc, char** argv) : Game("STR", argc, argv), m_running(true), us(25565), verShader(cage::Shader::VERTEX), fragShader(cage::Shader::FRAGMENT), worldvbo(true)
+STR::STR(int argc, char** argv) : 
+	Game("STR", argc, argv), 
+	m_running(true), 
+	verShader(cage::Shader::VERTEX), 
+	fragShader(cage::Shader::FRAGMENT), 
+	world("World", true), 
+	shrek("Shrek")
 {
 	auto size = m_window->GetSize();
 	glViewport(0, 0, size.first, size.second);
 	glEnable(GL_DEPTH_TEST);
 	glClearColor(0.8f, 0.5f, 0.1f, 1.0f);
-	IPaddress ip;
-	SDLNet_ResolveHost(&ip, "88.156.244.174", 25565);
-	them = new cage::networking::Endpoint(ip);
-	shrek = cage::LoadObjVertices("Assets/shrek.obj");
+
+	shrek.SetGeometry(cage::LoadObjVertices("Assets/shrek.obj"));
 
 	controller = SDL_GameControllerOpen(0);
 	SDL_assert(controller != nullptr);
 
-	std::string vsString = R"REE(
-	#version 460 core
+	std::string 
+	vsString = R"REE(
+		#version 460 core
 
-	layout (location = 0) in vec3 pos;
-	layout (location = 1) in vec2 uv;
-	layout (location = 2) in vec3 norm;
+		layout (location = 0) in vec3 pos;
+		layout (location = 1) in vec2 uv;
+		layout (location = 2) in vec3 norm;
 
-	uniform mat4 u_projection;
-	uniform mat4 u_view;
-	uniform mat4 u_model;
+		uniform mat4 u_projection;
+		uniform mat4 u_view;
+		uniform mat4 u_model;
 
-	out vec4 pos_o;
-	out vec3 pos_world_o;
-	out vec3 norm_o;
-	out vec2 uv_o;
+		out vec4 pos_o;
+		out vec3 pos_world_o;
+		out vec3 norm_o;
+		out vec2 uv_o;
 
-	void main()
-	{
-		pos_o = (u_projection * u_view * u_model * vec4(pos, 1.0));
-		pos_world_o = (u_model * vec4(pos, 1.0)).xyz;
-		norm_o = norm;
-		uv_o = uv;
-		gl_Position = pos_o;
-	}
-	)REE";
+		void main()
+		{
+			pos_o = (u_projection * u_view * u_model * vec4(pos, 1.0));
+			pos_world_o = (u_model * vec4(pos, 1.0)).xyz;
+			norm_o = norm;
+			uv_o = uv;
+			gl_Position = pos_o;
+		}
+		)REE",
+	fsString = R"REE(
+		#version 460 core
 
-	std::string fsString = R"REE(
-	#version 460 core
+		in vec4 pos_o;
+		in vec3 pos_world_o;
+		in vec2 uv_o;
+		in vec3 norm_o;
+		out vec4 colorOut;
 
-	in vec4 pos_o;
-	in vec3 pos_world_o;
-	in vec2 uv_o;
-	in vec3 norm_o;
-	out vec4 colorOut;
+		void main()
+		{
+			float diffuse = dot(norm_o, normalize(-pos_world_o + vec3(30.0, 100.0, 30.0)));
+			//colorOut = vec4(norm_o.r, norm_o.g, norm_o.b, 1.0);
+			colorOut = vec4(diffuse, diffuse, diffuse, 1.0);
+		}
+		)REE";
 
-	void main()
-	{
-		float diffuse = dot(norm_o, normalize(-pos_world_o + vec3(0, 100, 0)));
-		colorOut = vec4(diffuse, diffuse, diffuse, 1.0);
-	}
-	)REE";
-
-	vbo.Fill(shrek);
-	vao = new cage::VertexArray<cage::Vertex3UVNormal>(vbo);
-	vbo.Bind();
-
-	vao2 = new cage::VertexArray<cage::Vertex3UVNormal>(worldvbo);
-	worldvbo.Fill(genTerrain());
+	world.SetGeometry(genTerrain());
 
 	verShader.CompileFromSrcString(vsString);
 	fragShader.CompileFromSrcString(fsString);
@@ -190,13 +190,13 @@ void STR::update(float delta)
 	std::cout << SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) << std::endl;
 	//camera->Move({ 0.0f, -0.2f, 0.0f });
 	auto v = camera->GetPosition() + glm::vec3{ 0.0f, -0.7f, 3.0f };
-	//std::cout << v.x << ", " << v.z << std::endl;
+	std::cout << v.x << ", " << v.y << ", " << v.z << std::endl;
 	int xIndex = std::floorf(v.x / 5.f), zIndex = std::floorf(v.z / 5.f);
 	float dx = v.x / 5.f - xIndex;
 	float dz = v.z / 5.f - zIndex;
 	//std::cout << dx << ", " << dz << std::endl;
-	float yInterp1 = (1.0f - dx) * worldvbo[xIndex + (100 * zIndex)].position.y +     dx * worldvbo[xIndex + 1 + (100 * zIndex)].position.y;
-	float yInterp2 = (1.0f - dx) * worldvbo[xIndex + (100 * (zIndex+1))].position.y + dx * worldvbo[xIndex + 1 + (100 * (zIndex + 1))].position.y;
+	float yInterp1 = (1.0f - dx) * world.GetBuffer()[xIndex + (100 * zIndex)].position.y +     dx * world.GetBuffer()[xIndex + 1 + (100 * zIndex)].position.y;
+	float yInterp2 = (1.0f - dx) * world.GetBuffer()[xIndex + (100 * (zIndex+1))].position.y + dx * world.GetBuffer()[xIndex + 1 + (100 * (zIndex + 1))].position.y;
 	float yInterp = dz * yInterp2 + (1.0f - dz) * yInterp1;
 	//std::cout << yInterp1 << ", " << yInterp2 << ", " << yInterp << std::endl;
 	auto diff = v.y - yInterp;
@@ -210,18 +210,15 @@ void STR::update(float delta)
 
 void STR::draw()
 {
-	vao->Bind();
-	vbo.Bind();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	camera->Apply();
 	program->Model->value = glm::translate(glm::identity<glm::mat4>(), camera->GetPosition() + glm::vec3{0.0f, -0.7f, 3.0f});
 	program->Model->ForwardToShader();
-	glDrawArrays(GL_TRIANGLES, 0, shrek.size());
-	vao2->Bind();
+	shrek.Draw();
 	i += 0.1f;
 	program->Model->value = glm::identity<glm::mat4>();
 	program->Model->ForwardToShader();
-	glDrawElements(GL_TRIANGLES, 100 * 100 * 6, GL_UNSIGNED_INT, 0);
+	world.DrawIndexed(100 * 100 * 6);
 	m_window->SwapBuffers();
 }
 
@@ -244,7 +241,7 @@ std::vector<cage::Vertex3UVNormal> STR::genTerrain()
 		for (int x = 0; x < size; x++)
 		{
 			height = 0;
-			float temp = Perlin::OctavePerlin3((float)x / 70.f, (float)y / 70.f, 4.f, 8, 0.5) * heightScale * 12;
+			float temp = Perlin::OctavePerlin3((float)x / 70.f, (float)y / 70.f, 4.f, 1, 0.5) * heightScale * 12;
 			//if (temp > 0.5 * heightScale * 12)
 				height = temp;
 			//height += Perlin::OctavePerlin3((float)x/15.f, (float)y/15.f, 4.f, 1, 0.2) * heightScale;
@@ -273,9 +270,9 @@ std::vector<cage::Vertex3UVNormal> STR::genTerrain()
 		for (long x = 1; x < size - 1; x++)
 		{
 			float dx = positions[y * size + x + 1].y - positions[y * size + x - 1].y;
-			float dy = positions[(y+1) * size + x].y - positions[(y-1) * size + x].y;
+			float dz = positions[(y+1) * size + x].y - positions[(y-1) * size + x].y;
 
-			normals[y * size + x] = glm::normalize(glm::vec3{dx, dy, -2.f});
+			normals[y * size + x] = glm::normalize(glm::vec3{-dx * 0.5f, 1.f, -dz * 0.5f});
 		}
 	}
 	// Construct final geometry
@@ -284,8 +281,6 @@ std::vector<cage::Vertex3UVNormal> STR::genTerrain()
 			vertices.emplace_back(positions[i], glm::vec2{ 0.f, 0.f }, normals[i]);
 	}
 
-	vao2->Bind();
-	worldvbo.Bind();
 	glCreateBuffers(1, &eboid);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboid);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * indices.size(), &indices[0], GL_STATIC_DRAW);
