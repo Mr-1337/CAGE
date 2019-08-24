@@ -5,7 +5,7 @@
 #include "../CAGE/CAGE.hpp"
 #include "../CAGE/IO/MeshLoader.hpp"
 #include "../CAGE/Graphics/ShaderProgram/ShaderProgram.hpp"
-#include "../CAGE/Graphics/Models/Mesh.hpp"
+#include "../CAGE/Graphics/Models/Model.hpp"
 #include "../CAGE/Graphics/Camera/Camera.hpp"
 
 class STR : public cage::Game
@@ -21,7 +21,8 @@ private:
 
 	std::vector<cage::Vertex3UVNormal> genTerrain();
 
-	cage::Mesh<cage::Vertex3UVNormal> shrek, world;
+	cage::Mesh<cage::Vertex3UVNormal> world;
+	cage::Model shrek;
 	bool m_running;
 
 	cage::Shader verShader, fragShader;

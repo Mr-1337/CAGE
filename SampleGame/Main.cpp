@@ -6,8 +6,8 @@
 int main(int argc, char** argv)
 {
 
-	Shrektris game(argc, argv);
-	//STR game(argc, argv);
+	//Shrektris game(argc, argv);
+	STR game(argc, argv);
 
 	game.Run();
 
