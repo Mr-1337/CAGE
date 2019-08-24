@@ -8,8 +8,7 @@
 #include <GLM/glm/gtc/matrix_transform.hpp>
 #include "../CAGE/CAGE.hpp"
 
-#include "../CAGE/Graphics/Vertex/Vertex.hpp"
-#include "../CAGE/Graphics/VertexArrays/VertexArray.hpp"
+#include "../CAGE/Graphics/Models/Mesh.hpp"
 #include "../CAGE/Graphics/ShaderProgram/ShaderProgram.hpp"
 #include "../CAGE/IO/MeshLoader.hpp"
 
@@ -167,10 +166,8 @@ private:
 	glm::vec3 position = glm::vec3(0, 2, 20), target = glm::vec3(0, 0, -1);
 	Tetromino currentPiece;
 	Mix_Chunk *music, *layers1, *layers2, *bigLayers, *donkey;
-	std::vector<cage::Vertex3UVNormal> shrek;
+	cage::Mesh<cage::Vertex3UVNormal> shrek;
 	cage::Shader vertexShader, fragShader;
 	std::unique_ptr<cage::ShaderProgram> program;
-	cage::VertexArray<cage::Vertex3UVNormal>* vao;
-	cage::VertexBuffer<cage::Vertex3UVNormal> vbo;
 	bool m_running;
 };
