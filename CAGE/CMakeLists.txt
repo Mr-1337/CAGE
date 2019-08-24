@@ -16,6 +16,8 @@ set(SRC_FILES
 	"Graphics/Camera/Camera.hpp"
 	"Graphics/Camera/Camera.cpp"
 	"Graphics/Vertex/Vertex.hpp"
+	"Graphics/UI/UIElement.hpp"
+	"Graphics/UI/UIElement.cpp"
 	"Graphics/VertexLayouts/VertexAttribute.hpp"
 	"Graphics/VertexArrays/VertexArray.hpp"
 	"Graphics/Buffers/VertexBuffer.hpp"
