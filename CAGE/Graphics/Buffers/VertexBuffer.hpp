@@ -10,7 +10,7 @@ namespace cage
 	{
 	public:
 
-		VertexBuffer(bool storeLocalCopy = false) : m_id(0), m_local(storeLocalCopy)
+		VertexBuffer(bool storeLocalCopy = false) : m_id(0), m_local(storeLocalCopy), m_size(0)
 		{
 			glCreateBuffers(1, &m_id);
 		}
@@ -23,6 +23,7 @@ namespace cage
 		inline void Fill(std::vector<VertexType>& data)
 		{
 			Bind();
+			m_size = data.size();
 			if (m_local)
 			{
 				m_localData = data;
@@ -45,6 +46,8 @@ namespace cage
 			return m_localData[i];
 		}
 
+		inline unsigned int GetSize() const { return m_size; }
+
 		inline unsigned int GetID() const { return m_id; }
 
 	private:
@@ -56,6 +59,8 @@ namespace cage
 
 		// Should we store the vertex data software side?
 		bool m_local;
+
+		unsigned int m_size;
 
 	};
 }

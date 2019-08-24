@@ -9,8 +9,11 @@ namespace cage
 	{
 	public:
 
-		VertexArray() : m_id(0), VBO(nullptr)
+		VertexArray(VertexBuffer<VertexType>& vbo) : m_id(0), m_vbo(vbo)
 		{
+		
+			vbo.Bind();
+
 			glCreateVertexArrays(1, &m_id);
 
 			Bind();
@@ -34,10 +37,11 @@ namespace cage
 		}
 
 		inline unsigned int GetID() const { return m_id; }
-		VertexBuffer<VertexType>* VBO;
 
 	private:
 		// OpenGL id or "name" for this vao
 		unsigned int m_id;
+		// The buffer linked with this VAO
+		VertexBuffer<VertexType>& m_vbo;
 	};
 }
