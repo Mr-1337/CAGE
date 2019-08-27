@@ -27,6 +27,8 @@ set(SRC_FILES
 	"Graphics/Uniforms/Uniforms.cpp"
 	"Graphics/ShaderProgram/ShaderProgram.hpp"
 	"Graphics/ShaderProgram/ShaderProgram.cpp"
+	"Graphics/ShaderProgram/Generic3DShader.hpp"
+	"Graphics/ShaderProgram/SpriteShader.hpp"
 	"Graphics/Shaders/Shader.hpp"
 	"Graphics/Shaders/Shader.cpp"
 	"Graphics/Models/Mesh.hpp"

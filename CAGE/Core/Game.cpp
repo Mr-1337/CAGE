@@ -28,7 +28,7 @@ namespace cage
 		try
 		{
 			initSDL();
-			m_window = new Window(title, 1000, 800);
+			m_window = new Window(title, 1024, 768);
 			gladLoadGLLoader(SDL_GL_GetProcAddress);
 
 			printf("Vendor:   %s\n", glGetString(GL_VENDOR));

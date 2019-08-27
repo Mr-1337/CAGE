@@ -8,8 +8,9 @@
 #include <GLM/glm/gtc/matrix_transform.hpp>
 #include "../CAGE/CAGE.hpp"
 
-#include "../CAGE/Graphics/Models/Mesh.hpp"
-#include "../CAGE/Graphics/ShaderProgram/ShaderProgram.hpp"
+#include "../CAGE/Graphics/Models/Model.hpp"
+#include "../CAGE/Graphics/UI/UIElement.hpp"
+#include "../CAGE/Graphics/ShaderProgram/Generic3DShader.hpp"
 #include "../CAGE/IO/MeshLoader.hpp"
 
 class Shrektris : public cage::Game
@@ -164,10 +165,11 @@ private:
 	void logic(float& t);
 
 	glm::vec3 position = glm::vec3(0, 2, 20), target = glm::vec3(0, 0, -1);
-	Tetromino currentPiece;
+	Tetromino currentPiece, nextPiece;
 	Mix_Chunk *music, *layers1, *layers2, *bigLayers, *donkey;
-	cage::Mesh<cage::Vertex3UVNormal> shrek;
+	cage::ui::UIElement m_rootNode;
+	cage::Model shrek;
 	cage::Shader vertexShader, fragShader;
-	std::unique_ptr<cage::ShaderProgram> program;
+	std::unique_ptr<cage::Generic3DShader> program;
 	bool m_running;
 };

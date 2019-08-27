@@ -4,7 +4,7 @@
 #include <iostream>
 #include <Glad/glad/glad.h>
 
-namespace cage
+namespace cage::uniforms
 {
 	template <class T>
 	class Uniform
@@ -52,6 +52,24 @@ namespace cage
 	{
 	public:
 		Mat4Uniform(unsigned int program, const std::string& name);
+		void ForwardToShader() override;
+	};
+
+	// Vec2
+
+	class Vec2Uniform : public Uniform<glm::vec2>
+	{
+	public:
+		Vec2Uniform(unsigned int program, const std::string& name);
+		void ForwardToShader() override;
+	};
+
+	// Vec3
+
+	class Vec3Uniform : public Uniform<glm::vec3>
+	{
+	public:
+		Vec3Uniform(unsigned int program, const std::string& name);
 		void ForwardToShader() override;
 	};
 }

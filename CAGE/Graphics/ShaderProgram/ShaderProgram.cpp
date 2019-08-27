@@ -32,10 +32,6 @@ namespace cage
 		glDetachShader(m_id, vertexShader.GetID());
 		glDetachShader(m_id, fragmentShader.GetID());
 
-		Model = new Mat4Uniform(GetID(), "u_model");
-		View = new Mat4Uniform(GetID(), "u_view");
-		Projection = new Mat4Uniform(GetID(), "u_projection");
-
 	}
 
 	ShaderProgram::~ShaderProgram()

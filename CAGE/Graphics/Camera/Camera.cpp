@@ -2,7 +2,7 @@
 
 namespace cage
 {
-	Camera::Camera(ShaderProgram& program) : m_program(program)
+	Camera::Camera(Generic3DShader& program) : m_program(program)
 	{
 		cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
 		cameraUp = { 0.f, 1.f, 0.f };

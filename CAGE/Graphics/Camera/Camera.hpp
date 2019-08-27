@@ -2,7 +2,7 @@
 
 // TODO: Quaternions instead of Euler Angles!!!
 #include <GLM/glm/gtc/matrix_transform.hpp>
-#include "../ShaderProgram/ShaderProgram.hpp"
+#include "../ShaderProgram/Generic3DShader.hpp"
 
 namespace cage
 {
@@ -18,14 +18,14 @@ namespace cage
 
 		glm::vec3 m_position;
 		glm::mat4 m_projection;
-		ShaderProgram& m_program;
+		Generic3DShader& m_program;
 
 		bool m_thirdPerson = false;
 	public:
 
 		float yaw = 0.f, pitch = 0.f;
 
-		Camera(ShaderProgram& program);
+		Camera(Generic3DShader& program);
 		~Camera() = default;
 
 		Camera& Move(const glm::vec3& translation);

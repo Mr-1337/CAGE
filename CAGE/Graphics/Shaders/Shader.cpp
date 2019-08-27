@@ -51,9 +51,6 @@ namespace cage
 			glGetShaderInfoLog(m_id, maxLength, &maxLength, log);
 
 			std::cout << "Failed to compile shader! Error: " << log << std::endl;
-
-			// Let's not leak
-			glDeleteShader(m_id);
 		}
 	}
 

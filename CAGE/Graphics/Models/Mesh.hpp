@@ -38,7 +38,7 @@ namespace cage
 
 		void LoadTexture(SDL_Surface* surface)
 		{
-			m_texture = new Texture(*surface);
+			m_texture = new Texture(surface);
 		}
 
 		void SetGeometry(std::vector<VertexType>& geometry)
@@ -49,6 +49,8 @@ namespace cage
 		inline std::string GetName() const { return m_name; }
 
 		inline VertexBuffer<VertexType>& GetBuffer() { return m_vbo; }
+
+		inline void BindVAO() { m_vao.Bind(); }
 
 		void Draw()
 		{

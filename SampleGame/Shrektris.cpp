@@ -5,15 +5,15 @@ Shrektris::Shrektris(int argc, char** argv) :
 	Game("Shrektris", argc, argv),
 	m_running(true), 
 	vertexShader(cage::Shader::VERTEX), 
-	fragShader(cage::Shader::FRAGMENT),
-	shrek("Shrektromino!")
+	fragShader(cage::Shader::FRAGMENT)
 {
-	glViewport(0, 0, 500, 800);
+	auto size = m_window->GetSize();
+	glViewport(0, 0, size.first, size.second);
 
 	glEnable(GL_DEPTH_TEST);
 	//glDisable(GL_CULL_FACE);
 
-	shrek.SetGeometry(cage::LoadObjVertices("Assets/shrek.obj"));
+	shrek.LoadModel("Assets/shrek.obj");
 
 	std::string vsString = R"REE(
 	#version 460 core
@@ -36,7 +36,7 @@ Shrektris::Shrektris(int argc, char** argv) :
 		pos_o = (u_projection * u_view * u_model * vec4(pos, 1.0));
 		pos_world_o = (u_model * vec4(pos, 1.0)).xyz;
 		norm_o = norm;
-		uv_o = uv;
+		uv_o = vec2(uv.x, -uv.y);
 		gl_Position = pos_o;
 	}
 	)REE";
@@ -50,21 +50,23 @@ Shrektris::Shrektris(int argc, char** argv) :
 	in vec3 norm_o;
 	out vec4 colorOut;
 
+	uniform sampler2D u_texture;
+
 	void main()
 	{
-		float diffuse = dot(norm_o, normalize(-pos_world_o + vec3(0, 100, 0)));
-		colorOut = vec4(diffuse, diffuse, diffuse, 1.0);
+		float diffuse = max(dot(norm_o, normalize(-pos_world_o + vec3(0, 100, 0))), 0.2);
+		colorOut = vec4(diffuse, diffuse, diffuse, 1.0) * texture(u_texture, uv_o);
 	}
 	)REE";
 
 	vertexShader.CompileFromSrcString(vsString);
 	fragShader.CompileFromSrcString(fsString);
 
-	program = std::make_unique<cage::ShaderProgram>(vertexShader, fragShader);
+	program = std::make_unique<cage::Generic3DShader>(vertexShader, fragShader);
 
 	program->Use();
 
-	program->Projection->value = glm::perspective(glm::quarter_pi<float>(), 5.f / 8.f, 0.1f, 100.f);
+	program->Projection->value = glm::perspective(glm::quarter_pi<float>(), (float)size.first / (float)size.second, 0.1f, 100.f);
 	program->Projection->ForwardToShader();
 	program->Model->value = glm::scale(program->Model->value, { 1.f, 0.6f, 1.f });
 	program->Model->ForwardToShader();
@@ -127,6 +129,40 @@ void Shrektris::Run()
 				}
 			}
 		}
+
+		auto keys = SDL_GetKeyboardState(nullptr);
+		const float speed = 0.1;
+
+		if (keys[SDL_SCANCODE_J])
+		{
+			position.x -= speed;
+		}
+
+		if (keys[SDL_SCANCODE_K])
+		{
+			position.z += speed;
+		}
+
+		if (keys[SDL_SCANCODE_L])
+		{
+			position.x += speed;
+		}
+
+		if (keys[SDL_SCANCODE_I])
+		{
+			position.z -= speed;
+		}
+
+		if (keys[SDL_SCANCODE_U])
+		{
+			position.y += speed;
+		}
+
+		if (keys[SDL_SCANCODE_O])
+		{
+			position.y -= speed;
+		}
+
 		t += 1.f / 60.f;
 		logic(t);
 		draw();
@@ -155,7 +191,7 @@ void Shrektris::logic(float& t)
 			//Clear any rows we should
 
 			int breakTotal = 0;
-			for (size_t i = 15; i > 0; i--)
+			for (size_t i = 14; i > 0; i--)
 			{
 
 				int yesCount = 0;
@@ -192,15 +228,20 @@ void Shrektris::logic(float& t)
 				Mix_PlayChannel(3, bigLayers, 0);
 			}
 
-			currentPiece.x = 5;
-			currentPiece.y = 0;
-			currentPiece.shape = (std::rand() % 7) * 16;
+			nextPiece.x = 5;
+			nextPiece.y = 0;
+			nextPiece.orientation = 0;
+			currentPiece = nextPiece;
+			nextPiece.shape = (std::rand() % 7) * 16;
 		}
 	}
 }
 
+static float t = 0.f;
+
 void Shrektris::draw()
 {
+	t += 0.001f;
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	//program->View->value = glm::lookAt(glm::vec3( 0.f, 2.f, 20.f ), { 0.f, 2.f, -1.f }, { 0.f, 1.f, 0.f }) * glm::rotate(glm::identity<glm::mat4>(), 6.28f * t, glm::vec3(0.f, 1.f, 0.f));
@@ -220,5 +261,24 @@ void Shrektris::draw()
 		}
 	}
 
+	std::array<int, 16> box;
+
+	for (int i = 0; i < 16; i++)
+	{
+		box[i] = 0;
+		auto squares = getSquares(nextPiece);
+
+		for (int j = 0; j < 4; j++)
+		{
+			box[squares[j]] = 1;
+		}
+
+		if (box[i] != 0)
+		{
+			program->Model->value = glm::translate(glm::identity<glm::mat4>(), { 6.f + (i % 4), -((i / 4) - 5.f), 0.f });
+			program->Model->ForwardToShader();
+		}
+		shrek.Draw();
+	}
 	m_window->SwapBuffers();
 }

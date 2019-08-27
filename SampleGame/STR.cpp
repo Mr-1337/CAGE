@@ -5,11 +5,15 @@
 #include "STR.hpp"
 #include "Perlin.hpp"
 
+std::shared_ptr<cage::ui::UIElement> child, child2, child3;
+
 STR::STR(int argc, char** argv) : 
 	Game("STR", argc, argv), 
 	m_running(true), 
 	verShader(cage::Shader::VERTEX), 
 	fragShader(cage::Shader::FRAGMENT), 
+	spriteVerShader(cage::Shader::VERTEX),
+	spriteFragShader(cage::Shader::FRAGMENT),
 	world("World", true)
 {
 	auto size = m_window->GetSize();
@@ -18,17 +22,19 @@ STR::STR(int argc, char** argv) :
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	
-	//glClearColor(0.8f, 0.5f, 0.1f, 1.0f);
-	glClearColor(0.3f, 0.5f, 0.2f, 0.0f);
+	glClearColor(0.8f, 0.5f, 0.1f, 1.0f);
+	//glClearColor(0.3f, 0.5f, 0.2f, 0.0f);
 
+	world.BindVAO();
 	world.SetGeometry(genTerrain());
-	TTF_Font* font = TTF_OpenFont("Assets/sans.ttf", 72);
+	TTF_Font* font = TTF_OpenFont("Assets/sans.ttf", 32);
 	SDL_Color color;
-	color.g = 255;
-	color.r = 0;
-	color.b = 0;
-	auto surface = TTF_RenderText_Blended(font, "Onions have layers", color);
-	world.LoadTexture(surface);
+	color.g = 200;
+	color.r = 000;
+	color.b = 100;
+	color.a = 255;
+	auto surface = TTF_RenderText_Blended(font, "Coming soon to a swamp near you!", color);
+	auto surface2 = TTF_RenderText_Blended(font, "I hope that odor isn't coming from you", color);
 	shrek.LoadModel("Assets/shrek.obj");
 	controller = SDL_GameControllerOpen(0);
 	//SDL_assert(controller != nullptr);
@@ -72,7 +78,7 @@ STR::STR(int argc, char** argv) :
 
 		void main()
 		{
-			float diffuse = max(dot(norm_o, normalize(-pos_world_o + vec3(30.0, 500.0, 30.0))), 0.3);
+			float diffuse = max(dot(norm_o, normalize(-pos_world_o + vec3(30.0, 100.0, 30.0))), 0.1);
 			//colorOut = vec4(norm_o.r, norm_o.g, norm_o.b, 1.0);
 
 			colorOut = vec4(diffuse, diffuse, diffuse, 1.0) * texture(u_texture, uv_o);
@@ -82,7 +88,39 @@ STR::STR(int argc, char** argv) :
 	verShader.CompileFromSrcString(vsString);
 	fragShader.CompileFromSrcString(fsString);
 
-	program = new cage::ShaderProgram(verShader, fragShader);
+	vsString = R"REE(
+		#version 460 core
+
+		layout (location = 0) in vec2 pos;
+
+		uniform mat4 u_model;
+		uniform mat4 u_projection;
+		uniform vec2 u_spriteSize;
+
+		out vec2 uv_o;
+
+		void main()
+		{
+			uv_o = vec2(pos.x + 0.5, 0.5 + pos.y);
+			gl_Position = u_projection * u_model * (vec4(u_spriteSize, 0, 1.0) * vec4(pos, 0, 1.0));
+		}
+		)REE",
+		fsString = R"REE(
+		#version 460 core
+
+		in vec2 uv_o;
+
+		uniform sampler2D u_texture;
+
+		out vec4 colorOut;
+
+		void main()
+		{
+			colorOut += texture(u_texture, uv_o);
+		}
+		)REE";
+
+	program = new cage::Generic3DShader(verShader, fragShader);
 
 	program->Use();
 
@@ -90,6 +128,38 @@ STR::STR(int argc, char** argv) :
 	//camera->SetProjection(glm::ortho(-1.f, 1.f, -1.f, 1.f, 0.1f, 100.f));
 	camera->SetProjection(glm::perspective(glm::quarter_pi<float>(), (float)size.first / size.second, 0.1f, 5000.f));
 	camera->SetPosition({ 0.f, 1.f, 0.f });
+
+	spriteVerShader.CompileFromSrcString(vsString);
+	spriteFragShader.CompileFromSrcString(fsString);
+
+	spriteProgram = new cage::SpriteShader(spriteVerShader, spriteFragShader);
+	spriteProgram->Use();
+	//spriteProgram->Projection->value = glm::identity<glm::mat4>();
+	spriteProgram->Projection->value = glm::ortho(0.f, (float)size.first, (float)size.second, 0.f);
+	spriteProgram->Projection->ForwardToShader();
+
+	auto surface3 = IMG_Load("Assets/simon.png");
+	m_root.LoadTexture(surface);
+	m_root.MoveTo(glm::vec2{ 50.f });
+	m_root.Resize({ 1.f, 1.f });
+
+	cage::ui::UIElement::shader = spriteProgram;
+
+	child = std::make_shared<cage::ui::UIElement>();
+	child2 = std::make_shared<cage::ui::UIElement>();
+	child3 = std::make_shared<cage::ui::UIElement>();
+
+	child->LoadTexture(surface);
+	child2->LoadTexture(surface);
+	child3->LoadTexture(surface);
+
+	child->Scale(0.5f);
+	child2->Scale(0.3f);
+
+	child2->Add(child3);
+	child->Add(child2);
+
+	m_root.Add(child);
 }
 
 STR::~STR()
@@ -182,6 +252,12 @@ void STR::update(float delta)
 		i = 0;
 	}
 
+	m_root.MoveTo(glm::vec2{ 70.f * cosf(i/10) + 70, 70.f * sinf(i/10) + 70 });
+	m_root.Resize({ sinf((float)i / 10.f), sinf((float)i / 10.f) });
+	child->MoveTo(glm::vec2{ 15.f * cosf(i), 15.f * sinf(i) });
+	child2->MoveTo(glm::vec2{ 5.f * sinf(i / 18), 5.f * cosf(i / 26) });
+	child3->MoveTo(glm::vec2{ 25.f * cosf(i / 2), 25.f * sinf(i / 2) });
+
 	short controllerY = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTY);
 	short controllerX = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTX);
 	if (-1000 < controllerY && controllerY < 1000)
@@ -216,13 +292,19 @@ void STR::update(float delta)
 	{
 		camera->Move({ 0.0f, -diff, 0.0f });
 	}
+	m_root.Rotate(0.04f);
+	child->Rotate(0.03f);
+	child2->Rotate(0.02f);
+	child3->Rotate(0.01f);
 }
 
 
 
 void STR::draw()
 {
+	glEnable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	program->Use();
 	camera->Apply();
 	program->Model->value = glm::translate(glm::identity<glm::mat4>(), camera->GetPosition() + glm::vec3{0.0f, -0.7f, 3.0f});
 	program->Model->ForwardToShader();
@@ -231,6 +313,12 @@ void STR::draw()
 	program->Model->value = glm::identity<glm::mat4>();
 	program->Model->ForwardToShader();
 	world.DrawIndexed(100 * 100 * 6);
+
+	glDisable(GL_DEPTH_TEST);
+	spriteProgram->Use();
+
+	m_root.Draw();
+
 	m_window->SwapBuffers();
 }
 
@@ -253,7 +341,7 @@ std::vector<cage::Vertex3UVNormal> STR::genTerrain()
 		for (int x = 0; x < size; x++)
 		{
 			height = 0;
-			float temp = Perlin::OctavePerlin3((float)x / 70.f, (float)y / 70.f, 4.f, 5, 0.5) * heightScale * 12;
+			float temp = Perlin::OctavePerlin3((float)x / 70.f, (float)y / 70.f, 4.f, 3, 0.5) * heightScale * 12;
 			//if (temp > 0.5 * heightScale * 12)
 				height = temp;
 			//height += Perlin::OctavePerlin3((float)x/15.f, (float)y/15.f, 4.f, 1, 0.2) * heightScale;

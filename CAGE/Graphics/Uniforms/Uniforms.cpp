@@ -1,7 +1,7 @@
 #include "Uniforms.hpp"
 #include <GLM/glm/gtc/type_ptr.hpp>
 
-namespace cage
+namespace cage::uniforms
 {
 
 	/////////////////////////////////////////////////////////////
@@ -48,5 +48,35 @@ namespace cage
 	void Mat4Uniform::ForwardToShader()
 	{
 		glUniformMatrix4fv(m_location, 1, GL_FALSE, glm::value_ptr(value));
+	}
+
+	/////////////////////////////////////////////////////////////
+	///////////////   Vec2  /////////////////////////////////////
+	/////////////////////////////////////////////////////////////
+
+	Vec2Uniform::Vec2Uniform(unsigned int program, const std::string& name)
+		: Uniform<glm::vec2>(program, name)
+	{
+		value = glm::vec2{ 0.f };
+	}
+
+	void Vec2Uniform::ForwardToShader()
+	{
+		glUniform2fv(m_location, 1, glm::value_ptr(value));
+	}
+
+	/////////////////////////////////////////////////////////////
+	///////////////   Vec3  /////////////////////////////////////
+	/////////////////////////////////////////////////////////////
+
+	Vec3Uniform::Vec3Uniform(unsigned int program, const std::string& name)
+		: Uniform<glm::vec3>(program, name)
+	{
+		value = glm::vec3{ 0.f };
+	}
+
+	void Vec3Uniform::ForwardToShader()
+	{
+		glUniform3fv(m_location, 1, glm::value_ptr(value));
 	}
 }

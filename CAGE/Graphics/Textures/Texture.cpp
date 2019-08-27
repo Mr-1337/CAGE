@@ -2,10 +2,10 @@
 
 namespace cage
 {
-	Texture::Texture(SDL_Surface& textureData, bool keepLocalCopy) : 
-		m_width(textureData.w), 
-		m_height(textureData.h),
-		m_pixelData(textureData.pixels),
+	Texture::Texture(SDL_Surface* textureData, bool keepLocalCopy) : 
+		m_width(textureData->w), 
+		m_height(textureData->h),
+		m_pixelData(textureData->pixels),
 		m_textureUnit(0)
 	{
 		glGenTextures(1, &m_id);
@@ -23,7 +23,7 @@ namespace cage
 
 		if (!keepLocalCopy)
 		{
-			SDL_FreeSurface(&textureData);
+			SDL_FreeSurface(textureData);
 			m_pixelData = nullptr;
 		}
 	}
@@ -38,9 +38,9 @@ namespace cage
 		glBindTexture(GL_TEXTURE_2D, m_id);
 	}
 
-	void Texture::uploadTexData(SDL_Surface& surface)
+	void Texture::uploadTexData(SDL_Surface* surface)
 	{
-		auto glFormat = getGLPixelFormat(surface.format);
+		auto glFormat = getGLPixelFormat(surface->format);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width, m_height, 0, glFormat, GL_UNSIGNED_BYTE, m_pixelData);
 	}
 

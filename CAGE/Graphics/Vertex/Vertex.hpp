@@ -16,6 +16,22 @@ namespace cage
 	// The prototype for a vertex attribute is as follows:
 	// VertexAttribute(int dimensions, Type type, bool normalized, unsigned int offset)
 
+	struct Vertex2
+	{
+		Vertex2(float x, float y) : position{ x, y } {};
+		glm::vec2 position;
+	};
+
+	template<>
+	inline std::vector<VertexAttribute> GetLayout<Vertex2>()
+	{
+		std::vector<VertexAttribute> layout;
+
+		layout.emplace_back(2, VertexAttribute::Type::FLOAT, false, offsetof(Vertex2, position));
+
+		return layout;
+	}
+
 	struct Vertex3
 	{
 		Vertex3(float x, float y, float z) : position{ x, y, z } {};

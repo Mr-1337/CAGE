@@ -4,8 +4,10 @@
 
 #include "../CAGE/CAGE.hpp"
 #include "../CAGE/IO/MeshLoader.hpp"
-#include "../CAGE/Graphics/ShaderProgram/ShaderProgram.hpp"
+#include "../CAGE/Graphics/ShaderProgram/Generic3DShader.hpp"
+#include "../CAGE/Graphics/ShaderProgram/SpriteShader.hpp"
 #include "../CAGE/Graphics/Models/Model.hpp"
+#include "../CAGE/Graphics/UI/UIElement.hpp"
 #include "../CAGE/Graphics/Camera/Camera.hpp"
 
 class STR : public cage::Game
@@ -25,9 +27,12 @@ private:
 	cage::Model shrek;
 	bool m_running;
 
-	cage::Shader verShader, fragShader;
-	cage::ShaderProgram* program;
+	cage::Shader verShader, fragShader, spriteVerShader, spriteFragShader;
+	cage::Generic3DShader* program;
+	cage::SpriteShader* spriteProgram;
 	cage::Camera *camera;
+
+	cage::ui::UIElement m_root;
 
 	SDL_GameController* controller;
 

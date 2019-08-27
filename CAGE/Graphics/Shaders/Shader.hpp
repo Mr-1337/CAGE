@@ -18,6 +18,8 @@ namespace cage
 		};
 
 		Shader(ShaderType type);
+		Shader(const Shader& other) = delete;
+		Shader(const Shader&& other) = delete;
 		~Shader();
 
 		void CompileFromFile(const std::string& path);
