@@ -7,6 +7,10 @@
 
 std::shared_ptr<cage::ui::UIElement> child, child2, child3;
 
+SDL_Surface* surface;
+TTF_Font* font;
+SDL_Color color;
+
 STR::STR(int argc, char** argv) : 
 	Game("STR", argc, argv), 
 	m_running(true), 
@@ -27,13 +31,13 @@ STR::STR(int argc, char** argv) :
 
 	world.BindVAO();
 	world.SetGeometry(genTerrain());
-	TTF_Font* font = TTF_OpenFont("Assets/sans.ttf", 32);
-	SDL_Color color;
+	font = TTF_OpenFont("Assets/sans.ttf", 32);
+
 	color.g = 200;
 	color.r = 000;
 	color.b = 100;
 	color.a = 255;
-	auto surface = TTF_RenderText_Blended(font, "Coming soon to a swamp near you!", color);
+	surface = TTF_RenderText_Blended(font, "Weeeeeeeee!", color);
 	auto surface2 = TTF_RenderText_Blended(font, "I hope that odor isn't coming from you", color);
 	shrek.LoadModel("Assets/shrek.obj");
 	controller = SDL_GameControllerOpen(0);
@@ -116,7 +120,8 @@ STR::STR(int argc, char** argv) :
 
 		void main()
 		{
-			colorOut += texture(u_texture, uv_o);
+			//colorOut = vec4(uv_o, 0.0, 1.0);
+			colorOut = texture(u_texture, uv_o);
 		}
 		)REE";
 
@@ -139,9 +144,11 @@ STR::STR(int argc, char** argv) :
 	spriteProgram->Projection->ForwardToShader();
 
 	auto surface3 = IMG_Load("Assets/simon.png");
-	m_root.LoadTexture(surface);
-	m_root.MoveTo(glm::vec2{ 50.f });
+	m_root.LoadTexture(surface3);
+	m_root.MoveTo(glm::vec2{ 300.f });
 	m_root.Resize({ 1.f, 1.f });
+
+	m_root.SetMounting(cage::ui::MountPoint::TOP_LEFT);
 
 	cage::ui::UIElement::shader = spriteProgram;
 
@@ -149,17 +156,22 @@ STR::STR(int argc, char** argv) :
 	child2 = std::make_shared<cage::ui::UIElement>();
 	child3 = std::make_shared<cage::ui::UIElement>();
 
-	child->LoadTexture(surface);
-	child2->LoadTexture(surface);
-	child3->LoadTexture(surface);
+	child->SetMounting(cage::ui::MountPoint::TOP_LEFT);
+	child2->SetMounting(cage::ui::MountPoint::TOP_LEFT);
+	child->LoadTexture(surface3);
+	child2->LoadTexture(surface3);
+	child3->LoadTexture(surface3);
 
-	child->Scale(0.5f);
-	child2->Scale(0.3f);
+	child->Scale(0.7125f);
+	child2->Scale(0.5213f);
+	child3->Scale(0.232f);
+	child3->SetMounting(cage::ui::MountPoint::BOTTOM_RIGHT);
 
 	child2->Add(child3);
 	child->Add(child2);
 
 	m_root.Add(child);
+
 }
 
 STR::~STR()
@@ -252,11 +264,11 @@ void STR::update(float delta)
 		i = 0;
 	}
 
-	m_root.MoveTo(glm::vec2{ 70.f * cosf(i/10) + 70, 70.f * sinf(i/10) + 70 });
-	m_root.Resize({ sinf((float)i / 10.f), sinf((float)i / 10.f) });
-	child->MoveTo(glm::vec2{ 15.f * cosf(i), 15.f * sinf(i) });
-	child2->MoveTo(glm::vec2{ 5.f * sinf(i / 18), 5.f * cosf(i / 26) });
-	child3->MoveTo(glm::vec2{ 25.f * cosf(i / 2), 25.f * sinf(i / 2) });
+	//m_root.MoveTo(glm::vec2{ 70.f * cosf(i/10) + 570, 70.f * sinf(i/10) + 570 });
+	//m_root.Resize({ sinf((float)i / 10.f), sinf((float)i / 10.f) });
+	//child->MoveTo(glm::vec2{ i });
+	//child2->MoveTo(glm::vec2{ 5.f * sinf(i / 18), 5.f * cosf(i / 26) });
+	//child3->MoveTo(glm::vec2{ 25.f * cosf(i / 2), 25.f * sinf(i / 2) });
 
 	short controllerY = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTY);
 	short controllerX = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTX);
@@ -279,6 +291,14 @@ void STR::update(float delta)
 	//camera->Move({ 0.0f, -0.2f, 0.0f });
 	auto v = camera->GetPosition() + glm::vec3{ 0.0f, -0.7f, 3.0f };
 	//std::cout << v.x << ", " << v.y << ", " << v.z << std::endl;
+
+	surface = TTF_RenderText_Blended(font, std::to_string(camera->GetPosition().x).c_str(), color);
+	child->LoadTexture(surface);
+	surface = TTF_RenderText_Blended(font, std::to_string(camera->GetPosition().y).c_str(), color);
+	child2->LoadTexture(surface);
+	surface = TTF_RenderText_Blended(font, std::to_string(camera->GetPosition().z).c_str(), color);
+	m_root.LoadTexture(surface);
+
 	int xIndex = std::floorf(v.x / 5.f), zIndex = std::floorf(v.z / 5.f);
 	float dx = v.x / 5.f - xIndex;
 	float dz = v.z / 5.f - zIndex;

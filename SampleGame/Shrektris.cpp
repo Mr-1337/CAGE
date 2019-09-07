@@ -84,6 +84,7 @@ Shrektris::Shrektris(int argc, char** argv) :
 	currentPiece.x = 5;
 
 	glClearColor(0.3f, 0.5f, 0.2f, 0.0f);
+
 }
 
 void Shrektris::Run()
@@ -241,7 +242,7 @@ static float t = 0.f;
 
 void Shrektris::draw()
 {
-	t += 0.001f;
+	t += 0.003f;
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	//program->View->value = glm::lookAt(glm::vec3( 0.f, 2.f, 20.f ), { 0.f, 2.f, -1.f }, { 0.f, 1.f, 0.f }) * glm::rotate(glm::identity<glm::mat4>(), 6.28f * t, glm::vec3(0.f, 1.f, 0.f));

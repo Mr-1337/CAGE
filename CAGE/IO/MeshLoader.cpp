@@ -5,7 +5,7 @@
 namespace cage
 {
 
-	static std::vector<std::string> split(std::string& string, char delim)
+	static std::vector<std::string> split(const std::string& string, char delim)
 	{
 		std::stringstream stream(string);
 		std::string item;

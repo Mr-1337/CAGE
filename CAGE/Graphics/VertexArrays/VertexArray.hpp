@@ -1,5 +1,6 @@
 #pragma once
 #include "../Buffers/VertexBuffer.hpp"
+#include "../Vertex/Vertex.hpp"
 
 namespace cage
 {
@@ -18,7 +19,7 @@ namespace cage
 
 			Bind();
 
-			std::vector<VertexAttribute>& layout = GetLayout<VertexType>();
+			const std::vector<VertexAttribute> layout = GetLayout<VertexType>();
 			for (int i = 0; i < layout.size(); i++)
 			{
 				glVertexAttribPointer(i, layout[i].dimensions, (GLenum)layout[i].type, layout[i].normalized, sizeof(VertexType), (const void*)layout[i].offset);

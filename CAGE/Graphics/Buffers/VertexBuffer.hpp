@@ -20,7 +20,7 @@ namespace cage
 			glBindBuffer(GL_ARRAY_BUFFER, m_id);
 		}
 
-		inline void Fill(std::vector<VertexType>& data)
+		inline void Fill(const std::vector<VertexType>& data)
 		{
 			Bind();
 			m_size = data.size();

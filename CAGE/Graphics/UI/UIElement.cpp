@@ -42,6 +42,7 @@ namespace cage::ui
 		m_rotation = 0.f;
 		m_localTransform = glm::identity<glm::mat4>();
 		m_totalTransform = glm::identity<glm::mat4>();
+		m_mountOffset = { 0.f };
 
 		m_parent = nullptr;
 	}
@@ -91,9 +92,23 @@ namespace cage::ui
 		recalcTransform();
 	}
 
+	glm::vec2 UIElement::getMountOffset()
+	{
+		switch (m_mountPoint)
+		{
+		case MountPoint::CENTER:       return { 0.f, 0.f };
+		case MountPoint::TOP_LEFT:     return {  0.5f * m_size.x * m_scale.x,  0.5f * m_size.y * m_scale.y };
+		case MountPoint::TOP_RIGHT:	   return { -0.5f * m_size.x * m_scale.x,  0.5f * m_size.y * m_scale.y };
+		case MountPoint::BOTTOM_LEFT:  return {  0.5f * m_size.x * m_scale.x, -0.5f * m_size.y * m_scale.y };
+		case MountPoint::BOTTOM_RIGHT: return { -0.5f * m_size.x * m_scale.x, -0.5f * m_size.y * m_scale.y };
+		default:				       return { 0.f, 0.f };
+		}
+	}
+
 	void UIElement::recalcTransform()
 	{
-		m_localTransform = glm::scale(glm::rotate(glm::translate(glm::identity<glm::mat4>(), glm::vec3(m_position + 0.5f * m_size, 0.f)), m_rotation, { 0.f, 0.f, 1.f }), glm::vec3(m_scale, 1.0f));
+		m_mountOffset = getMountOffset();
+		m_localTransform = glm::scale(glm::rotate(glm::translate(glm::identity<glm::mat4>(), glm::vec3(m_position + m_mountOffset, 0.f)), m_rotation, { 0.f, 0.f, 1.f }), glm::vec3(m_scale, 1.0f));
 		if (m_parent == nullptr)
 		{
 			m_totalTransform = m_localTransform;
@@ -112,15 +127,16 @@ namespace cage::ui
 
 	void UIElement::Draw()
 	{
-		drawChildren();
 		if (m_texture)
 			m_texture->Bind();
 		sharedVAO->Bind();
+		recalcTransform();
 		shader->SpriteSize->value = m_size;
 		shader->SpriteSize->ForwardToShader();
 		shader->Model->value = m_totalTransform;
 		shader->Model->ForwardToShader();
 		glDrawArrays(GL_TRIANGLES, 0, 6);
+		drawChildren();
 	}
 
 }

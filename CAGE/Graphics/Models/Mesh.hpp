@@ -41,7 +41,7 @@ namespace cage
 			m_texture = new Texture(surface);
 		}
 
-		void SetGeometry(std::vector<VertexType>& geometry)
+		void SetGeometry(const std::vector<VertexType>& geometry)
 		{
 			m_vbo.Fill(geometry);
 		}

@@ -9,10 +9,9 @@ namespace cage
 	// A CAGE texture
 	class Texture
 	{
-		int m_width, m_height;
 		unsigned int m_id;
 		int m_textureUnit;
-		void* m_pixelData;
+		SDL_Surface* m_surface;
 
 		void uploadTexData(SDL_Surface* surface);
 		GLenum getGLPixelFormat(SDL_PixelFormat* sdlFormat);
@@ -21,7 +20,7 @@ namespace cage
 		// Contructs a texture from the given SDL_Surface. If the texture does not keep a local copy of the surface, it will be automatically freed upon construction
 		Texture(SDL_Surface* textureData, bool keepLocalCopy = false);
 
-		inline std::pair<int, int> GetSize() const { return { m_width, m_height }; }
+		inline std::pair<int, int> GetSize() const { return { m_surface->w, m_surface->h }; }
 
 		virtual ~Texture();
 		void Bind();

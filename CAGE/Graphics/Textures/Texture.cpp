@@ -1,15 +1,14 @@
 #include "Texture.hpp"
+#include <iostream>
 
 namespace cage
 {
 	Texture::Texture(SDL_Surface* textureData, bool keepLocalCopy) : 
-		m_width(textureData->w), 
-		m_height(textureData->h),
-		m_pixelData(textureData->pixels),
+		m_surface(textureData),
 		m_textureUnit(0)
 	{
 		glGenTextures(1, &m_id);
-
+		m_surface->refcount++;
 		Bind();
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -17,19 +16,16 @@ namespace cage
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-		uploadTexData(textureData);
+		uploadTexData(m_surface);
 
 		glGenerateMipmap(GL_TEXTURE_2D);
-
-		if (!keepLocalCopy)
-		{
-			SDL_FreeSurface(textureData);
-			m_pixelData = nullptr;
-		}
 	}
 
 	Texture::~Texture()
 	{
+		int count = --m_surface->refcount;
+		if (count == 1)
+			SDL_FreeSurface(m_surface);	
 		glDeleteTextures(1, &m_id);
 	}
 
@@ -41,7 +37,8 @@ namespace cage
 	void Texture::uploadTexData(SDL_Surface* surface)
 	{
 		auto glFormat = getGLPixelFormat(surface->format);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width, m_height, 0, glFormat, GL_UNSIGNED_BYTE, m_pixelData);
+		auto [w, h] = GetSize();
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, glFormat, GL_UNSIGNED_BYTE, m_surface->pixels);
 	}
 
 	GLenum Texture::getGLPixelFormat(SDL_PixelFormat* sdlFormat)
