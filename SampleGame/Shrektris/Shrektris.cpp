@@ -1,19 +1,35 @@
 #include "Shrektris.hpp"
 #include <Glad/glad/glad.h>
+#include <ctime>
+#include <chrono>
 
 Shrektris::Shrektris(int argc, char** argv) : 
 	Game("Shrektris", argc, argv),
 	m_running(true), 
 	vertexShader(cage::Shader::VERTEX), 
-	fragShader(cage::Shader::FRAGMENT)
+	fragShader(cage::Shader::FRAGMENT),
+	spriteVS(cage::Shader::VERTEX),
+	spriteFS(cage::Shader::FRAGMENT)
 {
 	auto size = m_window->GetSize();
 	glViewport(0, 0, size.first, size.second);
 
+	levelTime = 1.5f;
+	m_level = 1;
+	m_score = 0;
+	m_levelCounter = 0;
+
 	glEnable(GL_DEPTH_TEST);
-	//glDisable(GL_CULL_FACE);
+	
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	cage::Texture::MissingTexture = new cage::Texture(IMG_Load("Assets/missing.png"));
 
 	shrek.LoadModel("Assets/shrek.obj");
+	m_font = TTF_OpenFont("Assets/sans.ttf", 32);
+
+	std::srand(std::time(nullptr));
 
 	std::string vsString = R"REE(
 	#version 460 core
@@ -71,11 +87,28 @@ Shrektris::Shrektris(int argc, char** argv) :
 	program->Model->value = glm::scale(program->Model->value, { 1.f, 0.6f, 1.f });
 	program->Model->ForwardToShader();
 
+	spriteVS.CompileFromFile("Assets/sprite.ver");
+	spriteFS.CompileFromFile("Assets/sprite.frag");
+
+	spriteProgram = std::make_shared<cage::SpriteShader>(spriteVS, spriteFS);
+	spriteProgram->Use();
+
+	spriteProgram->Projection->value = glm::ortho(0.0f, (float)size.first, (float)size.second, 0.0f);
+	spriteProgram->Projection->ForwardToShader();
+	cage::ui::UIElement::shader = spriteProgram;
+
 	music = Mix_LoadWAV("Assets/shrek.ogg");
-	bigLayers = Mix_LoadWAV("Assets/biglayers.ogg");
+	
 	layers1 = Mix_LoadWAV("Assets/layers1.ogg");
 	layers2 = Mix_LoadWAV("Assets/layers2.ogg");
+	layers3 = Mix_LoadWAV("Assets/layers3.ogg");
+	bigLayers = Mix_LoadWAV("Assets/biglayers.ogg");
 	donkey = Mix_LoadWAV("Assets/donkey.ogg");
+
+	levels[0] = Mix_LoadWAV("Assets/level1.ogg");
+	levels[1] = Mix_LoadWAV("Assets/level2.ogg");
+	levels[2] = Mix_LoadWAV("Assets/level3.ogg");
+	levels[3] = Mix_LoadWAV("Assets/level4.ogg");
 
 	Mix_PlayChannel(2, music, -1);
 
@@ -85,15 +118,43 @@ Shrektris::Shrektris(int argc, char** argv) :
 
 	glClearColor(0.3f, 0.5f, 0.2f, 0.0f);
 
+	scoreText = std::make_shared<cage::ui::UIElement>();
+	levelText = std::make_shared<cage::ui::UIElement>();
+
+	m_rootNode.SetMounting(cage::ui::MountPoint::TOP_LEFT);
+	scoreText->SetMounting(cage::ui::MountPoint::TOP_LEFT);
+	levelText->SetMounting(cage::ui::MountPoint::TOP_LEFT);
+
+	scoreText->MoveTo({ 250.f, 0.f });
+	levelText->MoveTo({ 250.f, 50.f });
+
+	m_rootNode.Resize({ (float)size.first, (float)size.second });
+	//m_rootNode.LoadTexture(IMG_Load("Assets/simon.png"));
+
+	m_rootNode.Add(scoreText);
+	m_rootNode.Add(levelText);
+
+	scoreText->LoadTexture(TTF_RenderText_Blended(m_font, "Score: 0 ", fontColor));
+	levelText->LoadTexture(TTF_RenderText_Blended(m_font, "Level: 1", fontColor));
+
+
 }
+
+bool spin = false;
 
 void Shrektris::Run()
 {
 	SDL_Event e;
+	auto startTime = std::chrono::system_clock::now();
 	bool wireframe = false;
 	float t = 0;
+
+	std::chrono::time_point<std::chrono::high_resolution_clock> currTime;
+	std::chrono::duration<float> frameTime;
+
 	while (m_running)
 	{
+		currTime = std::chrono::high_resolution_clock::now();
 		while (SDL_PollEvent(&e))
 		{
 			if (e.type == SDL_QUIT)
@@ -112,6 +173,11 @@ void Shrektris::Run()
 					wireframe = !wireframe;
 					glPolygonMode(GL_FRONT_AND_BACK, wireframe ? GL_LINE : GL_FILL);
 				}
+				else if (e.key.keysym.scancode == SDL_SCANCODE_P && e.key.repeat == false)
+				{
+					spin = !spin;
+					position = glm::vec3(0, 2, 20), target = glm::vec3(0, 0, -1);
+				}
 				else if (e.key.keysym.scancode == SDL_SCANCODE_A)
 				{
 					movePieceLR(currentPiece, -1);
@@ -122,7 +188,8 @@ void Shrektris::Run()
 				}
 				else if (e.key.keysym.scancode == SDL_SCANCODE_S)
 				{
-					movePieceDown(currentPiece);
+					if (!movePieceDown(currentPiece))
+						t = levelTime;
 				}
 				else if (e.key.keysym.scancode == SDL_SCANCODE_E)
 				{
@@ -132,55 +199,84 @@ void Shrektris::Run()
 		}
 
 		auto keys = SDL_GetKeyboardState(nullptr);
-		const float speed = 0.1;
+		const float speed = 6;
+		glm::vec3 velocity{ 0.f, 0.f, 0.f };
 
-		if (keys[SDL_SCANCODE_J])
+		if (!spin)
 		{
-			position.x -= speed;
+			if (keys[SDL_SCANCODE_J])
+			{
+				velocity.x = -speed;
+			}
+
+			if (keys[SDL_SCANCODE_K])
+			{
+				velocity.z = speed;
+			}
+
+			if (keys[SDL_SCANCODE_L])
+			{
+				velocity.x = speed;
+			}
+
+			if (keys[SDL_SCANCODE_I])
+			{
+				velocity.z = -speed;
+			}
+
+			if (keys[SDL_SCANCODE_U])
+			{
+				velocity.y = speed;
+			}
+
+			if (keys[SDL_SCANCODE_O])
+			{
+				velocity.y = -speed;
+			}
+
+			position += velocity * frameTime.count();
 		}
 
-		if (keys[SDL_SCANCODE_K])
-		{
-			position.z += speed;
-		}
 
-		if (keys[SDL_SCANCODE_L])
-		{
-			position.x += speed;
-		}
 
-		if (keys[SDL_SCANCODE_I])
-		{
-			position.z -= speed;
-		}
-
-		if (keys[SDL_SCANCODE_U])
-		{
-			position.y += speed;
-		}
-
-		if (keys[SDL_SCANCODE_O])
-		{
-			position.y -= speed;
-		}
-
-		t += 1.f / 60.f;
+		t += frameTime.count();
 		logic(t);
-		draw();
+		draw(frameTime.count());
+
+		frameTime = std::chrono::high_resolution_clock::now() - currTime;
 	}
+
+	auto duration = std::chrono::system_clock::now() - startTime;
+	long long seconds = std::chrono::duration_cast<std::chrono::seconds>(duration).count();
+	int minutes = seconds / 60;
+	seconds = seconds % 60;
+	char z = '\a';
+	if (seconds < 10)
+		z = '0';
+	std::cout << "You survived for " << minutes << ":" << z << seconds % 60 << std::endl;
 }
 
 void Shrektris::logic(float& t)
 {
-	if (t >= 1.f)
+	if (t >= levelTime)
 	{
 		t = 0.f;
+		m_levelCounter++;
+		if (m_levelCounter > 60)
+		{
+			m_level++;
+			levelTime -= 0.1f;
+			m_levelCounter = 0;
+			Mix_PlayChannel(5, levels[rand() % 4], 0);
+			levelText->LoadTexture(TTF_RenderText_Blended(m_font, std::string("Level: ").append(std::to_string(m_level)).c_str(), fontColor));
+		}
 		std::cout << "MOVE" << std::endl;
 		if (!movePieceDown(currentPiece))
 		{
 			if (currentPiece.y == 0)
 			{
 				Mix_HaltChannel(2);
+				Mix_HaltChannel(5);
 				Mix_PlayChannel(4, donkey, 0);
 				SDL_Delay(7000);
 				m_running = false;
@@ -218,15 +314,28 @@ void Shrektris::logic(float& t)
 
 			if (breakTotal == 1)
 			{
+				m_score += 40 * m_level;
 				Mix_PlayChannel(3, layers1, 0);
 			}
-			else if (breakTotal == 2 || breakTotal == 3)
+			else if (breakTotal == 2)
 			{
+				m_score += 100 * m_level;
 				Mix_PlayChannel(3, layers2, 0);
+			}
+			else if (breakTotal == 3)
+			{
+				m_score += 300 * m_level;
+				Mix_PlayChannel(3, layers3, 0);
 			}
 			else if (breakTotal == 4)
 			{
+				m_score += 1200 * m_level;
 				Mix_PlayChannel(3, bigLayers, 0);
+			}
+
+			if (breakTotal > 0)
+			{
+				scoreText->LoadTexture(TTF_RenderText_Blended(m_font, std::string("Score: ").append(std::to_string(m_score)).c_str(), fontColor));
 			}
 
 			nextPiece.x = 5;
@@ -238,15 +347,19 @@ void Shrektris::logic(float& t)
 	}
 }
 
-static float t = 0.f;
+static float tot = 0.f;
 
-void Shrektris::draw()
+void Shrektris::draw(float t)
 {
-	t += 0.003f;
+	program->Use();
+	tot += 0.18 * t;
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
 
-	//program->View->value = glm::lookAt(glm::vec3( 0.f, 2.f, 20.f ), { 0.f, 2.f, -1.f }, { 0.f, 1.f, 0.f }) * glm::rotate(glm::identity<glm::mat4>(), 6.28f * t, glm::vec3(0.f, 1.f, 0.f));
-	program->View->value = glm::lookAt(position, position + target, { 0.f, 1.f, 0.f });
+	if (spin)
+		program->View->value = glm::lookAt(glm::vec3( 0.f, 2.f, 20.f ), { 0.f, 2.f, -1.f }, { 0.f, 1.f, 0.f }) * glm::rotate(glm::identity<glm::mat4>(), 6.28f * tot, glm::vec3(0.f, 1.f, 0.f));
+	else
+		program->View->value = glm::lookAt(position, position + target, { 0.f, 1.f, 0.f });
 	program->View->ForwardToShader();
 
 	for (int y = 0; y < 15; y++)
@@ -281,5 +394,8 @@ void Shrektris::draw()
 		}
 		shrek.Draw();
 	}
+	spriteProgram->Use();
+	glDisable(GL_DEPTH_TEST);
+	m_rootNode.Draw();
 	m_window->SwapBuffers();
 }

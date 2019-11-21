@@ -21,6 +21,7 @@ namespace cage
 		Generic3DShader& m_program;
 
 		bool m_thirdPerson = false;
+		bool m_ignoreYaw = false;
 	public:
 
 		float yaw = 0.f, pitch = 0.f;
@@ -34,12 +35,19 @@ namespace cage
 
 		Camera& MoveForward(float amount);
 		Camera& MoveLeftRight(float amount);
+
+		inline void IgnoreYaw(bool ignores) { m_ignoreYaw = ignores; }
 		
 		// Set the position in world space
 		inline Camera& SetPosition(const glm::vec3& position) { m_position = position; return *this; }
 		// Retreives the position in world space
-		inline glm::vec3 GetPosition() { return m_position; }
+		inline glm::vec3 GetPosition() const { return m_position; }
+		inline glm::vec3 GetRight() const { return right; }
 		Camera& SetOrientation(float yaw, float pitch, float roll);
+
+		void ApplyToShader(Generic3DShader& program);
+
+		inline glm::vec3 GetFront() const { return cameraFront; }
 
 		inline void ToggleMode() { m_thirdPerson = !m_thirdPerson; }
 

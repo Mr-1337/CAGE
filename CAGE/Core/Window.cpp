@@ -11,12 +11,18 @@ namespace cage
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 6);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-		m_rawHandle = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, m_width, m_height, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
+		m_rawHandle = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, m_width, m_height, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 		SDL_GLContext context = SDL_GL_CreateContext(m_rawHandle);
 		SDL_assert(context != NULL);
 		gladLoadGLLoader(SDL_GL_GetProcAddress);
 
-		SDL_GL_SetSwapInterval(1);
+		SDL_GL_SetSwapInterval(0);
+	}
+
+	Window::~Window()
+	{
+		SDL_DestroyWindow(m_rawHandle);
+		m_rawHandle = nullptr;
 	}
 
 	void Window::SetPosition(int x, int y)

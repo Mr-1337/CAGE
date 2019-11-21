@@ -46,7 +46,7 @@ namespace cage
 			return m_localData[i];
 		}
 
-		inline unsigned int GetSize() const { return m_size; }
+		inline size_t GetSize() const { return m_size; }
 
 		inline unsigned int GetID() const { return m_id; }
 
@@ -60,7 +60,7 @@ namespace cage
 		// Should we store the vertex data software side?
 		bool m_local;
 
-		unsigned int m_size;
+		size_t m_size;
 
 	};
 }

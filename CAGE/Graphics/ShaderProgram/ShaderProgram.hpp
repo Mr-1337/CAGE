@@ -10,6 +10,7 @@ namespace cage
 	public:
 
 		ShaderProgram(const Shader& vertexShader, const Shader& fragmentShader);
+		ShaderProgram(const Shader& vertexShader, const Shader& geometryShader, const Shader& fragmentShader);
 		virtual ~ShaderProgram();
 
 		// Make this the active ShaderProgram in the OpenGL context

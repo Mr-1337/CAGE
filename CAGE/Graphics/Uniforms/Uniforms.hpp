@@ -11,9 +11,15 @@ namespace cage::uniforms
 	{
 	public:
 
-		Uniform(unsigned int program, const std::string& name) : m_location(-1), m_program(program), m_name(name)
+		inline Uniform(unsigned int program, const std::string& name) : m_location(-1), m_program(program), m_name(name)
 		{
 			m_location = glGetUniformLocation(m_program, m_name.c_str());
+		}
+
+		inline Uniform<T>* operator=(T value)
+		{
+			this->value = value;
+			return this;
 		}
 
 		virtual void ForwardToShader() = 0;

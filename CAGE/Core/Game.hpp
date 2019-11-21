@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Window.hpp"
+#include "StateMachine.hpp"
 
 namespace cage
 {
@@ -15,6 +16,7 @@ namespace cage
 		virtual void Run() = 0;
 	protected:
 		Window* m_window;
+		StateMachine m_stateMachine;
 	private:
 		// Loads each SDL library, throws an exception if any fail
 		void initSDL();

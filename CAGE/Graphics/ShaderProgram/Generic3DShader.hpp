@@ -12,6 +12,7 @@ namespace cage
 		Generic3DShader(const Shader& verShader, const Shader& fragShader) :
 		ShaderProgram(verShader, fragShader)
 		{
+			std::cout << "Generic 3D Shader created" << std::endl;
 			Model = new uniforms::Mat4Uniform(GetID(), "u_model");
 			View = new uniforms::Mat4Uniform(GetID(), "u_view");
 			Projection = new uniforms::Mat4Uniform(GetID(), "u_projection");

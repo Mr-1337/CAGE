@@ -1,15 +1,20 @@
 #include <iostream>
 #include <thread>
-#include "Shrektris.hpp"
-#include "STR.hpp"
+#include "Shrektris/Shrektris.hpp"
+#include "STR/STR.hpp"
+#include "AFTR/AFTR.hpp"
+
+
+template<typename T>
+void PlayGame(int argc, char** argv)
+{
+	T game(argc, argv);
+	game.Run();
+}
 
 int main(int argc, char** argv)
 {
-
-	//Shrektris game(argc, argv);
-	STR game(argc, argv);
-	/**/
-	game.Run();
-
+	PlayGame<STR>(argc, argv);
+	std::cout << "It's not ogre, it's never ogre" << std::endl;
 	return 0;
 }

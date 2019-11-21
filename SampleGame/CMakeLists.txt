@@ -2,7 +2,46 @@
 
 cmake_minimum_required (VERSION 3.8)
 
-add_executable (SampleGame Main.cpp Shrektris.cpp Shrektris.hpp STR.cpp STR.hpp Perlin.cpp Perlin.hpp)
+set(SRC_FILES
+	"Main.cpp" 
+	"Shrektris/Shrektris.cpp" 
+	"Shrektris/Shrektris.hpp"
+	"STR/STR.cpp"
+	"STR/STR.hpp" 
+	"STR/Car.cpp" 
+	"STR/Car.hpp" 
+	"AFTR/AFTR.cpp" 
+	"AFTR/AFTR.hpp"
+	"AFTR/World.cpp"
+	"AFTR/World.hpp"
+	"AFTR/PartShader.hpp"
+	"AFTR/ComponentBase.hpp"
+	"AFTR/Cross.hpp"
+	"AFTR/Cross.cpp"
+	"AFTR/Pipe.hpp"
+	"AFTR/Pipe.cpp"
+	"AFTR/Well.hpp"
+	"AFTR/Well.cpp"
+	"AFTR/Network.hpp"
+	"AFTR/Network.cpp"
+	"STR/Perlin.cpp" 
+	"STR/Perlin.hpp"
+
+	"STR/Racers/Racer.hpp"
+	"STR/Racers/Racer.cpp"
+	"STR/Racers/Shrek.cpp"
+	"STR/Racers/Shrek.hpp"
+
+	"STR/GameStates/Sandbox.cpp"
+	"STR/GameStates/Sandbox.hpp"
+	"STR/GameStates/MainMenu.cpp"
+	"STR/GameStates/MainMenu.hpp"
+	"STR/GameStates/Lobby.cpp"
+	"STR/GameStates/Lobby.hpp"
+	"STR/MenuButton.hpp"
+)
+
+add_executable (SampleGame ${SRC_FILES})
 
 #install (DIRECTORY Assets/ DESTINATION ${CMAKE_BINARY_DIR}/Assets/)
 

@@ -17,7 +17,6 @@ namespace cage
 		std::string m_name;
 		VertexBuffer<VertexType> m_vbo;
 		VertexArray<VertexType> m_vao;
-
 		Texture* m_texture;
 	public:
 
@@ -52,18 +51,22 @@ namespace cage
 
 		inline void BindVAO() { m_vao.Bind(); }
 
-		void Draw()
+		void Draw(GLenum primitive = GL_TRIANGLES)
 		{
 			if (m_texture)
 				m_texture->Bind();
+			else
+				Texture::MissingTexture->Bind();
 			m_vao.Bind();
-			glDrawArrays(GL_TRIANGLES, 0, m_vbo.GetSize());
+			glDrawArrays(primitive, 0, m_vbo.GetSize());
 		}
 
 		void DrawIndexed(int count)
 		{
 			if (m_texture)
 				m_texture->Bind();
+			else
+				Texture::MissingTexture->Bind();
 			m_vao.Bind();
 			glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
 		}

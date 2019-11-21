@@ -113,7 +113,7 @@ namespace cage
 			std::string lineType;
 			temp >> lineType;
 
-			if (lineType == "#")
+			if (lineType == "#" || lineType == "mtllib" || lineType == "g")
 				continue;
 			else if (lineType == "v")
 			{
@@ -174,7 +174,9 @@ namespace cage
 					verticesOut.clear();
 				}
 				meshesOut.emplace_back(mtlName, true);
-				(meshesOut[meshCount]).LoadTexture(IMG_Load(fileName.c_str()));
+				SDL_Surface* surface = IMG_Load(fileName.c_str());
+				if (surface != nullptr)
+					(meshesOut[meshCount]).LoadTexture(surface);
 				meshCount++;
 			}
 		}

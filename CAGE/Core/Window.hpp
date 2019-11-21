@@ -10,6 +10,7 @@ namespace cage
 	{
 	public:
 		Window(const char* title, int w, int h);
+		~Window();
 		void SetPosition(int x, int y);
 		std::pair<int, int> GetPosition() const;
 		std::pair<int, int> GetSize() const;

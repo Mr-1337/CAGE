@@ -9,7 +9,7 @@ namespace cage::ui
 	// shared geometry for all UIElement instances
 
 	bool UIElement::init = false;
-	SpriteShader* UIElement::shader = nullptr;
+	std::shared_ptr<SpriteShader> UIElement::shader = nullptr;
 
 	VertexBuffer<Vertex2>* sharedVBO;
 	VertexArray<Vertex2>* sharedVAO;
@@ -32,7 +32,12 @@ namespace cage::ui
 		UIElement::init = true;
 	}
 
-	UIElement::UIElement()
+	UIElement::UIElement() : UIElement(true)
+	{
+
+	}
+
+	UIElement::UIElement(bool textured) : m_textured(textured)
 	{
 		if (!UIElement::init)
 			UIElement::initSharedData();
@@ -43,14 +48,15 @@ namespace cage::ui
 		m_localTransform = glm::identity<glm::mat4>();
 		m_totalTransform = glm::identity<glm::mat4>();
 		m_mountOffset = { 0.f };
+		m_pivot = { 0.f };
 
 		m_parent = nullptr;
 	}
 
 	void UIElement::LoadTexture(SDL_Surface* surface)
 	{
-		m_texture = std::make_unique<Texture>(surface, true);
-		auto size = m_texture->GetSize();
+		m_currentTexture = std::make_shared<Texture>(surface, true);
+		auto size = m_currentTexture->GetSize();
 		m_size = glm::vec2((float)size.first, (float)size.second);
 	}
 
@@ -76,7 +82,8 @@ namespace cage::ui
 
 	void UIElement::Resize(glm::vec2 size)
 	{
-		m_scale = size;
+		//m_scale = size;
+		m_size = size;
 		recalcTransform();
 	}
 
@@ -105,10 +112,16 @@ namespace cage::ui
 		}
 	}
 
+	void UIElement::onTransform()
+	{
+
+	}
+
 	void UIElement::recalcTransform()
 	{
+		onTransform();
 		m_mountOffset = getMountOffset();
-		m_localTransform = glm::scale(glm::rotate(glm::translate(glm::identity<glm::mat4>(), glm::vec3(m_position + m_mountOffset, 0.f)), m_rotation, { 0.f, 0.f, 1.f }), glm::vec3(m_scale, 1.0f));
+		m_localTransform = glm::scale(glm::translate(glm::rotate(glm::translate(glm::identity<glm::mat4>(), glm::vec3(m_position + m_mountOffset, 0.f)), m_rotation, { 0.f, 0.f, 1.f }), { -m_pivot, 0.f }), glm::vec3(m_scale, 1.0f));
 		if (m_parent == nullptr)
 		{
 			m_totalTransform = m_localTransform;
@@ -119,23 +132,36 @@ namespace cage::ui
 		}
 	}
 
-	void UIElement::Add(Child& child)
+	void UIElement::Add(Child child)
 	{
 		child->SetParent(this);
 		m_children.emplace_back(child);
 	}
 
+	std::vector<UIElement::Child>& UIElement::GetChildren()
+	{
+		return m_children;
+	}
+
 	void UIElement::Draw()
 	{
-		if (m_texture)
-			m_texture->Bind();
-		sharedVAO->Bind();
-		recalcTransform();
-		shader->SpriteSize->value = m_size;
-		shader->SpriteSize->ForwardToShader();
-		shader->Model->value = m_totalTransform;
-		shader->Model->ForwardToShader();
-		glDrawArrays(GL_TRIANGLES, 0, 6);
+		if (m_parent != nullptr)
+		{
+			if (m_currentTexture)
+				m_currentTexture->Bind();
+			else
+				Texture::MissingTexture->Bind();
+			sharedVAO->Bind();
+			recalcTransform();
+			if (m_textured)
+			{
+				shader->SpriteSize->value = m_size;
+				shader->SpriteSize->ForwardToShader();
+				shader->Model->value = m_totalTransform;
+				shader->Model->ForwardToShader();
+				glDrawArrays(GL_TRIANGLES, 0, 6);
+			}
+		}
 		drawChildren();
 	}
 

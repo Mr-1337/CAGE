@@ -14,7 +14,7 @@ namespace cage
 
 		if (!inputFile.is_open())
 		{
-			throw std::exception("Unable to find specified shader file!");
+			throw std::runtime_error("Unable to find specified shader file!");
 		}
 
 		std::stringstream lines;
@@ -51,6 +51,7 @@ namespace cage
 			glGetShaderInfoLog(m_id, maxLength, &maxLength, log);
 
 			std::cout << "Failed to compile shader! Error: " << log << std::endl;
+			delete[] log;
 		}
 	}
 
