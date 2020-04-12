@@ -5,10 +5,9 @@
 #include <memory>
 #include <GLM/glm/glm.hpp>
 
+#include "../../IO/Events/EventListener.hpp"
 #include "../ShaderProgram/SpriteShader.hpp"
 #include "../Textures/Texture.hpp"
-#include "../../IO/Events/EventListener.hpp"
-#include "../../IO/Events/MouseMotionEvent.hpp"
 
 namespace cage
 {
@@ -28,7 +27,7 @@ namespace cage
 		 * A CAGE UIElement is the base of all elements in the UI Scene Graph
 		 * They can either be directly visible or simply represent aggregates of children UIElements
 		 */
-		class UIElement
+		class UIElement : public cage::EventListener
 		{
 
 			MountPoint m_mountPoint = MountPoint::CENTER;
@@ -59,6 +58,11 @@ namespace cage
 				m_currentTexture = texture;
 				m_size.x = texture->GetSize().first;
 				m_size.y = texture->GetSize().second;
+			}
+
+			inline bool HandleEvent(Event& e)
+			{
+				return false;
 			}
 
 			virtual void Update(float deltaTime);

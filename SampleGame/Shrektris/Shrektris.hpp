@@ -54,6 +54,7 @@ private:
 		return squares;
 	};
 
+	// determines if the tetromino is colliding with occupied cells, returns false on collisions
 	auto checkCollision(Tetromino & t, const std::vector<int> & squares)
 	{
 		for (int i = 0; i < 4; i++)
@@ -167,9 +168,10 @@ private:
 	void logic(float& t);
 
 	float levelTime;
+	float totalTime;
 
 	glm::vec3 position = glm::vec3(0, 2, 20), target = glm::vec3(0, 0, -1);
-	Tetromino currentPiece, nextPiece;
+	Tetromino currentPiece, nextPiece, visualizer;
 	Mix_Chunk *music, *layers1, *layers2, *layers3, *bigLayers, *donkey;
 	Mix_Chunk* levels[4];
 	SDL_Surface* scoreSurface, * levelSurface;
@@ -178,7 +180,7 @@ private:
 	TTF_Font* m_font;
 	unsigned int m_score, m_level, m_levelCounter;
 	SDL_Color fontColor = { 12, 160, 18, 255 };
-	cage::Model shrek; 
+	cage::Model shrek, thanos; 
 	cage::Shader vertexShader, fragShader, spriteVS, spriteFS;
 	std::unique_ptr<cage::Generic3DShader> program;
 	std::shared_ptr<cage::SpriteShader> spriteProgram;

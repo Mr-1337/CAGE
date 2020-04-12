@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../IO/InputManager.hpp"
+
 namespace cage
 {
 	class StateMachine;
@@ -15,6 +17,8 @@ namespace cage
 		static StateMachine* s_stateMachine;
 
 	protected:
+		InputManager m_input;
 		bool m_quit = false;
+
 	};
 }

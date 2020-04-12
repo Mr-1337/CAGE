@@ -100,6 +100,7 @@ void Lobby::ProcessEvents()
 		case SDL_QUIT:
 			m_quit = true;
 			break;
+		/*
 		case SDL_MOUSEMOTION:
 			cage::MouseMotionEvent::RaiseEvent({ e.motion.x, e.motion.y, e.motion.xrel, e.motion.yrel });
 			m_camera->yaw += (float)e.motion.xrel / 10;
@@ -111,6 +112,7 @@ void Lobby::ProcessEvents()
 		case SDL_MOUSEBUTTONUP:
 			cage::MouseClickEvent::RaiseEvent({ e.button.x, e.button.y, (cage::MouseClickEvent::MouseButton)e.button.button, true });
 			break;
+			*/
 		case SDL_WINDOWEVENT:
 			switch (e.window.event)
 			{

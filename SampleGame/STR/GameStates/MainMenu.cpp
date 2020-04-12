@@ -23,8 +23,6 @@ MainMenu::MainMenu(std::pair<int, int> size)
 
 	//MenuButton::s_font = TTF_OpenFont("Assets/sans.ttf", 36);
 
-	using Ref = std::shared_ptr<cage::ui::UIElement>;
-
 	Ref button1 = std::make_shared<MenuButton>("Play");
 	Ref button2 = std::make_shared<MenuButton>("Multiplayer");
 	Ref button3 = std::make_shared<MenuButton>("Quit");
@@ -37,9 +35,9 @@ MainMenu::MainMenu(std::pair<int, int> size)
 	button2->MoveTo({ 200.f, 300.f });
 	button3->MoveTo({ 200.f, 600.f });
 
-	m_root.Add(button1);
-	m_root.Add(button2);
-	m_root.Add(button3);
+	Add(button1);
+	Add(button2);
+	Add(button3);
 
 	std::static_pointer_cast<MenuButton>(button1)->OnClick = [&, size]() { s_stateMachine->Push(new Sandbox(size)); };
 	std::static_pointer_cast<MenuButton>(button2)->OnClick = [&, size]() { s_stateMachine->Push(new Lobby(size)); };
@@ -55,15 +53,6 @@ void MainMenu::ProcessEvents()
 		case SDL_QUIT:
 			m_quit = true;
 			break;
-		case SDL_MOUSEMOTION:
-			cage::MouseMotionEvent::RaiseEvent({ e.motion.x, e.motion.y, e.motion.xrel, e.motion.yrel });
-			break;
-		case SDL_MOUSEBUTTONDOWN:
-			cage::MouseClickEvent::RaiseEvent({ e.button.x, e.button.y, (cage::MouseClickEvent::MouseButton)e.button.button, false });
-			break;
-		case SDL_MOUSEBUTTONUP:
-			cage::MouseClickEvent::RaiseEvent({ e.button.x, e.button.y, (cage::MouseClickEvent::MouseButton)e.button.button, true });
-			break;
 		case SDL_WINDOWEVENT:
 			switch (e.window.event)
 			{
@@ -75,13 +64,28 @@ void MainMenu::ProcessEvents()
 				break;
 			}
 			break;
+		default:
+			m_input.Raise(e);
 		}
 	}
 }
 
+void MainMenu::Add(Ref thingy)
+{
+	m_root.Add(thingy);
+
+	cage::EventListener* l = dynamic_cast<cage::EventListener*>(thingy.get());
+
+	m_input.Subscribe(l);
+}
+
+static float r = 0;
+
 void MainMenu::Update(float delta)
 {
-
+	r += 0.0001;
+	m_root.MoveTo({ 300.0 * sin(r), 300 * cos(r) });
+	//m_root.Rotate(0.001);
 }
 
 void MainMenu::Draw()

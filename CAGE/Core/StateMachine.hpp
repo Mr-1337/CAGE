@@ -5,6 +5,7 @@
 
 namespace cage
 {
+	// The CAGE Finite State Machine
 	class StateMachine
 	{
 	public:

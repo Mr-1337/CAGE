@@ -13,7 +13,7 @@ Sandbox::Sandbox(std::pair<int, int> size) :
 	glClearColor(0.f, 0.f, 0.f, 1.f);
 	shrek.LoadModel("Assets/shrek.obj");
 	thanos.LoadModel("Assets/thanos.obj");
-	vader.LoadModel("Assets/vader.obj");
+	//vader.LoadModel("Assets/vader.obj");
 
 	//SDL_assert(controller != nullptr);
 
@@ -125,10 +125,10 @@ Sandbox::Sandbox(std::pair<int, int> size) :
 	//Ref checkgroup = std::make_shared<cage::ui::CheckBoxGroup>();
 	std::static_pointer_cast<cage::ui::Button>(button)->OnClick = [&]() { cage::Texture::MissingTexture = new cage::Texture(IMG_Load("Assets/simon.png")); };
 
-	s1.MoveTo(glm::vec3{ 120.0f, 19.f, 150.0f }).Play(Mix_LoadWAV("Assets/shrek.ogg"));
-	s2.MoveTo({ 200.f, 12.f, 200.f }).Play(Mix_LoadWAV("Assets/shrek2.ogg"));
-	s3.MoveTo({ 50.0f, 15.f, 50.f }).Play(Mix_LoadWAV("Assets/shrek1.ogg"));
-	s4.MoveTo({ 80.0f, 15.f, 120.0f }).Play(Mix_LoadWAV("Assets/vader.ogg"));
+	//s1.MoveTo(glm::vec3{ 120.0f, 19.f, 150.0f }).Play(Mix_LoadWAV("Assets/shrek.ogg"));
+	//s2.MoveTo({ 200.f, 12.f, 200.f }).Play(Mix_LoadWAV("Assets/shrek2.ogg"));
+	//s3.MoveTo({ 50.0f, 15.f, 50.f }).Play(Mix_LoadWAV("Assets/shrek1.ogg"));
+	//s4.MoveTo({ 80.0f, 15.f, 120.0f }).Play(Mix_LoadWAV("Assets/vader.ogg"));
 }
 
 void Sandbox::ProcessEvents()
@@ -136,6 +136,13 @@ void Sandbox::ProcessEvents()
 	SDL_Event e;
 	while (SDL_PollEvent(&e))
 	{
+		if (e.type == SDL_QUIT)
+		{
+			m_quit = true;
+		}
+
+		m_input.Raise(e);
+
 		switch (e.type)
 		{
 		case SDL_QUIT:
@@ -147,29 +154,17 @@ void Sandbox::ProcessEvents()
 				if (e.key.keysym.sym == SDLK_f)
 				{
 					SDL_SetRelativeMouseMode((SDL_bool)!SDL_GetRelativeMouseMode());
-					cage::MouseMotionEvent::RaiseEvent({ 500, 500, 0, 0 });
 				}
 				else if (e.key.keysym.sym == SDLK_u)
 					camera->ToggleMode();
 			}
 			break;
 		case SDL_MOUSEMOTION:
-			if (!SDL_GetRelativeMouseMode())
-				cage::MouseMotionEvent::RaiseEvent({ e.motion.x, e.motion.y, e.motion.xrel, e.motion.yrel });
-			else
 			{
 				camera->yaw += (float)e.motion.xrel / 10;
 				camera->pitch -= (float)e.motion.yrel / 10;
 				car.heading += glm::vec2{ e.motion.xrel, e.motion.yrel };
 			}
-			break;
-		case SDL_MOUSEBUTTONDOWN:
-			if (!SDL_GetRelativeMouseMode())
-				cage::MouseClickEvent::RaiseEvent({ e.button.x, e.button.y, (cage::MouseClickEvent::MouseButton)e.button.button, false });
-			break;
-		case SDL_MOUSEBUTTONUP:
-			if (!SDL_GetRelativeMouseMode())
-				cage::MouseClickEvent::RaiseEvent({ e.button.x, e.button.y, (cage::MouseClickEvent::MouseButton)e.button.button, true });
 			break;
 		case SDL_WINDOWEVENT:
 			if (e.window.event == SDL_WINDOWEVENT_RESIZED)
@@ -191,6 +186,7 @@ void Sandbox::ProcessEvents()
 			}
 			break;
 		}
+
 	}
 }
 
@@ -285,9 +281,9 @@ void Sandbox::Draw()
 	program->Model->value = glm::translate(glm::identity<glm::mat4>(), glm::vec3{ 120.0f, 19.f, 150.0f });
 	program->Model->ForwardToShader();
 	shrek.Draw();
-	program->Model->value = glm::translate(glm::identity<glm::mat4>(), glm::vec3{ 80.0f, 15.f, 120.0f });
-	program->Model->ForwardToShader();
-	vader.Draw();
+	//program->Model->value = glm::translate(glm::identity<glm::mat4>(), glm::vec3{ 80.0f, 15.f, 120.0f });
+	//program->Model->ForwardToShader();
+	//vader.Draw();
 	program->Model->value = glm::translate(glm::identity<glm::mat4>(), { 50.0f, 15.f, 50.f });
 	program->Model->ForwardToShader();
 	car.Draw();

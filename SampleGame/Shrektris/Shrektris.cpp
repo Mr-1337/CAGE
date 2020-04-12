@@ -14,10 +14,11 @@ Shrektris::Shrektris(int argc, char** argv) :
 	auto size = m_window->GetSize();
 	glViewport(0, 0, size.first, size.second);
 
-	levelTime = 1.5f;
 	m_level = 1;
 	m_score = 0;
 	m_levelCounter = 0;
+	levelTime = 1.5f - (m_level - 1) * 0.1f;
+	totalTime = 0;
 
 	glEnable(GL_DEPTH_TEST);
 	
@@ -27,6 +28,7 @@ Shrektris::Shrektris(int argc, char** argv) :
 	cage::Texture::MissingTexture = new cage::Texture(IMG_Load("Assets/missing.png"));
 
 	shrek.LoadModel("Assets/shrek.obj");
+	thanos.LoadModel("Assets/thanos.obj");
 	m_font = TTF_OpenFont("Assets/sans.ttf", 32);
 
 	std::srand(std::time(nullptr));
@@ -97,7 +99,9 @@ Shrektris::Shrektris(int argc, char** argv) :
 	spriteProgram->Projection->ForwardToShader();
 	cage::ui::UIElement::shader = spriteProgram;
 
-	music = Mix_LoadWAV("Assets/shrek.ogg");
+	music = Mix_LoadWAV("Assets/music.mp3");
+
+	Mix_VolumeChunk(music, 10);
 	
 	layers1 = Mix_LoadWAV("Assets/layers1.ogg");
 	layers2 = Mix_LoadWAV("Assets/layers2.ogg");
@@ -146,11 +150,12 @@ void Shrektris::Run()
 {
 	SDL_Event e;
 	auto startTime = std::chrono::system_clock::now();
+	
 	bool wireframe = false;
 	float t = 0;
 
 	std::chrono::time_point<std::chrono::high_resolution_clock> currTime;
-	std::chrono::duration<float> frameTime;
+	std::chrono::duration<float> frameTime(1.0f/60.0f);
 
 	while (m_running)
 	{
@@ -196,6 +201,7 @@ void Shrektris::Run()
 					rotate(currentPiece);
 				}
 			}
+
 		}
 
 		auto keys = SDL_GetKeyboardState(nullptr);
@@ -237,27 +243,38 @@ void Shrektris::Run()
 			position += velocity * frameTime.count();
 		}
 
+		float ft = frameTime.count();
 
-
-		t += frameTime.count();
+		t += ft;
+		totalTime += ft;
 		logic(t);
-		draw(frameTime.count());
-
+		draw(ft);
 		frameTime = std::chrono::high_resolution_clock::now() - currTime;
+
 	}
 
 	auto duration = std::chrono::system_clock::now() - startTime;
 	long long seconds = std::chrono::duration_cast<std::chrono::seconds>(duration).count();
 	int minutes = seconds / 60;
 	seconds = seconds % 60;
-	char z = '\a';
+	std::string z = ":";
 	if (seconds < 10)
-		z = '0';
-	std::cout << "You survived for " << minutes << ":" << z << seconds % 60 << std::endl;
+		z = ":0";
+	std::cout << "You survived for " << minutes << z << seconds % 60 << std::endl;
 }
 
 void Shrektris::logic(float& t)
 {
+	visualizer = currentPiece;
+	visualizer.y += 4;
+
+	while (checkCollision(visualizer, getSquares(visualizer)))
+	{
+		visualizer.y++;
+	}
+
+	visualizer.y--;
+
 	if (t >= levelTime)
 	{
 		t = 0.f;
@@ -273,7 +290,7 @@ void Shrektris::logic(float& t)
 		std::cout << "MOVE" << std::endl;
 		if (!movePieceDown(currentPiece))
 		{
-			if (currentPiece.y == 0)
+			if (currentPiece.y == 0) // You lost :(
 			{
 				Mix_HaltChannel(2);
 				Mix_HaltChannel(5);
@@ -299,13 +316,12 @@ void Shrektris::logic(float& t)
 				}
 				if (yesCount == 10)
 				{
-					for (int k = 0; k < 10; k++)
-						board[i][k] = 0;
-					int* temp = new int[i * 10];
-					memcpy(temp, board, (i * 10 * sizeof(int)));
-					memset(board, 0, (i * 10 * sizeof(int)));
-					memcpy(&board[1][0], temp, i * 10 * sizeof(int));
-					delete[] temp;
+					// we cleared the row
+
+					// copy the board into itself but 1 row lower
+					memcpy(&board[1][0], board, (i * 10 * sizeof(int)));
+					// zero the now empty top
+					memset(board, 0, (10 * sizeof(int)));
 					i++;
 					breakTotal++;
 				}
@@ -347,21 +363,25 @@ void Shrektris::logic(float& t)
 	}
 }
 
-static float tot = 0.f;
+
 
 void Shrektris::draw(float t)
 {
+	//totalTime += t;
+
+	std::cout << totalTime << std::endl;
+
 	program->Use();
-	tot += 0.18 * t;
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 
 	if (spin)
-		program->View->value = glm::lookAt(glm::vec3( 0.f, 2.f, 20.f ), { 0.f, 2.f, -1.f }, { 0.f, 1.f, 0.f }) * glm::rotate(glm::identity<glm::mat4>(), 6.28f * tot, glm::vec3(0.f, 1.f, 0.f));
+		program->View->value = glm::lookAt(glm::vec3(0.f, 2.f, 20.f), { 0.f, 2.f, -1.f }, { 0.f, 1.f, 0.f }) * glm::rotate(glm::identity<glm::mat4>(), 6.28f * totalTime, glm::vec3(0.f, 1.f, 0.f));
 	else
 		program->View->value = glm::lookAt(position, position + target, { 0.f, 1.f, 0.f });
 	program->View->ForwardToShader();
 
+	// draw the main game board
 	for (int y = 0; y < 15; y++)
 	{
 		for (int x = 0; x < 10; x++)
@@ -375,12 +395,14 @@ void Shrektris::draw(float t)
 		}
 	}
 
+	// draw the next piece
 	std::array<int, 16> box;
+
+	auto squares = getSquares(nextPiece);
 
 	for (int i = 0; i < 16; i++)
 	{
 		box[i] = 0;
-		auto squares = getSquares(nextPiece);
 
 		for (int j = 0; j < 4; j++)
 		{
@@ -394,6 +416,30 @@ void Shrektris::draw(float t)
 		}
 		shrek.Draw();
 	}
+
+	// draw the visualizer
+
+	squares = getSquares(visualizer);
+
+	for (int i = 0; i < 16; i++)
+	{
+		box[i] = 0;
+
+		for (int j = 0; j < 4; j++)
+		{
+			box[squares[j]] = 1;
+		}
+
+		if (box[i] != 0)
+		{
+			int x = visualizer.x + (i % 4);
+			int y = visualizer.y + (i / 4);
+			program->Model->value = glm::translate(glm::identity<glm::mat4>(), { x - 5, -(y - 10), 0.f });
+			program->Model->ForwardToShader();
+			thanos.Draw();
+		}
+	}
+
 	spriteProgram->Use();
 	glDisable(GL_DEPTH_TEST);
 	m_rootNode.Draw();

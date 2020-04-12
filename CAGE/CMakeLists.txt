@@ -59,6 +59,10 @@ set(SRC_FILES
 	"IO/Events/EventListener.hpp"
 	"IO/Events/MouseMotionEvent.hpp"
 	"IO/Events/ClickEvents.hpp"
+	"IO/Events/KeyEvents.hpp"
+	"IO/Events/EventDispatcher.hpp"
+	"IO/InputManager.hpp"
+	"IO/InputManager.cpp"
 )
 
 # Add source to this project's library.

@@ -14,7 +14,7 @@ void PlayGame(int argc, char** argv)
 
 int main(int argc, char** argv)
 {
-	PlayGame<STR>(argc, argv);
+	PlayGame<Shrektris>(argc, argv);
 	std::cout << "It's not ogre, it's never ogre" << std::endl;
 	return 0;
 }

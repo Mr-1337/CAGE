@@ -2,11 +2,13 @@
 
 #include "UIElement.hpp"
 
+#include "../../IO/Events/EventListener.hpp"
+
 namespace cage
 {
 	namespace ui
 	{
-		class Hoverable : public UIElement, EventListener<MouseMotionEvent>
+		class Hoverable : public UIElement
 		{
 		public:
 			Hoverable(std::optional<std::shared_ptr<Texture>> idleTexture, std::optional<std::shared_ptr<Texture>> hoverTexture) :
@@ -17,19 +19,23 @@ namespace cage
 				m_hovering = false;
 				SetActiveTexture(idleTexture.value());
 			}
-			inline bool HandleEvent(MouseMotionEvent e) override
+
+			virtual inline bool HandleEvent(Event& e)
 			{
-				m_lastX = e.x;
-				m_lastY = e.y;
-				if (inBounds(e.x, e.y))
+				if (auto mm = std::get_if<MouseMotionEvent>(&e))
 				{
-					onHover();
-					m_hovering = true;
-					return true;
+					m_lastX = mm->x;
+					m_lastY = mm->y;
+					if (inBounds(mm->x, mm->y))
+					{
+						onHover();
+						m_hovering = true;
+						return true;
+					}
+					onUnHover();
+					m_hovering = false;
+					return false;
 				}
-				onUnHover();
-				m_hovering = false;
-				return false;
 			}
 
 		protected:
@@ -63,7 +69,7 @@ namespace cage
 
 			void onTransform() override
 			{
-				HandleEvent({ m_lastX, m_lastY, 0, 0 });
+				//HandleEvent({ m_lastX, m_lastY, 0, 0 });
 			}
 
 		};

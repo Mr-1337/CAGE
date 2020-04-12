@@ -4,13 +4,12 @@
 #include <optional>
 
 #include "Hoverable.hpp"
-#include "../../IO/Events/ClickEvents.hpp"
 
 namespace cage
 {
 	namespace ui
 	{
-		class Button : public Hoverable, EventListener<MouseClickEvent>
+		class Button : public Hoverable
 		{
 		public:
 			Button(std::optional<std::shared_ptr<Texture>> idleTexture, std::optional<std::shared_ptr<Texture>> hoverTexture, std::optional<std::shared_ptr<Texture>> clickTexture)
@@ -21,13 +20,19 @@ namespace cage
 
 			std::function<void(void)> OnClick;
 
-			bool HandleEvent(MouseClickEvent e) override
+			
+			bool HandleEvent(Event& e) override
 			{
-				if (e.wasRelease)
-					return onRelease();
-				else
-					return onClick();
+				Hoverable::HandleEvent(e);
+				if (auto ce = std::get_if<MouseClickEvent>(&e))
+				{
+					if (ce->wasRelease)
+						return onRelease();
+					else
+						return onClick();
+				}
 			}
+			
 
 		protected:
 

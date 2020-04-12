@@ -1,10 +1,8 @@
 #pragma once
 
-#include "Event.hpp"
-
 namespace cage
 {
-	class MouseClickEvent : public Event<MouseClickEvent>
+	class MouseClickEvent
 	{
 	public:
 
@@ -29,5 +27,6 @@ namespace cage
 		{
 
 		}
+
 	};
 }

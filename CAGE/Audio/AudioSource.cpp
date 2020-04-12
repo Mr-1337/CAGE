@@ -4,7 +4,7 @@
 namespace cage
 {
 
-	AudioSource::AudioSource() : m_channel(-1)
+	AudioSource::AudioSource() : m_channel(-1), m_position {0, 0, 0}
 	{
 
 	}
@@ -18,7 +18,7 @@ namespace cage
 		lFront.y = 0;
 		lFront = glm::normalize(lFront);
 
-		distance = (uint8_t) glm::min(glm::distance(lPos, m_position) * 5, 250.f);
+		distance = (uint8_t) glm::min(glm::distance(lPos, m_position) * 5.f, 250.f);
 
 		float dot = (glm::dot(lFront, m_position - lPos));
 		float dot2 = glm::dot(lRight, m_position - lPos);
@@ -32,7 +32,8 @@ namespace cage
 		if (m_channel == 1)
 			std::cout << angle << '\n';
 
-		Mix_SetPosition(m_channel, angle, distance);
+		Mix_Volume(m_channel, distance);
+		//std::cout << Mix_GetError() << '\n';
 	}
 
 	void AudioSource::Play(Mix_Chunk* audio)

@@ -16,6 +16,8 @@ namespace cage
 		virtual void Run() = 0;
 	protected:
 		Window* m_window;
+
+		// A finite state machine, facilitates switching between potentially vastly different application states
 		StateMachine m_stateMachine;
 	private:
 		// Loads each SDL library, throws an exception if any fail

@@ -8,6 +8,8 @@
 
 #include "../MenuButton.hpp"
 
+using Ref = std::shared_ptr<cage::ui::UIElement>;
+
 class MainMenu : public cage::GameState
 {
 public:
@@ -17,6 +19,7 @@ public:
 	void ProcessEvents() override;
 	void Update(float delta) override;
 	void Draw() override;
+	void Add(Ref thingy);
 
 private:
 	cage::ui::UIElement m_root;
