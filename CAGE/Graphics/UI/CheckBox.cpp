@@ -38,11 +38,16 @@ namespace cage
 
 		}
 
+		bool CheckBox::CheckBoxButton::onRelease()
+		{
+			return false;
+		}
+
 		CheckBox::CheckBox(const std::string& label, TTF_Font* font)
 			: UIElement(false), m_label(label), m_font(font)
 		{
-			std::shared_ptr<UIElement> t = std::make_shared<Text>(font);
-			std::static_pointer_cast<Text>(t)->SetText(label);
+			auto t = std::make_shared<Text>(font);
+			t->SetText(label);
 			Add(t);
 			t->SetMounting(MountPoint::TOP_LEFT);
 			m_button = std::make_shared<CheckBoxButton>();
@@ -54,9 +59,14 @@ namespace cage
 			Resize({ w, h });
 		}
 
+		bool CheckBox::HandleEvent(Event& e)
+		{
+			return m_button->HandleEvent(e);
+		}
+
 		bool CheckBox::Checked()
 		{
-			return std::static_pointer_cast<CheckBoxButton>(m_button)->m_selected;
+			return m_button->m_selected;
 		}
 	}
 }

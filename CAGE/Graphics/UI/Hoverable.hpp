@@ -69,7 +69,8 @@ namespace cage
 
 			void onTransform() override
 			{
-				//HandleEvent({ m_lastX, m_lastY, 0, 0 });
+				Event e = MouseMotionEvent(m_lastX, m_lastY, 0, 0);
+				HandleEvent(e);
 			}
 
 		};

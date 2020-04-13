@@ -141,7 +141,6 @@ Shrektris::Shrektris(int argc, char** argv) :
 	scoreText->LoadTexture(TTF_RenderText_Blended(m_font, "Score: 0 ", fontColor));
 	levelText->LoadTexture(TTF_RenderText_Blended(m_font, "Level: 1", fontColor));
 
-
 }
 
 bool spin = false;
@@ -155,7 +154,7 @@ void Shrektris::Run()
 	float t = 0;
 
 	std::chrono::time_point<std::chrono::high_resolution_clock> currTime;
-	std::chrono::duration<float> frameTime(1.0f/60.0f);
+	std::chrono::duration<float> frameTime(1.0/60.0);
 
 	while (m_running)
 	{
@@ -367,16 +366,13 @@ void Shrektris::logic(float& t)
 
 void Shrektris::draw(float t)
 {
-	//totalTime += t;
-
-	std::cout << totalTime << std::endl;
 
 	program->Use();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
 
 	if (spin)
-		program->View->value = glm::lookAt(glm::vec3(0.f, 2.f, 20.f), { 0.f, 2.f, -1.f }, { 0.f, 1.f, 0.f }) * glm::rotate(glm::identity<glm::mat4>(), 6.28f * totalTime, glm::vec3(0.f, 1.f, 0.f));
+		program->View->value = glm::lookAt(glm::vec3(0.f, 2.f, 20.f), { 0.f, 2.f, -1.f }, { 0.f, 1.f, 0.f }) * glm::rotate(glm::identity<glm::mat4>(), 0.5f * 6.28f * totalTime, glm::vec3(0.f, 1.f, 0.f));
 	else
 		program->View->value = glm::lookAt(position, position + target, { 0.f, 1.f, 0.f });
 	program->View->ForwardToShader();

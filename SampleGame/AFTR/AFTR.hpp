@@ -52,6 +52,8 @@ private:
 
 	aftr::ComponentBase* partFactory(int partID);
 
+	double totalTime;
+
 	void drawGrid();
 
 };

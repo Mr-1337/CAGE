@@ -71,8 +71,10 @@ namespace cage
 					if (OnClick)
 						OnClick();
 					m_clickStart = false;
+					SetActiveTexture(m_hoverTexture.value_or(m_idleTexture.value()));
 					return true;
 				}
+				SetActiveTexture(m_idleTexture.value());
 				m_clickStart = false;
 				return false;
 			}

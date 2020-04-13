@@ -22,6 +22,7 @@ namespace cage
 				bool onClick() override;
 				void onHover() override;
 				void onUnHover() override;
+				bool onRelease() override;
 
 				friend class CheckBox;
 			};
@@ -30,8 +31,10 @@ namespace cage
 			CheckBox(const std::string& label, TTF_Font* font);
 			bool Checked();
 
+			bool HandleEvent(Event& e) override;
+
 		private:
-			std::shared_ptr<UIElement> m_button;
+			std::shared_ptr<CheckBoxButton> m_button;
 			std::string m_label;
 			TTF_Font* m_font;
 		};

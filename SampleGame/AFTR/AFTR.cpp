@@ -16,7 +16,8 @@ AFTR::AFTR(int argc, char** argv) : cage::Game("AFTR", argc, argv), m_network(WO
 	//glClearColor(0.005f, 0.0f, 0.1f, 1.0f);
 	glClearColor(1.0, 0, 1.0, 1.0);
 
-	m_cubePosition = { 0.f };
+	m_cubePosition = { 0.0f, 0.0f, 0.f };
+	totalTime = 0;
 
 	SDL_SetRelativeMouseMode(SDL_TRUE);
 
@@ -123,25 +124,22 @@ AFTR::~AFTR()
 
 }
 
-double totalTime = 0;
-
 void AFTR::Run()
 {
 	using namespace std::chrono;
 
 	using GameClock = high_resolution_clock;
 	time_point<steady_clock> last;
-	double dt = 1.0 / 60.0;
+	duration<double> elapsedTime(1.0 / 60);
 	while (m_running)
 	{
+		last = GameClock::now();
 		handleEvents();
-		update(dt);
+		update(elapsedTime.count());
 		draw();
 
-		duration<double> elapsedTime = GameClock::now() - last;
-		dt = elapsedTime.count();
-		totalTime += dt;
-		last = GameClock::now();
+		elapsedTime = GameClock::now() - last;
+		totalTime += elapsedTime.count();
 	}
 }
 

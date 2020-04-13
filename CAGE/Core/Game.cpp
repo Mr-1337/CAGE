@@ -54,36 +54,38 @@ namespace cage
 		// Base SDL
 
 		if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
-			throw std::exception("Failed to initialize SDL.");
+			throw std::runtime_error("Failed to initialize SDL.");
 
 		// SDL_image
 
 		int imgFlags = IMG_INIT_PNG | IMG_INIT_JPG;
 		if ((IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG) & imgFlags) != imgFlags)
-			throw std::exception("Failed to initialize SDL_image.");
+			throw std::runtime_error("Failed to initialize SDL_image.");
 
 		// SDL_mixer
 
 		if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 2048) == -1)
-			throw std::exception("Failed to OpenAudio with SDL_mixer.");
+			throw std::runtime_error("Failed to OpenAudio with SDL_mixer.");
 
 		int sndFlags = MIX_INIT_MP3 | MIX_INIT_OGG;
 		if ((Mix_Init(sndFlags) & sndFlags) != sndFlags)
-			throw std::exception("Failed to initialize SDL_mixer.");
+			throw std::runtime_error("Failed to initialize SDL_mixer.");
 
 		// SDL_ttf
 
 		if (TTF_Init() != 0)
-			throw std::exception("Failed to initialize SDL_ttf.");
+			throw std::runtime_error("Failed to initialize SDL_ttf.");
 
 		// SDL_net
 
 		if (SDLNet_Init() != 0)
-			throw std::exception("Failed to initialize SDL_net.");
+			throw std::runtime_error("Failed to initialize SDL_net.");
 	}
 
 	void Game::unloadSDL()
 	{
+		SDLNet_Quit();
+		TTF_Quit();
 		Mix_CloseAudio();
 		Mix_Quit();
 		IMG_Quit();

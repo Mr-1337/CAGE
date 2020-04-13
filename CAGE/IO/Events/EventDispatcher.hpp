@@ -1,11 +1,12 @@
 #pragma once
 
-#include <list>
+#include <vector>
+#include <algorithm>
 #include "EventListener.hpp"
 
 namespace cage
 {
-	// The EventDispatcher maintains lists of all objects that need to be notified of an  event 
+	// The EventDispatcher maintains lists of all objects that need to be notified of an event 
 	class EventDispatcher
 	{
 	public:
@@ -14,12 +15,14 @@ namespace cage
 		void Subscribe(EventListener* listener)
 		{
 			m_listeners.push_back(listener);
+
+			std::sort(m_listeners.begin(), m_listeners.end(), [](auto l1, auto l2) { return l1->GetDepth() > l2->GetDepth();  });
 		}
 		
 		// Removes a listener
 		void Unsubscribe(EventListener* listener)
 		{
-			m_listeners.remove(listener);
+
 		}
 
 		// Notify will send the event to all listeners interested in EventType
@@ -33,7 +36,7 @@ namespace cage
 			}
 		}
 	private:
-		std::list<EventListener*> m_listeners;
+		std::vector<EventListener*> m_listeners;
 
 	};
 }

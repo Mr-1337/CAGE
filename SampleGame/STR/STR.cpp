@@ -6,7 +6,7 @@
 #include "Perlin.hpp"
 
 STR::STR(int argc, char** argv) : 
-	Game("Jerma's Aerobics Training", argc, argv), 
+	Game("ShrekTech Racing", argc, argv), 
 	m_running(true)
 {
 	auto size = m_window->GetSize();

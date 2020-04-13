@@ -1,8 +1,6 @@
 #pragma once
 
 #include <utility>
-#include <SDL2/SDL_ttf.h>
-#include <SDL2/SDL_image.h>
 #include <GLM/glm/gtc/matrix_transform.hpp>
 #include "../CAGE/Core/GameState.hpp"
 

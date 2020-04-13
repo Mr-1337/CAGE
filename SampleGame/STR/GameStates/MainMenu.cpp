@@ -1,6 +1,7 @@
 #include "MainMenu.hpp"
 #include "Sandbox.hpp"
 #include "Lobby.hpp"
+#include "UITest.hpp"
 #include "../../../CAGE/Core/StateMachine.hpp"
 
 MainMenu::MainMenu(std::pair<int, int> size)
@@ -25,22 +26,28 @@ MainMenu::MainMenu(std::pair<int, int> size)
 
 	Ref button1 = std::make_shared<MenuButton>("Play");
 	Ref button2 = std::make_shared<MenuButton>("Multiplayer");
-	Ref button3 = std::make_shared<MenuButton>("Quit");
+	Ref button3 = std::make_shared<MenuButton>("Transform Testing");
+	Ref button4 = std::make_shared<MenuButton>("Quit");
 
 	button1->SetMounting(cage::ui::MountPoint::TOP_LEFT);
 	button2->SetMounting(cage::ui::MountPoint::TOP_LEFT);
 	button3->SetMounting(cage::ui::MountPoint::TOP_LEFT);
+	button4->SetMounting(cage::ui::MountPoint::TOP_LEFT);
 
-	button1->MoveTo({ 200.f, 0.f });
-	button2->MoveTo({ 200.f, 300.f });
-	button3->MoveTo({ 200.f, 600.f });
+	button1->MoveTo({ 300.f, 0.f });
+	button2->MoveTo({ 300.f, 200.f });
+	button3->MoveTo({ 300.f, 400.f });
+	button4->MoveTo({ 300.f, 600.f });
 
 	Add(button1);
 	Add(button2);
 	Add(button3);
+	Add(button4);
 
 	std::static_pointer_cast<MenuButton>(button1)->OnClick = [&, size]() { s_stateMachine->Push(new Sandbox(size)); };
 	std::static_pointer_cast<MenuButton>(button2)->OnClick = [&, size]() { s_stateMachine->Push(new Lobby(size)); };
+	std::static_pointer_cast<MenuButton>(button3)->OnClick = [&, size]() { s_stateMachine->Push(new UITest(size)); };
+	std::static_pointer_cast<MenuButton>(button4)->OnClick = [&, size]() { m_quit = true; };
 }
 
 void MainMenu::ProcessEvents()
@@ -79,13 +86,8 @@ void MainMenu::Add(Ref thingy)
 	m_input.Subscribe(l);
 }
 
-static float r = 0;
-
 void MainMenu::Update(float delta)
 {
-	r += 0.0001;
-	m_root.MoveTo({ 300.0 * sin(r), 300 * cos(r) });
-	//m_root.Rotate(0.001);
 }
 
 void MainMenu::Draw()

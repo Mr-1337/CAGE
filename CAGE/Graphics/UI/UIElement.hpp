@@ -60,7 +60,7 @@ namespace cage
 				m_size.y = texture->GetSize().second;
 			}
 
-			inline bool HandleEvent(Event& e)
+			inline virtual bool HandleEvent(Event& e)
 			{
 				return false;
 			}
@@ -78,8 +78,10 @@ namespace cage
 			inline void SetPivot(glm::vec2 pivot) { m_pivot = pivot; }
 			inline void Rotate(float angle) { m_rotation += angle; recalcTransform(); }
 			inline void SetRotation(float angle) { m_rotation = angle; recalcTransform(); }
+			inline void SetScale(float scaleFactor) { m_scale = { scaleFactor }; recalcTransform(); }
 			
 			inline glm::mat4 GetTransform() const { return m_totalTransform; }
+
 			std::vector<Child>& GetChildren();
 
 			// Adds a child to this UI element
@@ -110,6 +112,7 @@ namespace cage
 			virtual void onTransform();
 			glm::vec2 getMountOffset();
 			std::shared_ptr<Texture> m_currentTexture;
+
 		};
 	}
 }

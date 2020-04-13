@@ -103,12 +103,12 @@ namespace cage::ui
 	{
 		switch (m_mountPoint)
 		{
-		case MountPoint::CENTER:       return { 0.f, 0.f };
-		case MountPoint::TOP_LEFT:     return {  0.5f * m_size.x * m_scale.x,  0.5f * m_size.y * m_scale.y };
-		case MountPoint::TOP_RIGHT:	   return { -0.5f * m_size.x * m_scale.x,  0.5f * m_size.y * m_scale.y };
-		case MountPoint::BOTTOM_LEFT:  return {  0.5f * m_size.x * m_scale.x, -0.5f * m_size.y * m_scale.y };
-		case MountPoint::BOTTOM_RIGHT: return { -0.5f * m_size.x * m_scale.x, -0.5f * m_size.y * m_scale.y };
-		default:				       return { 0.f, 0.f };
+		case MountPoint::CENTER:		return { 0.f, 0.f };
+		case MountPoint::TOP_LEFT:		return {  0.5f * m_size.x * m_scale.x,  0.5f * m_size.y * m_scale.y };
+		case MountPoint::TOP_RIGHT:		return { -0.5f * m_size.x * m_scale.x,  0.5f * m_size.y * m_scale.y };
+		case MountPoint::BOTTOM_LEFT:	return {  0.5f * m_size.x * m_scale.x, -0.5f * m_size.y * m_scale.y };
+		case MountPoint::BOTTOM_RIGHT:	return { -0.5f * m_size.x * m_scale.x, -0.5f * m_size.y * m_scale.y };
+		default:						return { 0.f, 0.f };
 		}
 	}
 
@@ -135,6 +135,7 @@ namespace cage::ui
 	void UIElement::Add(Child child)
 	{
 		child->SetParent(this);
+		child->SetDepth(GetDepth() + 1);
 		m_children.emplace_back(child);
 	}
 
