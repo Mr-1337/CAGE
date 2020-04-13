@@ -1,4 +1,5 @@
 #include <cmath>
+#include <math.h>
 #include "Perlin.hpp"
 
 namespace Perlin
@@ -76,8 +77,8 @@ namespace Perlin
 
 	float Perlin(float x, float y)
 	{
-		x = std::fmodf(x, 255.f);
-		y = std::fmodf(y, 255.f);
+		x = fmodf(x, 255.f);
+		y = fmodf(y, 255.f);
 
 		int xi = (int)x & 255;
 		int yi = (int)y & 255;
@@ -109,9 +110,9 @@ namespace Perlin
 
 	float Perlin3(float x, float y, float z)
 	{
-		x = std::fmodf(x, 255.f);
-		y = std::fmodf(y, 255.f);
-		z = std::fmodf(z, 255.f);
+		x = fmodf(x, 255.f);
+		y = fmodf(y, 255.f);
+		z = fmodf(z, 255.f);
 
 		int xi = (int)x & 255;
 		int yi = (int)y & 255;

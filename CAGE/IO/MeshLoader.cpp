@@ -1,4 +1,5 @@
 #include <SDL2/SDL_image.h>
+#include <stdexcept>
 
 #include "MeshLoader.hpp"
 
@@ -23,7 +24,7 @@ namespace cage
 
 		std::ifstream file(path);
 		if (!file.is_open())
-			throw std::exception("File not found!");
+			throw std::runtime_error("File not found! " + path);
 
 		std::vector<glm::vec3> positions;
 		std::vector<glm::vec2> uvs;
@@ -96,7 +97,7 @@ namespace cage
 
 		std::ifstream file(path);
 		if (!file.is_open())
-			throw std::exception("File not found!");
+			throw std::runtime_error("File not found! " + path);
 
 		int meshCount = 0;
 

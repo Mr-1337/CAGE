@@ -1,4 +1,5 @@
 #include <exception>
+#include <stdexcept>
 #include "Endpoint.hpp"
 
 namespace cage
@@ -20,7 +21,7 @@ namespace cage
 		void Endpoint::Send(char* dataBuffer, size_t size, const Endpoint& destination)
 		{
 			if (!IsLocal())
-				throw std::exception("Only local endpoints can send!");
+				throw std::runtime_error("Only local endpoints can send!");
 			m_sendPacket->address = destination.GetIP();
 			m_sendPacket->len = size;
 			SDL_memcpy(m_sendPacket->data, dataBuffer, size);
@@ -30,7 +31,7 @@ namespace cage
 		void Endpoint::Receive(void* dataBuffer, size_t& size)
 		{
 			if (!IsLocal())
-				throw std::exception("Only local endpoints can receive!");
+				throw std::runtime_error("Only local endpoints can receive!");
 			if (SDLNet_UDP_Recv(m_socket, m_recvPacket))
 			{
 				dataBuffer = m_recvPacket->data;

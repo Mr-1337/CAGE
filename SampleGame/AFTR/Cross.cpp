@@ -1,5 +1,7 @@
 #include "Cross.hpp"
 
+typedef char uint8_t;
+
 namespace aftr
 {
 	Cross::Cross()

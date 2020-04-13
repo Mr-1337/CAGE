@@ -2,6 +2,7 @@
 
 #include <array>
 #include <GLM/glm/gtc/quaternion.hpp>
+#include <memory>
 
 #include "../CAGE/CAGE.hpp"
 #include "../CAGE/Graphics/ShaderProgram/Generic3DShader.hpp"

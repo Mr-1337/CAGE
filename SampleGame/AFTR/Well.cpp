@@ -1,5 +1,7 @@
 #include "Well.hpp"
 
+typedef char uint8_t;
+
 namespace aftr
 {
 	Well::Well()

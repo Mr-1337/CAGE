@@ -12,14 +12,14 @@ Sandbox::Sandbox(std::pair<int, int> size) :
 	//glClearColor(0.4f, 0.5f, 0.2f, 0.0f);
 	glClearColor(0.f, 0.f, 0.f, 1.f);
 	shrek.LoadModel("Assets/shrek.obj");
-	thanos.LoadModel("Assets/thanos.obj");
+	thanos.LoadModel("Assets/Thanos.obj");
 	//vader.LoadModel("Assets/vader.obj");
 
 	//SDL_assert(controller != nullptr);
 
 	std::string
 		vsString = R"REE(
-		#version 460 core
+		#version 450 core
 
 		layout (location = 0) in vec3 pos;
 		layout (location = 1) in vec2 uv;
@@ -44,7 +44,7 @@ Sandbox::Sandbox(std::pair<int, int> size) :
 		}
 		)REE",
 		fsString = R"REE(
-		#version 460 core
+		#version 450 core
 
 		in vec4 pos_o;
 		in vec3 pos_world_o;
@@ -249,7 +249,7 @@ void Sandbox::Update(float delta)
 
 	auto v = camera->GetPosition() + glm::vec3{ 0.0f, -0.7f, 3.0f };
 
-	int xIndex = std::floorf(v.x / 5.f), zIndex = std::floorf(v.z / 5.f);
+	int xIndex = std::floor(v.x / 5.f), zIndex = std::floor(v.z / 5.f);
 	float dx = v.x / 5.f - xIndex;
 	float dz = v.z / 5.f - zIndex;
 	float yInterp1 = (1.0f - dx) * world.GetBuffer()[xIndex + (100 * zIndex)].position.y + dx * world.GetBuffer()[xIndex + 1 + (100 * zIndex)].position.y;

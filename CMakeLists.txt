@@ -15,7 +15,7 @@ endif(MSVC)
 
 # Include sub-projects.
 add_subdirectory ("CAGE")
-target_compile_features("CAGE" PRIVATE cxx_std_17)
+target_compile_features("CAGE" PUBLIC cxx_std_17)
 
 add_subdirectory ("SampleGame")
-target_compile_features("CAGE" PRIVATE cxx_std_17)
+target_compile_features("CAGE" PUBLIC cxx_std_17)

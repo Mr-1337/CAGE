@@ -5,7 +5,7 @@
 namespace aftr
 {
 
-	enum class Directions : uint8_t
+	enum class Directions : char
 	{
 		NORTH = 1,
 		EAST = 1 << 1,
@@ -21,7 +21,7 @@ namespace aftr
 		bool m_state = false;
 
 	protected:
-		uint8_t m_connections = 0;
+		char m_connections = 0;
 	public:
 		virtual void Update() = 0;
 		inline bool Visited() { return m_visited; }
@@ -31,7 +31,7 @@ namespace aftr
 		inline virtual Directions GetOrientation() = 0;
 		inline bool HasConnection(Directions dir)
 		{
-			return m_connections & (uint8_t)dir;
+			return m_connections & (char)dir;
 		}
 	public:
 		ComponentBase* North = nullptr, * East = nullptr, * South = nullptr, * West = nullptr, * Up = nullptr, * Down = nullptr;

@@ -1,6 +1,7 @@
 #include "Shrektris.hpp"
 #include <Glad/glad/glad.h>
 #include <ctime>
+#include <cstring>
 #include <chrono>
 
 Shrektris::Shrektris(int argc, char** argv) : 
@@ -28,13 +29,13 @@ Shrektris::Shrektris(int argc, char** argv) :
 	cage::Texture::MissingTexture = new cage::Texture(IMG_Load("Assets/missing.png"));
 
 	shrek.LoadModel("Assets/shrek.obj");
-	thanos.LoadModel("Assets/thanos.obj");
+	thanos.LoadModel("Assets/Thanos.obj");
 	m_font = TTF_OpenFont("Assets/sans.ttf", 32);
 
 	std::srand(std::time(nullptr));
 
 	std::string vsString = R"REE(
-	#version 460 core
+	#version 450 core
 
 	layout (location = 0) in vec3 pos;
 	layout (location = 1) in vec2 uv;
@@ -60,7 +61,7 @@ Shrektris::Shrektris(int argc, char** argv) :
 	)REE";
 
 	std::string fsString = R"REE(
-	#version 460 core
+	#version 450 core
 
 	in vec4 pos_o;
 	in vec3 pos_world_o;

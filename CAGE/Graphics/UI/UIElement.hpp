@@ -78,7 +78,7 @@ namespace cage
 			inline void SetPivot(glm::vec2 pivot) { m_pivot = pivot; }
 			inline void Rotate(float angle) { m_rotation += angle; recalcTransform(); }
 			inline void SetRotation(float angle) { m_rotation = angle; recalcTransform(); }
-			inline void SetScale(float scaleFactor) { m_scale = { scaleFactor }; recalcTransform(); }
+			inline void SetScale(float scaleFactor) { m_scale = { scaleFactor, scaleFactor }; recalcTransform(); }
 			
 			inline glm::mat4 GetTransform() const { return m_totalTransform; }
 

@@ -41,14 +41,14 @@ namespace cage::ui
 	{
 		if (!UIElement::init)
 			UIElement::initSharedData();
-		m_position = { 0.f };
-		m_size = { 0.f };
-		m_scale = { 1.f };
+		m_position = { 0.f, 0.f };
+		m_size = { 0.f, 0.f };
+		m_scale = { 1.f, 1.f };
 		m_rotation = 0.f;
 		m_localTransform = glm::identity<glm::mat4>();
 		m_totalTransform = glm::identity<glm::mat4>();
-		m_mountOffset = { 0.f };
-		m_pivot = { 0.f };
+		m_mountOffset = { 0.f, 0.f };
+		m_pivot = { 0.f, 0.f };
 
 		m_parent = nullptr;
 	}

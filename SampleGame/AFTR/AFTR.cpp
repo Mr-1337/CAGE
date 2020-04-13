@@ -129,7 +129,7 @@ void AFTR::Run()
 	using namespace std::chrono;
 
 	using GameClock = high_resolution_clock;
-	time_point<steady_clock> last;
+	time_point<high_resolution_clock> last;
 	duration<double> elapsedTime(1.0 / 60);
 	while (m_running)
 	{
