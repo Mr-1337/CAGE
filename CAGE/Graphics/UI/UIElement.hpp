@@ -17,6 +17,10 @@ namespace cage
 		enum class MountPoint
 		{
 			CENTER,
+			CENTER_LEFT,
+			CENTER_RIGHT,
+			TOP,
+			BOTTOM,
 			TOP_LEFT,
 			TOP_RIGHT,
 			BOTTOM_LEFT,
@@ -27,10 +31,12 @@ namespace cage
 		 * A CAGE UIElement is the base of all elements in the UI Scene Graph
 		 * They can either be directly visible or simply represent aggregates of children UIElements
 		 */
+
 		class UIElement : public cage::EventListener
 		{
 
-			MountPoint m_mountPoint = MountPoint::CENTER;
+			MountPoint m_localMount;
+			MountPoint m_parentMount;
 
 			using Child = std::shared_ptr<UIElement>;
 
@@ -41,7 +47,7 @@ namespace cage
 
 			glm::vec2 m_position;
 			// Size is the actual dimensions of the raw, untransformed UIElement which does not impact children, Scale is a scale transform that affects children 
-			glm::vec2 m_scale, m_size, m_mountOffset, m_pivot;
+			glm::vec2 m_scale, m_size, m_mountOffset, m_parentMountOffset;
 
 			float m_rotation;
 
@@ -68,17 +74,18 @@ namespace cage
 			virtual void Update(float deltaTime);
 			virtual void Draw(); 
 
-			inline void SetMounting(MountPoint mounting) { m_mountPoint = mounting; }
+			inline void SetLocalMounting(MountPoint mounting) { m_localMount = mounting; }
+			inline void SetParentMounting(MountPoint mounting) { m_parentMount = mounting; }
 
 			void Resize(glm::vec2 size);
 			void MoveTo(glm::vec2 newPosition);
 			void Scale(float scaleFactor);
 			inline glm::vec2 GetSize() const { return m_size; }
+			inline glm::vec2 GetScale() const { return m_scale; }
 			inline glm::vec2 GetPosition() const { return m_position; }
-			inline void SetPivot(glm::vec2 pivot) { m_pivot = pivot; }
 			inline void Rotate(float angle) { m_rotation += angle; recalcTransform(); }
 			inline void SetRotation(float angle) { m_rotation = angle; recalcTransform(); }
-			inline void SetScale(float scaleFactor) { m_scale = { scaleFactor }; recalcTransform(); }
+			inline void SetScale(float scaleFactor) { m_scale = { scaleFactor, scaleFactor }; recalcTransform(); }
 			
 			inline glm::mat4 GetTransform() const { return m_totalTransform; }
 
@@ -91,6 +98,8 @@ namespace cage
 			{
 				m_parent = parent;
 			}
+
+			static glm::vec2 GetMountOffset(MountPoint mounting, glm::vec2 size, glm::vec2 scale);
 
 			virtual ~UIElement() = default;
 
@@ -110,7 +119,9 @@ namespace cage
 
 		protected:
 			virtual void onTransform();
-			glm::vec2 getMountOffset();
+
+
+
 			std::shared_ptr<Texture> m_currentTexture;
 
 		};

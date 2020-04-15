@@ -10,6 +10,6 @@ out vec2 uv_o;
 
 void main()
 {
-	uv_o = vec2(pos.x + 0.5, 0.5 + pos.y);
+	uv_o = vec2(pos.x + 0.5, pos.y + 0.5);
 	gl_Position = u_projection * u_model * (vec4(u_spriteSize, 0, 1.0) * vec4(pos, 0, 1.0));
 }

@@ -11,12 +11,12 @@ namespace cage
 		class Hoverable : public UIElement
 		{
 		public:
-			Hoverable(std::optional<std::shared_ptr<Texture>> idleTexture, std::optional<std::shared_ptr<Texture>> hoverTexture) :
+			Hoverable(std::optional<std::shared_ptr<Texture>> idleTexture, std::optional<std::shared_ptr<Texture>> hoverTexture) : 
+				m_hovering(false),
 				m_idleTexture(idleTexture), m_hoverTexture(hoverTexture)
 			{
 				m_lastX = 0;
 				m_lastY = 0;
-				m_hovering = false;
 				SetActiveTexture(idleTexture.value());
 			}
 
@@ -36,6 +36,7 @@ namespace cage
 					m_hovering = false;
 					return false;
 				}
+				return false;
 			}
 
 		protected:

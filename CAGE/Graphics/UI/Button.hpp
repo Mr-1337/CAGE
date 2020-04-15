@@ -23,7 +23,8 @@ namespace cage
 			
 			bool HandleEvent(Event& e) override
 			{
-				Hoverable::HandleEvent(e);
+				if (Hoverable::HandleEvent(e))
+					return true;
 				if (auto ce = std::get_if<MouseClickEvent>(&e))
 				{
 					if (ce->wasRelease)
@@ -31,6 +32,7 @@ namespace cage
 					else
 						return onClick();
 				}
+				return false;
 			}
 			
 

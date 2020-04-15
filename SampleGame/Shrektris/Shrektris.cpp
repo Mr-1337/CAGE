@@ -125,9 +125,9 @@ Shrektris::Shrektris(int argc, char** argv) :
 	scoreText = std::make_shared<cage::ui::UIElement>();
 	levelText = std::make_shared<cage::ui::UIElement>();
 
-	m_rootNode.SetMounting(cage::ui::MountPoint::TOP_LEFT);
-	scoreText->SetMounting(cage::ui::MountPoint::TOP_LEFT);
-	levelText->SetMounting(cage::ui::MountPoint::TOP_LEFT);
+	m_rootNode.SetLocalMounting(cage::ui::MountPoint::TOP_LEFT);
+	scoreText->SetLocalMounting(cage::ui::MountPoint::TOP_LEFT);
+	levelText->SetLocalMounting(cage::ui::MountPoint::TOP_LEFT);
 
 	scoreText->MoveTo({ 250.f, 0.f });
 	levelText->MoveTo({ 250.f, 50.f });

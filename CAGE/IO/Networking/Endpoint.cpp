@@ -1,4 +1,4 @@
-#include <exception>
+#include <stdexcept>
 #include "Endpoint.hpp"
 
 namespace cage
@@ -8,8 +8,8 @@ namespace cage
 		Endpoint::Endpoint(int port) : m_local(true), m_address({0, 0})
 		{
 			m_socket = SDLNet_UDP_Open(port);
-			m_sendPacket = SDLNet_AllocPacket(64);
-			m_recvPacket = SDLNet_AllocPacket(64);
+			m_sendPacket = SDLNet_AllocPacket(4096);
+			m_recvPacket = SDLNet_AllocPacket(4096);
 		}
 
 		Endpoint::Endpoint(IPaddress address) : m_local(false), m_address(address), m_recvPacket(nullptr), m_sendPacket(nullptr)
@@ -20,7 +20,7 @@ namespace cage
 		void Endpoint::Send(char* dataBuffer, size_t size, const Endpoint& destination)
 		{
 			if (!IsLocal())
-				throw std::exception("Only local endpoints can send!");
+				throw std::runtime_error("Only local endpoints can send!");
 			m_sendPacket->address = destination.GetIP();
 			m_sendPacket->len = size;
 			SDL_memcpy(m_sendPacket->data, dataBuffer, size);
@@ -30,10 +30,10 @@ namespace cage
 		void Endpoint::Receive(void* dataBuffer, size_t& size)
 		{
 			if (!IsLocal())
-				throw std::exception("Only local endpoints can receive!");
-			if (SDLNet_UDP_Recv(m_socket, m_recvPacket))
+				throw std::runtime_error("Only local endpoints can receive!");
+			if (size = SDLNet_UDP_Recv(m_socket, m_recvPacket))
 			{
-				dataBuffer = m_recvPacket->data;
+				memcpy(dataBuffer, m_recvPacket->data, m_recvPacket->len);
 				size = m_recvPacket->len;
 			}
 		}

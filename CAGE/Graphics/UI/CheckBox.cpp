@@ -49,9 +49,9 @@ namespace cage
 			auto t = std::make_shared<Text>(font);
 			t->SetText(label);
 			Add(t);
-			t->SetMounting(MountPoint::TOP_LEFT);
+			t->SetLocalMounting(MountPoint::TOP_LEFT);
 			m_button = std::make_shared<CheckBoxButton>();
-			m_button->SetMounting(MountPoint::TOP_LEFT);
+			m_button->SetLocalMounting(MountPoint::TOP_LEFT);
 			t->MoveTo({ m_button->GetSize().x * 1.5, 0.f });
 			Add(m_button);
 			float w = m_button->GetSize().x + t->GetSize().x;

@@ -9,7 +9,7 @@ include_directories ("include")
 link_directories ("lib")
 
 if(MSVC)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17 /permissive-")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /permissive- /std:c++17")
 endif(MSVC)
 
 

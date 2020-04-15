@@ -13,7 +13,7 @@ Sandbox::Sandbox(std::pair<int, int> size) :
 	glClearColor(0.f, 0.f, 0.f, 1.f);
 	shrek.LoadModel("Assets/shrek.obj");
 	thanos.LoadModel("Assets/thanos.obj");
-	//vader.LoadModel("Assets/vader.obj");
+	vader.LoadModel("Assets/vader.obj");
 
 	//SDL_assert(controller != nullptr);
 
@@ -90,7 +90,7 @@ Sandbox::Sandbox(std::pair<int, int> size) :
 
 	m_fpsCounter = std::make_shared<cage::ui::UIElement>();
 	m_root.Add(m_fpsCounter);
-	m_fpsCounter->SetMounting(cage::ui::MountPoint::TOP_LEFT);
+	m_fpsCounter->SetLocalMounting(cage::ui::MountPoint::TOP_LEFT);
 	m_fpsCounter->MoveTo({ 20, 0 });
 
 	spriteVerShader.CompileFromFile("Assets/sprite.ver");
@@ -104,9 +104,9 @@ Sandbox::Sandbox(std::pair<int, int> size) :
 	spriteProgram->Projection->ForwardToShader();
 
 	m_root.Resize({ size.first, size.second });
-	m_speedometer->SetMounting(cage::ui::MountPoint::TOP_LEFT);
+	m_speedometer->SetLocalMounting(cage::ui::MountPoint::TOP_LEFT);
 	m_root.Add(m_speedometer);
-	m_needle->SetMounting(cage::ui::MountPoint::CENTER);
+	m_needle->SetLocalMounting(cage::ui::MountPoint::CENTER);
 	m_speedometer->Add(m_needle);
 	m_speedometer->MoveTo({ 880.f, 0.f });
 	m_needle->MoveTo({ 0.f, 5.f });
@@ -114,14 +114,12 @@ Sandbox::Sandbox(std::pair<int, int> size) :
 
 	camera->SetPosition({ 200, 30, 10 });
 
-	m_needle->SetPivot({ 0.f, 12.f });
-
 	m_menuOverlay = std::make_shared<cage::ui::UIElement>(false);
 
 	using Ref = std::shared_ptr<cage::ui::UIElement>;
 	Ref button = std::make_shared<cage::ui::Button>(std::make_shared<cage::Texture>(IMG_Load("Assets/button/idle.png")), std::make_shared<cage::Texture>(IMG_Load("Assets/button/hover.png")), std::make_shared<cage::Texture>(IMG_Load("Assets/button/pressed.png")));
 	m_root.Add(button);
-	button->SetMounting(cage::ui::MountPoint::TOP_LEFT);
+	button->SetLocalMounting(cage::ui::MountPoint::TOP_LEFT);
 	//Ref checkgroup = std::make_shared<cage::ui::CheckBoxGroup>();
 	std::static_pointer_cast<cage::ui::Button>(button)->OnClick = [&]() { cage::Texture::MissingTexture = new cage::Texture(IMG_Load("Assets/simon.png")); };
 
@@ -281,9 +279,9 @@ void Sandbox::Draw()
 	program->Model->value = glm::translate(glm::identity<glm::mat4>(), glm::vec3{ 120.0f, 19.f, 150.0f });
 	program->Model->ForwardToShader();
 	shrek.Draw();
-	//program->Model->value = glm::translate(glm::identity<glm::mat4>(), glm::vec3{ 80.0f, 15.f, 120.0f });
-	//program->Model->ForwardToShader();
-	//vader.Draw();
+	program->Model->value = glm::translate(glm::identity<glm::mat4>(), glm::vec3{ 80.0f, 15.f, 120.0f });
+	program->Model->ForwardToShader();
+	vader.Draw();
 	program->Model->value = glm::translate(glm::identity<glm::mat4>(), { 50.0f, 15.f, 50.f });
 	program->Model->ForwardToShader();
 	car.Draw();

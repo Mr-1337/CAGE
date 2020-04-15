@@ -29,15 +29,26 @@ MainMenu::MainMenu(std::pair<int, int> size)
 	Ref button3 = std::make_shared<MenuButton>("Transform Testing");
 	Ref button4 = std::make_shared<MenuButton>("Quit");
 
-	button1->SetMounting(cage::ui::MountPoint::TOP_LEFT);
-	button2->SetMounting(cage::ui::MountPoint::TOP_LEFT);
-	button3->SetMounting(cage::ui::MountPoint::TOP_LEFT);
-	button4->SetMounting(cage::ui::MountPoint::TOP_LEFT);
+	button2->SetLocalMounting(cage::ui::MountPoint::TOP);
+	button3->SetLocalMounting(cage::ui::MountPoint::TOP);
+	button4->SetLocalMounting(cage::ui::MountPoint::TOP);
+	button1->SetLocalMounting(cage::ui::MountPoint::TOP);
 
-	button1->MoveTo({ 300.f, 0.f });
-	button2->MoveTo({ 300.f, 200.f });
-	button3->MoveTo({ 300.f, 400.f });
-	button4->MoveTo({ 300.f, 600.f });
+	button1->SetParentMounting(cage::ui::MountPoint::TOP);
+	button2->SetParentMounting(cage::ui::MountPoint::TOP);
+	button3->SetParentMounting(cage::ui::MountPoint::TOP);
+	button4->SetParentMounting(cage::ui::MountPoint::TOP);
+
+	button1->MoveTo({ 0.f, 0.f });
+	button2->MoveTo({ 0.f, 150.f });
+	button3->MoveTo({ 0.f, 300.f });
+	button4->MoveTo({ 0.f, 450.f });
+
+	std::cout << size.first << ", " << size.second << std::endl;
+
+	m_root.SetLocalMounting(cage::ui::MountPoint::CENTER);
+	m_root.Resize({ (float)size.first, (float)size.second });
+	m_root.MoveTo({ (float)size.first/2, (float)size.second/2 });
 
 	Add(button1);
 	Add(button2);
@@ -48,6 +59,8 @@ MainMenu::MainMenu(std::pair<int, int> size)
 	std::static_pointer_cast<MenuButton>(button2)->OnClick = [&, size]() { s_stateMachine->Push(new Lobby(size)); };
 	std::static_pointer_cast<MenuButton>(button3)->OnClick = [&, size]() { s_stateMachine->Push(new UITest(size)); };
 	std::static_pointer_cast<MenuButton>(button4)->OnClick = [&, size]() { m_quit = true; };
+
+
 }
 
 void MainMenu::ProcessEvents()
@@ -66,6 +79,8 @@ void MainMenu::ProcessEvents()
 			case SDL_WINDOWEVENT_RESIZED:
 				auto size = std::make_pair(e.window.data1, e.window.data2);
 				glViewport(0, 0, e.window.data1, e.window.data2);
+				m_root.Resize({ (float)e.window.data1, (float)e.window.data2 });
+				m_root.MoveTo({ (float)e.window.data1/2, (float)e.window.data2/2 });
 				m_spriteShader->Projection->value = glm::ortho(0.f, (float)size.first, (float)size.second, 0.f);
 				m_spriteShader->Projection->ForwardToShader();
 				break;
@@ -82,12 +97,12 @@ void MainMenu::Add(Ref thingy)
 	m_root.Add(thingy);
 
 	cage::EventListener* l = dynamic_cast<cage::EventListener*>(thingy.get());
-
 	m_input.Subscribe(l);
 }
 
 void MainMenu::Update(float delta)
 {
+	//m_root.Rotate(delta * 0.5);
 }
 
 void MainMenu::Draw()

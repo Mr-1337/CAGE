@@ -11,7 +11,7 @@ namespace cage
 
 		void Text::SetText(const std::string& text)
 		{
-			m_text = text;
+			m_text = text.empty() ? " " : text;
 			SetActiveTexture(std::make_shared<Texture>(TTF_RenderText_Blended(m_font, m_text.c_str(), m_color)));
 		}
 
