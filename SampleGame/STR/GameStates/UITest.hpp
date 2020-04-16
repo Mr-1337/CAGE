@@ -27,11 +27,4 @@ private:
 	std::shared_ptr<cage::ui::CheckBox> c1, c2, c3;
 
 	Mix_Chunk *s1, *s2, *s3, *s4;
-
-	TCPsocket us, him;
-	IPaddress ip;
-
-	SDL_RWops* rw;
-	bool fuckery;
-	char* data;
 };

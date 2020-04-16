@@ -3,8 +3,6 @@
 #include <GLM/glm/gtc/matrix_transform.hpp>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
-#include <SDL2/SDL_net.h>
-#include <thread>
 
 #include "UITest.hpp"
 
@@ -86,28 +84,6 @@ UITest::UITest(std::pair<int, int> size)
 	b3->OnClick = [this]() { Mix_PlayChannel(1, s3, 0); };
 	b4->OnClick = [this]() { Mix_PlayChannel(1, s4, 0); };
 
-	SDLNet_ResolveHost(&ip, INADDR_ANY, 25570);
-	us = SDLNet_TCP_Open(&ip);
-
-	while (!(him = SDLNet_TCP_Accept(us)));
-
-
-#define SIZE 40000000
-
-	fuckery = false;
-	data = new char[SIZE];
-	std::thread* t1 = new std::thread([this]()
-		{
-			while (true)
-			{
-				SDLNet_TCP_Recv(him, data, SIZE);
-				rw = SDL_RWFromMem(data, SIZE);
-				fuckery = true;
-				SDL_Delay(1000);
-				fuckery = false;
-			}
-		});
-
 }
 
 void UITest::ProcessEvents()
@@ -171,12 +147,6 @@ void UITest::Update(float dt)
 	}
 
 	message->MoveTo(total);
-
-	if (fuckery)
-	{
-		message->LoadTexture(IMG_Load_RW(rw, 1));
-		fuckery = false;
-	}
 
 }
 
