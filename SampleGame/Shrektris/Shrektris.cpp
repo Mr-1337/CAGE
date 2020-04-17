@@ -33,52 +33,8 @@ Shrektris::Shrektris(int argc, char** argv) :
 
 	std::srand(std::time(nullptr));
 
-	std::string vsString = R"REE(
-	#version 460 core
-
-	layout (location = 0) in vec3 pos;
-	layout (location = 1) in vec2 uv;
-	layout (location = 2) in vec3 norm;
-
-	uniform mat4 u_projection;
-	uniform mat4 u_view;
-	uniform mat4 u_model;
-
-	out vec4 pos_o;
-	out vec3 pos_world_o;
-	out vec3 norm_o;
-	out vec2 uv_o;
-
-	void main()
-	{
-		pos_o = (u_projection * u_view * u_model * vec4(pos, 1.0));
-		pos_world_o = (u_model * vec4(pos, 1.0)).xyz;
-		norm_o = norm;
-		uv_o = vec2(uv.x, -uv.y);
-		gl_Position = pos_o;
-	}
-	)REE";
-
-	std::string fsString = R"REE(
-	#version 460 core
-
-	in vec4 pos_o;
-	in vec3 pos_world_o;
-	in vec2 uv_o;
-	in vec3 norm_o;
-	out vec4 colorOut;
-
-	uniform sampler2D u_texture;
-
-	void main()
-	{
-		float diffuse = max(dot(norm_o, normalize(-pos_world_o + vec3(0, 100, 0))), 0.2);
-		colorOut = vec4(diffuse, diffuse, diffuse, 1.0) * texture(u_texture, uv_o);
-	}
-	)REE";
-
-	vertexShader.CompileFromSrcString(vsString);
-	fragShader.CompileFromSrcString(fsString);
+	vertexShader.CompileFromFile("Assets/generic3D.vert");
+	fragShader.CompileFromFile("Assets/generic3D.frag");
 
 	program = std::make_unique<cage::Generic3DShader>(vertexShader, fragShader);
 

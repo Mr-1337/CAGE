@@ -1,3 +1,11 @@
+/*
+ *	Welcome to the CAGE
+ *
+ *	Include the header for your game and make it the template argument for PlayGame<T>
+ *
+ */
+
+
 #include <iostream>
 #include <thread>
 #include "Shrektris/Shrektris.hpp"
