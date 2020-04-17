@@ -10,7 +10,7 @@ UITest::UITest(std::pair<int, int> size)
 {
 	{
 		cage::Shader ver(cage::Shader::VERTEX), frag(cage::Shader::FRAGMENT);
-		ver.CompileFromFile("Assets/sprite.ver");
+		ver.CompileFromFile("Assets/sprite.vert");
 		frag.CompileFromFile("Assets/sprite.frag");
 
 		m_spriteShader = std::make_unique<cage::SpriteShader>(ver, frag);

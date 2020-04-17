@@ -12,7 +12,7 @@ MainMenu::MainMenu(std::pair<int, int> size)
 	cage::Texture::MissingTexture = new cage::Texture(IMG_Load("Assets/missing.png"));
 
 	cage::Shader vertex(cage::Shader::VERTEX), fragment(cage::Shader::FRAGMENT);
-	vertex.CompileFromFile("Assets/sprite.ver");
+	vertex.CompileFromFile("Assets/sprite.vert");
 	fragment.CompileFromFile("Assets/sprite.frag");
 	m_spriteShader = std::make_shared<cage::SpriteShader>(vertex, fragment);
 
