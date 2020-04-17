@@ -45,7 +45,6 @@ namespace cage::ui
 		m_size = { 0.f, 0.f };
 		m_scale = { 1.f, 1.f };
 		m_rotation = 0.f;
-		m_localTransform = glm::identity<glm::mat4>();
 		m_totalTransform = glm::identity<glm::mat4>();
 		m_mountOffset = { 0.f, 0.f };
 		m_parentMountOffset = { 0.f, 0.f };
@@ -131,14 +130,18 @@ namespace cage::ui
 		if (m_parent != nullptr)
 			m_parentMountOffset = -GetMountOffset(m_parentMount, m_parent->GetSize(), { 1.f, 1.f });
 
-		m_localTransform = glm::scale(glm::translate(glm::rotate(glm::translate(glm::identity<glm::mat4>(), glm::vec3(m_position + m_parentMountOffset, 0.f)), m_rotation, { 0.f, 0.f, 1.f }), { m_mountOffset, 0.f }), glm::vec3(m_scale, 1.0f));
+		auto local = glm::scale(glm::translate(glm::rotate(glm::translate(glm::identity<glm::mat4>(), glm::vec3(m_position + m_parentMountOffset, 0.f)), m_rotation, { 0.f, 0.f, 1.f }), { m_mountOffset, 0.f }), glm::vec3(m_scale, 1.0f));
 		if (m_parent == nullptr)
 		{
-			m_totalTransform = m_localTransform;
+			m_totalTransform = local;
 		}
 		else
 		{
-			m_totalTransform = m_parent->GetTransform() * m_localTransform;
+			m_totalTransform = m_parent->GetTransform() * local;
+		}
+		for (auto c : m_children)
+		{
+			c->recalcTransform();
 		}
 	}
 
@@ -163,7 +166,6 @@ namespace cage::ui
 			else
 				Texture::MissingTexture->Bind();
 			sharedVAO->Bind();
-			recalcTransform();
 			if (m_textured)
 			{
 				shader->SpriteSize->value = m_size;

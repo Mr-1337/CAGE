@@ -2,6 +2,7 @@
 #include "Sandbox.hpp"
 #include "Lobby.hpp"
 #include "UITest.hpp"
+#include "Editor.hpp"
 #include "../../../CAGE/Core/StateMachine.hpp"
 
 MainMenu::MainMenu(std::pair<int, int> size)
@@ -27,39 +28,44 @@ MainMenu::MainMenu(std::pair<int, int> size)
 	Ref button1 = std::make_shared<MenuButton>("Play");
 	Ref button2 = std::make_shared<MenuButton>("Multiplayer");
 	Ref button3 = std::make_shared<MenuButton>("Transform Testing");
-	Ref button4 = std::make_shared<MenuButton>("Quit");
+	Ref button4 = std::make_shared<MenuButton>("Editor");
+	Ref button5 = std::make_shared<MenuButton>("Quit");
 
+	button1->SetLocalMounting(cage::ui::MountPoint::TOP);
 	button2->SetLocalMounting(cage::ui::MountPoint::TOP);
 	button3->SetLocalMounting(cage::ui::MountPoint::TOP);
 	button4->SetLocalMounting(cage::ui::MountPoint::TOP);
-	button1->SetLocalMounting(cage::ui::MountPoint::TOP);
+	button5->SetLocalMounting(cage::ui::MountPoint::TOP);
 
 	button1->SetParentMounting(cage::ui::MountPoint::TOP);
 	button2->SetParentMounting(cage::ui::MountPoint::TOP);
 	button3->SetParentMounting(cage::ui::MountPoint::TOP);
 	button4->SetParentMounting(cage::ui::MountPoint::TOP);
+	button5->SetParentMounting(cage::ui::MountPoint::TOP);
 
 	button1->MoveTo({ 0.f, 0.f });
 	button2->MoveTo({ 0.f, 150.f });
 	button3->MoveTo({ 0.f, 300.f });
 	button4->MoveTo({ 0.f, 450.f });
+	button5->MoveTo({ 0.f, 600.f });
 
 	std::cout << size.first << ", " << size.second << std::endl;
-
-	m_root.SetLocalMounting(cage::ui::MountPoint::CENTER);
-	m_root.Resize({ (float)size.first, (float)size.second });
-	m_root.MoveTo({ (float)size.first/2, (float)size.second/2 });
 
 	Add(button1);
 	Add(button2);
 	Add(button3);
 	Add(button4);
+	Add(button5);
 
 	std::static_pointer_cast<MenuButton>(button1)->OnClick = [&, size]() { s_stateMachine->Push(new Sandbox(size)); };
 	std::static_pointer_cast<MenuButton>(button2)->OnClick = [&, size]() { s_stateMachine->Push(new Lobby(size)); };
 	std::static_pointer_cast<MenuButton>(button3)->OnClick = [&, size]() { s_stateMachine->Push(new UITest(size)); };
-	std::static_pointer_cast<MenuButton>(button4)->OnClick = [&, size]() { m_quit = true; };
+	std::static_pointer_cast<MenuButton>(button4)->OnClick = [&, size]() { s_stateMachine->Push(new Editor(size)); };
+	std::static_pointer_cast<MenuButton>(button5)->OnClick = [&, size]() { m_quit = true; };
 
+	m_root.SetLocalMounting(cage::ui::MountPoint::CENTER);
+	m_root.Resize({ (float)size.first, (float)size.second });
+	m_root.MoveTo({ (float)size.first / 2, (float)size.second / 2 });
 
 }
 

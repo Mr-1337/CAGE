@@ -6,10 +6,9 @@
 
 #include "../MenuButton.hpp"
 
-using Ref = std::shared_ptr<cage::ui::UIElement>;
-
 class MainMenu : public cage::GameState
 {
+	using Ref = std::shared_ptr<cage::ui::UIElement>;
 public:
 
 	MainMenu(std::pair<int, int> size);

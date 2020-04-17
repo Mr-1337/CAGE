@@ -17,55 +17,8 @@ Sandbox::Sandbox(std::pair<int, int> size) :
 
 	//SDL_assert(controller != nullptr);
 
-	std::string
-		vsString = R"REE(
-		#version 460 core
-
-		layout (location = 0) in vec3 pos;
-		layout (location = 1) in vec2 uv;
-		layout (location = 2) in vec3 norm;
-
-		uniform mat4 u_projection;
-		uniform mat4 u_view;
-		uniform mat4 u_model;
-
-		out vec4 pos_o;
-		out vec3 pos_world_o;
-		out vec3 norm_o;
-		out vec2 uv_o;
-
-		void main()
-		{
-			pos_o = (u_projection * u_view * u_model * vec4(pos, 1.0));
-			pos_world_o = (u_model * vec4(pos, 1.0)).xyz;
-			norm_o = norm;
-			uv_o = vec2(uv.x, 1.0 - uv.y);
-			gl_Position = pos_o;
-		}
-		)REE",
-		fsString = R"REE(
-		#version 460 core
-
-		in vec4 pos_o;
-		in vec3 pos_world_o;
-		in vec2 uv_o;
-		in vec3 norm_o;
-		out vec4 colorOut;
-
-		uniform sampler2D u_texture;
-
-		void main()
-		{
-			//float diffuse = max(dot(norm_o, normalize(-pos_world_o + vec3(200.0, 20.0, 200.0))) / (0.05 * length(-pos_world_o + vec3(200.0, 20.0, 200.0))), 0.001);
-			float diffuse = max(dot(norm_o, normalize(-pos_world_o + vec3(200.0, 20.0, 200.0))), 0.1);
-			//colorOut = vec4(norm_o.r, norm_o.g, norm_o.b, 1.0);
-
-			colorOut = vec4(diffuse, diffuse * 0.6, diffuse * 0.7, 1.0) * texture(u_texture, uv_o);
-		}
-		)REE";
-
-	verShader.CompileFromSrcString(vsString);
-	fragShader.CompileFromSrcString(fsString);
+	verShader.CompileFromFile("Assets/generic3D.vert");
+	fragShader.CompileFromFile("Assets/generic3D.frag");
 
 	m_font = TTF_OpenFont("Assets/sans.ttf", 36);
 	music = Mix_LoadWAV("Assets/thanos.ogg");

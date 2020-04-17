@@ -40,6 +40,9 @@ set(SRC_FILES
 	"STR/GameStates/Lobby.hpp"
 	"STR/GameStates/UITest.hpp"
 	"STR/GameStates/UITest.cpp"
+	"STR/GameStates/Editor.hpp"
+	"STR/GameStates/Editor.cpp"
+
 	"STR/MenuButton.hpp"
 )
 

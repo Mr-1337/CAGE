@@ -43,7 +43,7 @@ namespace cage
 			UIElement* m_parent;
 			std::vector<Child> m_children;
 
-			glm::mat4 m_localTransform, m_totalTransform;
+			glm::mat4 m_totalTransform;
 
 			glm::vec2 m_position;
 			// Size is the actual dimensions of the raw, untransformed UIElement which does not impact children, Scale is a scale transform that affects children 
@@ -104,6 +104,7 @@ namespace cage
 			virtual ~UIElement() = default;
 
 			static std::shared_ptr<SpriteShader> shader;
+			
 
 		private:
 
@@ -113,7 +114,6 @@ namespace cage
 			bool m_textured;
 
 			void recalcTransform();
-
 			void drawChildren();
 			void updateChildren(float deltaTime);
 

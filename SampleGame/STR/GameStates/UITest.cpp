@@ -133,7 +133,7 @@ void UITest::Update(float dt)
 	b1->Rotate(dt * (0.11 + fast));
 	b2->Rotate(dt * (0.23 + fast));
 	b3->Rotate(dt * (0.34 + fast));
-	b4->Rotate(dt * (0.64 + fast));
+	//b4->Rotate(dt * (0.64 + fast));
 
 	glm::vec2 total = { 0.f, 0.f };
 
