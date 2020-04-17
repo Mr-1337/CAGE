@@ -32,6 +32,9 @@ set(SRC_FILES
 	"STR/Racers/Shrek.cpp"
 	"STR/Racers/Shrek.hpp"
 
+	"STR/Track/Track.hpp"
+	"STR/Track/Track.cpp"
+
 	"STR/GameStates/Sandbox.cpp"
 	"STR/GameStates/Sandbox.hpp"
 	"STR/GameStates/MainMenu.cpp"

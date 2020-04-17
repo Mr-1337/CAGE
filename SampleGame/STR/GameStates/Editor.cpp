@@ -19,6 +19,8 @@ Editor::Editor(std::pair<int, int> size)
 		spriteVer.CompileFromFile("Assets/sprite.vert");
 		spriteVer.CompileFromFile("Assets/sprite.frag");
 
+		
+
 		m_genericShader = std::make_shared<cage::Generic3DShader>(spriteVer, spriteFrag);
 	}
 
