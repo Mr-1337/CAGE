@@ -70,6 +70,10 @@ namespace cage
 	{
 
 		Vertex3UVNormal(const glm::vec3& position, const glm::vec2& uv, const glm::vec3& normal) : position(position), uv(uv), normal(normal) {};
+		Vertex3UVNormal(const Vertex3UVNormal& other) : position(other.position), uv(other.uv), normal(other.normal)
+		{
+
+		}
 
 		glm::vec3 position;
 		glm::vec2 uv;
