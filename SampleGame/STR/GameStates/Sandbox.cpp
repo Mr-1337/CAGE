@@ -69,17 +69,12 @@ Sandbox::Sandbox(std::pair<int, int> size) :
 
 	m_menuOverlay = std::make_shared<cage::ui::UIElement>(false);
 
-	using Ref = std::shared_ptr<cage::ui::UIElement>;
-	Ref button = std::make_shared<cage::ui::Button>(std::make_shared<cage::Texture>(IMG_Load("Assets/button/idle.png")), std::make_shared<cage::Texture>(IMG_Load("Assets/button/hover.png")), std::make_shared<cage::Texture>(IMG_Load("Assets/button/pressed.png")));
-	m_root.Add(button);
-	button->SetLocalMounting(cage::ui::MountPoint::TOP_LEFT);
-	//Ref checkgroup = std::make_shared<cage::ui::CheckBoxGroup>();
-	std::static_pointer_cast<cage::ui::Button>(button)->OnClick = [&]() { cage::Texture::MissingTexture = new cage::Texture(IMG_Load("Assets/simon.png")); };
-
 	//s1.MoveTo(glm::vec3{ 120.0f, 19.f, 150.0f }).Play(Mix_LoadWAV("Assets/shrek.ogg"));
 	//s2.MoveTo({ 200.f, 12.f, 200.f }).Play(Mix_LoadWAV("Assets/shrek2.ogg"));
 	//s3.MoveTo({ 50.0f, 15.f, 50.f }).Play(Mix_LoadWAV("Assets/shrek1.ogg"));
 	//s4.MoveTo({ 80.0f, 15.f, 120.0f }).Play(Mix_LoadWAV("Assets/vader.ogg"));
+
+	m_root.Resize(glm::vec2{ size.first, size.second });
 }
 
 void Sandbox::ProcessEvents()

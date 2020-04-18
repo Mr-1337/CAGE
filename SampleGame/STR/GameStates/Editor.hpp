@@ -23,7 +23,10 @@ private:
 	std::shared_ptr<cage::Generic3DShader> m_genericShader;
 	std::shared_ptr<cage::SpriteShader> m_spriteShader;
 
+	bool m_wireframe;
+	int m_selectedNode;
+
 	std::shared_ptr<cage::Camera> m_camera;
-	cage::Model shrek;
+	cage::Model shrek, thanos;
 	Track m_track;
 };

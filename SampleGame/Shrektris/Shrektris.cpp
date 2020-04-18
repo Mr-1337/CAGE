@@ -81,18 +81,23 @@ Shrektris::Shrektris(int argc, char** argv) :
 	scoreText = std::make_shared<cage::ui::UIElement>();
 	levelText = std::make_shared<cage::ui::UIElement>();
 
-	m_rootNode.SetLocalMounting(cage::ui::MountPoint::TOP_LEFT);
-	scoreText->SetLocalMounting(cage::ui::MountPoint::TOP_LEFT);
-	levelText->SetLocalMounting(cage::ui::MountPoint::TOP_LEFT);
+	scoreText->SetLocalMounting(cage::ui::MountPoint::CENTER_RIGHT);
+	levelText->SetLocalMounting(cage::ui::MountPoint::CENTER_RIGHT);
 
-	scoreText->MoveTo({ 250.f, 0.f });
-	levelText->MoveTo({ 250.f, 50.f });
+	scoreText->SetParentMounting(cage::ui::MountPoint::CENTER_RIGHT);
+	levelText->SetParentMounting(cage::ui::MountPoint::CENTER_RIGHT);
+
+	scoreText->MoveTo({ -200.f, 0.f });
+	levelText->MoveTo({ -200.f, 50.f });
 
 	m_rootNode.Resize({ (float)size.first, (float)size.second });
 	//m_rootNode.LoadTexture(IMG_Load("Assets/simon.png"));
 
 	m_rootNode.Add(scoreText);
 	m_rootNode.Add(levelText);
+
+	m_rootNode.Resize(glm::vec2{ size.first, size.second });
+	m_rootNode.MoveTo(0.5f * glm::vec2{ size.first, size.second });
 
 	scoreText->LoadTexture(TTF_RenderText_Blended(m_font, "Score: 0 ", fontColor));
 	levelText->LoadTexture(TTF_RenderText_Blended(m_font, "Level: 1", fontColor));

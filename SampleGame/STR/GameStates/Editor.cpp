@@ -1,6 +1,6 @@
 #include "Editor.hpp"
 
-Editor::Editor(std::pair<int, int> size)
+Editor::Editor(std::pair<int, int> size) : m_wireframe(false), m_selectedNode(0)
 {
 	glClearColor(0.1f, 0.3f, 0.1f, 1.0f);
 
@@ -32,10 +32,11 @@ Editor::Editor(std::pair<int, int> size)
 		m_genericShader->Projection->value = glm::perspective(glm::quarter_pi<float>(), (float)size.first / size.second, 0.1f, 500.f);
 		m_genericShader->Projection->ForwardToShader();
 
-		m_genericShader->Model->value = glm::translate(glm::identity<glm::mat4>(), {5, 5, +5});
+		m_genericShader->Model->value = glm::identity<glm::mat4>();
 		m_genericShader->Model->ForwardToShader();
 
 		shrek.LoadModel("Assets/shrek.obj");
+		thanos.LoadModel("Assets/Thanos.obj");
 
 		m_camera = std::make_shared<cage::Camera>(*m_genericShader);
 
@@ -74,6 +75,19 @@ void Editor::ProcessEvents()
 			m_camera->yaw += (float)e.motion.xrel / 10;
 			m_camera->pitch -= (float)e.motion.yrel / 10;
 			break;
+		case SDL_KEYDOWN:
+			if (e.key.keysym.sym == SDLK_f)
+			{
+				m_wireframe = !m_wireframe;
+				glPolygonMode(GL_FRONT_AND_BACK, m_wireframe ? GL_LINE : GL_FILL);
+			}
+			else if (e.key.keysym.sym == SDLK_n)
+			{
+				m_selectedNode++;
+				m_selectedNode %= 4;
+				m_track.Select(m_selectedNode);
+			}
+			break;
 		default:
 			m_input.Raise(e);
 		}
@@ -86,7 +100,7 @@ void Editor::Update(float dt)
 	tot += dt;
 
 	const Uint8* keys = SDL_GetKeyboardState(nullptr);
-	const float SPEED = 50.f;
+	const float SPEED = 5.f;
 	if (keys[SDL_SCANCODE_A])
 	{
 		m_camera->MoveLeftRight(-SPEED * dt);
@@ -111,6 +125,43 @@ void Editor::Update(float dt)
 	{
 		m_camera->Move(dt * glm::vec3{ 0.f,-SPEED,0.f });
 	}
+
+	glm::vec3 nodeMotion = { 0.f, 0.f, 0.f };
+
+	if (keys[SDL_SCANCODE_I])
+	{
+		nodeMotion.z += 1;
+	}
+	if (keys[SDL_SCANCODE_J])
+	{
+		nodeMotion.x += -1;
+	}
+	if (keys[SDL_SCANCODE_K])
+	{
+		nodeMotion.z += -1;
+	}
+	if (keys[SDL_SCANCODE_L])
+	{
+		nodeMotion.x += 1;
+	}
+	if (keys[SDL_SCANCODE_U])
+	{
+		nodeMotion.y += -1;
+	}
+	if (keys[SDL_SCANCODE_O])
+	{
+		nodeMotion.y += 1;
+	}
+
+	nodeMotion *= dt * 2.0f;
+
+	m_track.MoveNode(nodeMotion);
+
+	if (keys[SDL_SCANCODE_SPACE])
+	{
+		auto pos = m_camera->GetPosition();
+		std::cout << pos.x << ", " << pos.y << ", " << pos.z << std::endl;
+	}
 }
 
 
@@ -124,10 +175,19 @@ void Editor::Draw()
 
 	m_camera->Apply();
 
+	m_genericShader->Model->value = glm::identity<glm::mat4>();
+	m_genericShader->Model->ForwardToShader();
+
 	shrek.Draw();
 
-	glLineWidth(4.0f);
+	glLineWidth(2.0f);
 	m_track.GetRoad().Draw(GL_LINE_STRIP);
+	glLineWidth(4.0f);
+	m_track.GetTangentMesh().Draw(GL_LINES);
+	m_track.GetNormalMesh().Draw(GL_LINES);
+	m_genericShader->Model->value = glm::translate(glm::identity<glm::mat4>(), m_track.GetSelectionOffset());
+	m_genericShader->Model->ForwardToShader();
+	thanos.Draw();
 
 	glDisable(GL_DEPTH_TEST);
 	m_spriteShader->Use();
