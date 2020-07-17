@@ -7,18 +7,90 @@ Sandbox::Sandbox(std::pair<int, int> size) :
 	spriteFragShader(cage::Shader::ShaderType::FRAGMENT),
 	world("World", true)
 {
+
+	totalTime = 0;
+	iplCreateContext(nullptr, nullptr, nullptr, &context);
+
+
+	IPLRenderingSettings settings{ samplingrate, framesize };
+
+	IPLHrtfParams hrtfParams{ IPL_HRTFDATABASETYPE_DEFAULT, nullptr, 0};
+	iplCreateBinauralRenderer(context, settings, hrtfParams, &m_audioRenderer);
+
+	IPLAudioFormat input, output;
+	input.channelLayoutType	= IPL_CHANNELLAYOUTTYPE_SPEAKERS;
+	input.channelLayout		= IPL_CHANNELLAYOUT_SEVENPOINTONE;
+	input.channelOrder		= IPL_CHANNELORDER_INTERLEAVED;
+
+	output.channelLayoutType = IPL_CHANNELLAYOUTTYPE_SPEAKERS;
+	output.channelLayout	 = IPL_CHANNELLAYOUT_SEVENPOINTONE;
+	output.channelOrder		 = IPL_CHANNELORDER_INTERLEAVED;
+
+	effect = nullptr;
+	iplCreateBinauralEffect(m_audioRenderer, input, output, &effect);
+	
+	iplCreateDirectSoundEffect(output, output, settings, &effect2);
+
+	Mix_Chunk* sound = Mix_LoadWAV("Assets/shrek.ogg");
+
+	inBuffer = { input, framesize, (IPLfloat32*)sound->abuf };
+
+	srcBuff = (float*)sound->abuf;
+	audioBuffer.resize(framesize * 8);
+
+	iplCreateEnvironment(context, nullptr, {}, nullptr, nullptr, &m_envRenderer);
+
+	// get and print the audio format in use
+	int numtimesopened, frequency, channels;
+	Uint16 format;
+	numtimesopened = Mix_QuerySpec(&frequency, &format, &channels);
+	if (!numtimesopened) {
+		printf("Mix_QuerySpec: %s\n", Mix_GetError());
+	}
+	else {
+		const char* format_str = "Unknown";
+		switch (format) {
+		case AUDIO_U8: format_str = "U8"; break;
+		case AUDIO_S8: format_str = "S8"; break;
+		case AUDIO_U16LSB: format_str = "U16LSB"; break;
+		case AUDIO_S16LSB: format_str = "S16LSB"; break;
+		case AUDIO_U16MSB: format_str = "U16MSB"; break;
+		case AUDIO_S16MSB: format_str = "S16MSB"; break;
+		case AUDIO_F32LSB: format_str = "F32LSB"; break;
+		}
+		printf("opened=%d times  frequency=%dHz  format=%s  channels=%d",
+			numtimesopened, frequency, format_str, channels);
+	}
+
+	outBuffer = { output, framesize, audioBuffer.data() };
+
+	shrekSong.allocated = 0;
+	shrekSong.abuf = (Uint8*)audioBuffer.data();
+	shrekSong.alen = audioBuffer.size() * sizeof(float);
+	shrekSong.volume = 127;
+
+
+	//Mix_PlayChannel(3, sound, -1);
+
 	world.BindVAO();
 	world.SetGeometry(genTerrain());
 	//glClearColor(0.4f, 0.5f, 0.2f, 0.0f);
 	glClearColor(0.f, 0.f, 0.f, 1.f);
 	shrek.LoadModel("Assets/shrek.obj");
-	thanos.LoadModel("Assets/thanos.obj");
-	vader.LoadModel("Assets/vader.obj");
+	//thanos.LoadModel("Assets/thanos.obj");
+	//vader.LoadModel("Assets/vader.obj");
 
 	//SDL_assert(controller != nullptr);
 
 	verShader.CompileFromFile("Assets/generic3D.vert");
 	fragShader.CompileFromFile("Assets/generic3D.frag");
+
+	SDL_AudioSpec spec;
+	spec.freq = 44100;
+	spec.channels = 8;
+	spec.format = AUDIO_F32LSB;
+	spec.samples = 1024;
+	spec.callback = nullptr;
 
 	m_font = TTF_OpenFont("Assets/sans.ttf", 36);
 	music = Mix_LoadWAV("Assets/thanos.ogg");
@@ -39,12 +111,11 @@ Sandbox::Sandbox(std::pair<int, int> size) :
 	m_needle = std::make_shared<cage::ui::UIElement>();
 	m_needle->LoadTexture(IMG_Load("Assets/needle.png"));
 
-	//m_button->MoveTo({ 600, 300 });
-
-	m_fpsCounter = std::make_shared<cage::ui::UIElement>();
+	m_fpsCounter = std::make_shared<cage::ui::Text>(m_font);
 	m_root.Add(m_fpsCounter);
 	m_fpsCounter->SetLocalMounting(cage::ui::MountPoint::TOP_LEFT);
-	m_fpsCounter->MoveTo({ 20, 0 });
+	m_fpsCounter->SetParentMounting(cage::ui::MountPoint::TOP_LEFT);
+	//m_fpsCounter->MoveTo({ 20, 20 });
 
 	spriteVerShader.CompileFromFile("Assets/sprite.ver");
 	spriteFragShader.CompileFromFile("Assets/sprite.frag");
@@ -52,17 +123,16 @@ Sandbox::Sandbox(std::pair<int, int> size) :
 	spriteProgram = std::make_shared<cage::SpriteShader>(spriteVerShader, spriteFragShader);
 	spriteProgram->Use();
 
-	//spriteProgram->Projection->value = glm::identity<glm::mat4>();
 	spriteProgram->Projection->value = glm::ortho(0.f, (float)size.first, (float)size.second, 0.f);
 	spriteProgram->Projection->ForwardToShader();
 
 	m_root.Resize({ size.first, size.second });
-	m_speedometer->SetLocalMounting(cage::ui::MountPoint::TOP_LEFT);
+	m_speedometer->SetLocalMounting(cage::ui::MountPoint::TOP_RIGHT);
+	m_speedometer->SetParentMounting(cage::ui::MountPoint::TOP_RIGHT);
 	m_root.Add(m_speedometer);
-	m_needle->SetLocalMounting(cage::ui::MountPoint::CENTER);
-	m_speedometer->Add(m_needle);
-	m_speedometer->MoveTo({ 880.f, 0.f });
+	m_needle->SetLocalMounting(cage::ui::MountPoint::BOTTOM);
 	m_needle->MoveTo({ 0.f, 5.f });
+	m_speedometer->Add(m_needle);
 	cage::ui::UIElement::shader = spriteProgram;
 
 	camera->SetPosition({ 200, 30, 10 });
@@ -75,6 +145,7 @@ Sandbox::Sandbox(std::pair<int, int> size) :
 	//s4.MoveTo({ 80.0f, 15.f, 120.0f }).Play(Mix_LoadWAV("Assets/vader.ogg"));
 
 	m_root.Resize(glm::vec2{ size.first, size.second });
+	m_root.MoveTo(0.5f * glm::vec2{ size.first, size.second });
 }
 
 void Sandbox::ProcessEvents()
@@ -129,6 +200,9 @@ void Sandbox::ProcessEvents()
 
 				spriteProgram->Projection->value = glm::ortho(0.f, (float)e.window.data1, (float)e.window.data2, 0.f);
 				spriteProgram->Projection->ForwardToShader();
+
+				m_root.Resize(glm::vec2{ e.window.data1, e.window.data2 });
+				m_root.MoveTo(0.5f * glm::vec2{ e.window.data1, e.window.data2 });
 			}
 			break;
 		}
@@ -176,17 +250,80 @@ void Sandbox::Update(float delta)
 		i = 0;
 	}
 
-	//yVel += g * delta;
+	yVel += g * delta;
 	textTime += delta;
 
-	listener.MoveTo(camera->GetPosition()).LookAt(glm::normalize(camera->GetFront()), camera->GetRight());
-	s1.UpdateListener(listener);
-	s2.UpdateListener(listener);
-	s3.UpdateListener(listener);
-	s4.UpdateListener(listener);
-	if (textTime > 0.1)
+	totalTime += delta;
+
+	//std::cout << totalTime << std::endl;
+
+	static int soundFrame = 0;
+
+	if (totalTime >=  (1024.f / 44100.f))
 	{
-		m_fpsCounter->LoadTexture(TTF_RenderText_Blended(m_font, std::string("FPS: " + std::to_string(1.0 / delta)).c_str(), FONT_COLOR));
+
+		soundFrame += 1;
+
+		IPLVector3 offset, pos;
+		auto v = glm::normalize(glm::vec3{ 120.0f, 19.f, 150.0f } - camera->GetPosition());
+
+		auto v2 = camera->GetPosition();
+		pos = { v2.x, v2.y, v2.z };
+
+		auto front = camera->GetFront();
+		auto right = camera->GetRight();
+		auto up = glm::cross(right, front);
+
+		offset.x = v.x;
+		offset.y = v.y;
+		offset.z = v.z;
+
+		IPLSource source;
+		IPLDirectivity d;
+
+		d.dipolePower = 0.8;
+		d.dipoleWeight = 0.7;
+		d.callback = nullptr;
+
+		source.position = { 120.0f, 19.f, 150.0f };
+		source.ahead = { 1.0, 0, 0 };
+		source.up = { 0, 1, 0 };
+		source.right = { 0, 0, 1 };
+		source.distanceAttenuationModel = { IPL_DISTANCEATTENUATION_DEFAULT };
+		source.airAbsorptionModel = { IPL_AIRABSORPTION_DEFAULT };
+		source.directivity = d;
+
+		IPLDirectSoundPath path = iplGetDirectSoundPath(m_envRenderer, pos, { front.x, front.y, front.z }, { up.x, up.y, up.z }, source, 10.f, 0, IPL_DIRECTOCCLUSION_NONE, IPL_DIRECTOCCLUSION_RAYCAST);
+
+		IPLDirectSoundEffectOptions options;
+		options.applyAirAbsorption = IPL_FALSE;
+		options.applyDirectivity = IPL_FALSE;
+		options.applyDistanceAttenuation = IPL_TRUE;
+		options.directOcclusionMode = IPL_DIRECTOCCLUSION_NONE;
+
+		//iplApplyDirectSoundEffect(effect2, inBuffer, path, options, outBuffer);
+		iplApplyBinauralEffect(effect, m_audioRenderer, inBuffer, offset, IPL_HRTFINTERPOLATION_NEAREST, 1, outBuffer);
+
+		inBuffer.interleavedBuffer += framesize * 4;
+
+		//SDL_memcpy(audioBuffer.data(), &srcBuff[soundFrame * 1024 * 8], 1024 * 8 * sizeof(float));
+
+		//std::cout << SDL_QueueAudio(2, audioBuffer.data(), audioBuffer.size() * sizeof(float));
+		//std::cout << SDL_GetError() << '\n';
+
+		Mix_PlayChannel(1, &shrekSong, 0);
+
+		totalTime = 0;
+	}
+
+	listener.MoveTo(camera->GetPosition()).LookAt(glm::normalize(camera->GetFront()), camera->GetRight());
+	//s1.UpdateListener(listener);
+	//s2.UpdateListener(listener);
+	//s3.UpdateListener(listener);
+	//s4.UpdateListener(listener);
+	if (textTime > 0.05)
+	{
+		m_fpsCounter->SetText(std::string("FPS: " + std::to_string(1.0 / delta)).c_str());
 		textTime = 0.f;
 	}
 	m_needle->SetRotation((std::abs(yVel / 128.0 * M_PI)) - 2 * M_PI / 3);
@@ -227,15 +364,15 @@ void Sandbox::Draw()
 	program->Model->value = glm::translate(glm::identity<glm::mat4>(), glm::vec3{ 120.0f, 19.f, 150.0f });
 	program->Model->ForwardToShader();
 	shrek.Draw();
-	program->Model->value = glm::translate(glm::identity<glm::mat4>(), glm::vec3{ 80.0f, 15.f, 120.0f });
-	program->Model->ForwardToShader();
-	vader.Draw();
+	//program->Model->value = glm::translate(glm::identity<glm::mat4>(), glm::vec3{ 80.0f, 15.f, 120.0f });
+	//program->Model->ForwardToShader();
+	//vader.Draw();
 	program->Model->value = glm::translate(glm::identity<glm::mat4>(), { 50.0f, 15.f, 50.f });
 	program->Model->ForwardToShader();
 	car.Draw();
-	program->Model->value = glm::rotate(glm::scale(glm::translate(glm::identity<glm::mat4>(), { 200.f, 12.f, 200.f }), { 3.f, 3.f, 3.f }), glm::pi<float>(), { 0.f, 1.f, 0.f });
-	program->Model->ForwardToShader();
-	thanos.Draw();
+	//program->Model->value = glm::rotate(glm::scale(glm::translate(glm::identity<glm::mat4>(), { 200.f, 12.f, 200.f }), { 3.f, 3.f, 3.f }), glm::pi<float>(), { 0.f, 1.f, 0.f });
+	//program->Model->ForwardToShader();
+	//thanos.Draw();
 	program->Model->value = glm::identity<glm::mat4>();
 	program->Model->ForwardToShader();
 	

@@ -5,6 +5,7 @@
 #include <SDL2/SDL_ttf.h>
 
 #include "UITest.hpp"
+#include "../MenuButton.hpp"
 
 UITest::UITest(std::pair<int, int> size)
 {
@@ -24,10 +25,15 @@ UITest::UITest(std::pair<int, int> size)
 
 	cage::ui::UIElement::shader = m_spriteShader;
 
-	b1 = std::make_shared<cage::ui::Button>(std::make_shared<cage::Texture>(IMG_Load("Assets/simon.png")), std::make_shared<cage::Texture>(IMG_Load("Assets/simon2.png")), std::make_shared<cage::Texture>(IMG_Load("Assets/ms.png")));
-	b2 = std::make_shared<cage::ui::Button>(std::make_shared<cage::Texture>(IMG_Load("Assets/simon.png")), std::make_shared<cage::Texture>(IMG_Load("Assets/simon2.png")), std::make_shared<cage::Texture>(IMG_Load("Assets/ms.png")));
-	b3 = std::make_shared<cage::ui::Button>(std::make_shared<cage::Texture>(IMG_Load("Assets/simon.png")), std::make_shared<cage::Texture>(IMG_Load("Assets/simon2.png")), std::make_shared<cage::Texture>(IMG_Load("Assets/ms.png")));
-	b4 = std::make_shared<cage::ui::Button>(std::make_shared<cage::Texture>(IMG_Load("Assets/simon.png")), std::make_shared<cage::Texture>(IMG_Load("Assets/simon2.png")), std::make_shared<cage::Texture>(IMG_Load("Assets/ms.png")));
+	//b1 = std::make_shared<cage::ui::Button>(std::make_shared<cage::Texture>(IMG_Load("Assets/simon.png")), std::make_shared<cage::Texture>(IMG_Load("Assets/simon2.png")), std::make_shared<cage::Texture>(IMG_Load("Assets/ms.png")));
+	//b2 = std::make_shared<cage::ui::Button>(std::make_shared<cage::Texture>(IMG_Load("Assets/simon.png")), std::make_shared<cage::Texture>(IMG_Load("Assets/simon2.png")), std::make_shared<cage::Texture>(IMG_Load("Assets/ms.png")));
+	//b3 = std::make_shared<cage::ui::Button>(std::make_shared<cage::Texture>(IMG_Load("Assets/simon.png")), std::make_shared<cage::Texture>(IMG_Load("Assets/simon2.png")), std::make_shared<cage::Texture>(IMG_Load("Assets/ms.png")));
+	//b4 = std::make_shared<cage::ui::Button>(std::make_shared<cage::Texture>(IMG_Load("Assets/simon.png")), std::make_shared<cage::Texture>(IMG_Load("Assets/simon2.png")), std::make_shared<cage::Texture>(IMG_Load("Assets/ms.png")));
+
+	b1 = std::make_shared<MenuButton>("1");
+	b2 = std::make_shared <MenuButton>("2");
+	b3 = std::make_shared <MenuButton>("3");
+	b4 = std::make_shared <MenuButton>("4");
 
 	auto font = TTF_OpenFont("Assets/sans.ttf", 36);
 
@@ -39,20 +45,19 @@ UITest::UITest(std::pair<int, int> size)
 	message->SetColor({ 0, 0, 255, 255 });
 	message->SetText("Still waiting...");
 
-	//m_root.Resize({ size.first, size.second });
-
-	b1->MoveTo({ 700, 700 });
+	//b4->MoveTo({ 300, 300 });
 
 	m_root.Add(b1);
 	b1->Add(message);
 	b1->Add(b2);
 	b2->Add(b3);
 	b3->Add(b4);
-	b1->Add(c1);
+
+	m_root.Add(c1);
 	m_root.Add(c2);
-	
 	m_root.Add(c3);
 
+	b1->SetParentMounting(cage::ui::MountPoint::CENTER);
 	b2->SetLocalMounting(cage::ui::MountPoint::TOP_RIGHT);
 	b2->SetParentMounting(cage::ui::MountPoint::BOTTOM_RIGHT);
 	b3->SetLocalMounting(cage::ui::MountPoint::CENTER_LEFT);
@@ -60,11 +65,13 @@ UITest::UITest(std::pair<int, int> size)
 	b4->SetLocalMounting(cage::ui::MountPoint::CENTER_RIGHT);
 	b4->SetParentMounting(cage::ui::MountPoint::BOTTOM_RIGHT);
 
-	b2->Scale(0.7);
+	b2->Scale(0.8);
 	b3->Scale(0.5);
 	b4->Scale(0.5);
 
+	c1->MoveTo({ 800, 700 });
 	c2->MoveTo({ 0, 100 });
+	c3->MoveTo({ 800, 600 });
 
 	m_input.Subscribe((cage::EventListener*)b1.get());
 	m_input.Subscribe((cage::EventListener*)b2.get());
@@ -83,6 +90,9 @@ UITest::UITest(std::pair<int, int> size)
 	b2->OnClick = [this]() { Mix_PlayChannel(1, s2, 0); };
 	b3->OnClick = [this]() { Mix_PlayChannel(1, s3, 0); };
 	b4->OnClick = [this]() { Mix_PlayChannel(1, s4, 0); };
+
+	m_root.Resize({ size.first, size.second });
+	m_root.MoveTo({ size.first / 2, size.second / 2 });
 
 }
 
@@ -104,6 +114,10 @@ void UITest::ProcessEvents()
 				glViewport(0, 0, e.window.data1, e.window.data2);
 				m_spriteShader->Projection->value = glm::ortho(0.f, (float)newSize.first, (float)newSize.second, 0.f);
 				m_spriteShader->Projection->ForwardToShader();
+
+				m_root.Resize({ e.window.data1, e.window.data2 });
+				m_root.MoveTo({ e.window.data1 / 2, e.window.data2 / 2 });
+
 				break;
 			}
 			break;
@@ -113,7 +127,7 @@ void UITest::ProcessEvents()
 			else
 			{
 				b1->Scale(0.99f);
-				///message->SetText("REEEEEE");
+				message->SetText("REEEEEE");
 			}
 			break;
 		default:
@@ -133,7 +147,8 @@ void UITest::Update(float dt)
 	b1->Rotate(dt * (0.11 + fast));
 	b2->Rotate(dt * (0.23 + fast));
 	b3->Rotate(dt * (0.34 + fast));
-	//b4->Rotate(dt * (0.64 + fast));
+
+	b4->Rotate(dt * (0.64 + fast));
 
 	glm::vec2 total = { 0.f, 0.f };
 

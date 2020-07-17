@@ -8,6 +8,7 @@ out vec4 colorOut;
 
 void main()
 {
-	//colorOut = vec4(uv_o, 0.0, 1.0);
+	//colorOut = vec4(2.f * uv_o, 0.0, 1.0);
+
 	colorOut = texture(u_texture, uv_o);
 }

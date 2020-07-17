@@ -11,14 +11,14 @@ namespace cage
 
 	void AudioSource::UpdateListener(const Listener& listener)
 	{
-		uint8_t distance;
+		float distance;
 		Sint16 angle;
 
 		glm::vec3 lFront = listener.GetFront(), lPos = listener.GetPosition(), lRight = listener.GetRight();
 		lFront.y = 0;
 		lFront = glm::normalize(lFront);
 
-		distance = (uint8_t) glm::min(glm::distance(lPos, m_position) * 5.f, 250.f);
+		distance = glm::min(glm::distance(lPos, m_position) * 0.1f, 250.f);
 
 		float dot = (glm::dot(lFront, m_position - lPos));
 		float dot2 = glm::dot(lRight, m_position - lPos);
@@ -29,11 +29,10 @@ namespace cage
 
 		angle = (Sint16)theta * ((dot2 >= 0) ? 1 : -1) + 360;
 
-		if (m_channel == 1)
-			std::cout << angle << '\n';
+		int volume = 127 * (1.0f / (distance*distance));
 
-		Mix_Volume(m_channel, distance);
-		//std::cout << Mix_GetError() << '\n';
+		Mix_Volume(m_channel, volume);
+
 	}
 
 	void AudioSource::Play(Mix_Chunk* audio)

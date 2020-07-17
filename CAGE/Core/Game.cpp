@@ -64,7 +64,7 @@ namespace cage
 
 		// SDL_mixer
 
-		if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 2048) == -1)
+		if (Mix_OpenAudio(44100, AUDIO_F32LSB, 8, 1024) == -1)
 			throw std::runtime_error("Failed to OpenAudio with SDL_mixer.");
 
 		int sndFlags = MIX_INIT_MP3 | MIX_INIT_OGG;

@@ -38,10 +38,10 @@ glm::vec3 SplineSegment::GetNormal(float t)
 
 Track::Track() : m_roadMesh("Road Mesh"), m_tangentMesh("Tangent Mesh"), m_normMesh("Normal Mesh"), m_selected(0)
 {
-	m_spline.p0 = { 2.5f, 9.f, 0.f };
-	m_spline.p1 = { 4.f, 2.0f, 5.f };
-	m_spline.p2 = { 7.5f, 4.f, 10.f };
-	m_spline.p3 = { 10.f, 10., 5.f };
+	m_spline.p0 = { 2.5f, 9.f, 5.f };
+	m_spline.p1 = { 4.f, 4.0f, 5.f };
+	m_spline.p2 = { 7.5f, 4.f, 5.f };
+	m_spline.p3 = { 10.f, 9., 5.f };
 
 	regenMesh();
 
@@ -98,10 +98,10 @@ void Track::regenMesh()
 		points.emplace_back(cage::Vertex3UVNormal{ m_spline.Interpolate(t) - thickness * normal, {0.f, 0.f}, normal });
 
 		tanPoints.emplace_back(cage::Vertex3UVNormal{ m_spline.Interpolate(t), {0.f, 0.f},  {0.0, 0.0, 0.0} });
-		tanPoints.emplace_back(cage::Vertex3UVNormal{ m_spline.Interpolate(t) + 0.4f * tan, {0.f, 0.f},  normal });
+		tanPoints.emplace_back(cage::Vertex3UVNormal{ m_spline.Interpolate(t) + 0.05f * tan, {0.f, 0.f},  normal });
 
 		normPoints.emplace_back(cage::Vertex3UVNormal{ m_spline.Interpolate(t), {0.f, 0.f},  {0.0, 0.0, 0.0} });
-		normPoints.emplace_back(cage::Vertex3UVNormal{ m_spline.Interpolate(t) + 0.4f * normal, {0.f, 0.f},  normal });
+		normPoints.emplace_back(cage::Vertex3UVNormal{ m_spline.Interpolate(t) + 0.05f * normal, {0.f, 0.f},  normal });
 	}
 
 	m_roadMesh.SetGeometry(points);
