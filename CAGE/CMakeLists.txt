@@ -39,6 +39,8 @@ set(SRC_FILES
 	"Graphics/VertexLayouts/VertexAttribute.hpp"
 	"Graphics/VertexArrays/VertexArray.hpp"
 	"Graphics/Buffers/VertexBuffer.hpp"
+	"Graphics/Buffers/FrameBuffer.hpp"
+	"Graphics/Buffers/FrameBuffer.cpp"
 	"Graphics/Textures/Texture.hpp"
 	"Graphics/Textures/Texture.cpp"
 	"Graphics/Uniforms/Uniforms.hpp"

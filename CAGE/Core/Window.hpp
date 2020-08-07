@@ -14,9 +14,13 @@ namespace cage
 		void SetPosition(int x, int y);
 		std::pair<int, int> GetPosition() const;
 		std::pair<int, int> GetSize() const;
+		void SetSize(int w, int h);
+		void MakeContextCurrent(SDL_GLContext context);
+		inline SDL_GLContext GetGLContext() { return m_context; };
 		inline void SwapBuffers() { SDL_GL_SwapWindow(m_rawHandle); }
 	private:
 		SDL_Window* m_rawHandle;
+		SDL_GLContext m_context;
 		int m_width, m_height;
 	};
 }

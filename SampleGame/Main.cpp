@@ -23,5 +23,6 @@ int main(int argc, char** argv)
 {
 	PlayGame<Shrektris>(argc, argv);
 	std::cout << "It's not ogre, it's never ogre" << std::endl;
+
 	return 0;
 }
