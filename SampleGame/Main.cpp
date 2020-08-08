@@ -9,7 +9,6 @@
 #include <iostream>
 #include "Shrektris/Shrektris.hpp"
 #include "STR/STR.hpp"
-#include "AFTR/AFTR.hpp"
 
 
 template<typename T>

@@ -1,6 +1,6 @@
 # sample game configuration
 
-cmake_minimum_required (VERSION 3.8)
+cmake_minimum_required (VERSION 3.10)
 
 set(SRC_FILES
 	"Main.cpp" 
@@ -10,20 +10,6 @@ set(SRC_FILES
 	"STR/STR.hpp" 
 	"STR/Car.cpp" 
 	"STR/Car.hpp" 
-	"AFTR/AFTR.cpp" 
-	"AFTR/AFTR.hpp"
-	"AFTR/World.cpp"
-	"AFTR/World.hpp"
-	"AFTR/PartShader.hpp"
-	"AFTR/ComponentBase.hpp"
-	"AFTR/Cross.hpp"
-	"AFTR/Cross.cpp"
-	"AFTR/Pipe.hpp"
-	"AFTR/Pipe.cpp"
-	"AFTR/Well.hpp"
-	"AFTR/Well.cpp"
-	"AFTR/Network.hpp"
-	"AFTR/Network.cpp"
 	"STR/Perlin.cpp" 
 	"STR/Perlin.hpp"
 
@@ -51,15 +37,15 @@ set(SRC_FILES
 
 add_executable (SampleGame ${SRC_FILES})
 
-#install (DIRECTORY Assets/ DESTINATION ${CMAKE_BINARY_DIR}/Assets/)
+install (DIRECTORY Assets/ DESTINATION ${CMAKE_BINARY_DIR}/Assets/)
 
-#add_custom_command(TARGET SampleGame PRE_BUILD
-#                   COMMAND ${CMAKE_COMMAND} -E copy_directory
-#                       ${CMAKE_SOURCE_DIR}/SampleGame/Assets $<TARGET_FILE_DIR:SampleGame>/Assets)
+add_custom_command(TARGET SampleGame PRE_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E copy_directory
+                       ${CMAKE_SOURCE_DIR}/SampleGame/Assets $<TARGET_FILE_DIR:SampleGame>/Assets)
 
-#add_custom_command(TARGET SampleGame PRE_BUILD
-#                   COMMAND ${CMAKE_COMMAND} -E copy_directory
-#                       ${CMAKE_SOURCE_DIR}/lib/Dlls $<TARGET_FILE_DIR:SampleGame>)
+add_custom_command(TARGET SampleGame PRE_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E copy_directory
+                       ${CMAKE_SOURCE_DIR}/lib/Dlls $<TARGET_FILE_DIR:SampleGame>)
 
 # SDL libraries
 set (SDL_LIBS SDL2/SDL2 SDL2/SDL2main SDL2/SDL2_mixer SDL2/SDL2_image SDL2/SDL2_ttf SDL2/SDL2_net)

@@ -112,7 +112,7 @@ Shrektris::Shrektris(int argc, char** argv) :
 	program->Model->value = glm::scale(program->Model->value, { 1.f, 0.6f, 1.f });
 	program->Model->ForwardToShader();
 
-	spriteVS.CompileFromFile("Assets/sprite.ver");
+	spriteVS.CompileFromFile("Assets/sprite.vert");
 	spriteFS.CompileFromFile("Assets/sprite.frag");
 
 	spriteProgram = std::make_shared<cage::SpriteShader>(spriteVS, spriteFS);
