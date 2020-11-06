@@ -4,7 +4,7 @@ namespace cage
 {
 	namespace ui
 	{
-		Text::Text(TTF_Font* font) : m_font(font), m_color{ 255, 255, 255, 255}
+		Text::Text(const Font& font) : m_font(font), m_color{ 255, 255, 255, 255}
 		{
 
 		}
@@ -12,7 +12,7 @@ namespace cage
 		void Text::SetText(const std::string& text)
 		{
 			m_text = text.empty() ? " " : text;
-			SetActiveTexture(std::make_shared<Texture>(TTF_RenderText_Blended(m_font, m_text.c_str(), m_color)));
+			SetActiveTexture(m_font.Render(m_text, m_color));
 		}
 
 		void Text::SetColor(SDL_Color color)

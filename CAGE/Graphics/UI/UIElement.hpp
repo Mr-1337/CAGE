@@ -34,11 +34,13 @@ namespace cage
 
 		class UIElement : public cage::EventListener
 		{
+		protected:
+
+			using Child = std::shared_ptr<UIElement>;
+		private:
 
 			MountPoint m_localMount;
 			MountPoint m_parentMount;
-
-			using Child = std::shared_ptr<UIElement>;
 
 			UIElement* m_parent;
 			std::vector<Child> m_children;
@@ -48,6 +50,9 @@ namespace cage
 			glm::vec2 m_position;
 			// Size is the actual dimensions of the raw, untransformed UIElement which does not impact children, Scale is a scale transform that affects children 
 			glm::vec2 m_scale, m_size, m_mountOffset, m_parentMountOffset;
+
+			// The color to render this quad if it is a non textured element
+			glm::vec4 m_color;
 
 			float m_rotation;
 
@@ -61,9 +66,18 @@ namespace cage
 
 			inline void SetActiveTexture(std::shared_ptr<Texture> texture)
 			{
-				m_currentTexture = texture;
-				m_size.x = texture->GetSize().first;
-				m_size.y = texture->GetSize().second;
+				if (texture)
+				{
+					m_textured = true;
+					m_currentTexture = texture;
+					m_size.x = texture->GetSize().first;
+					m_size.y = texture->GetSize().second;
+				}
+			}
+
+			inline void SetColor(glm::vec4 color)
+			{
+				m_color = color;
 			}
 
 			inline virtual bool HandleEvent(Event& e)
@@ -74,20 +88,30 @@ namespace cage
 			virtual void Update(float deltaTime);
 			virtual void Draw(); 
 
-			inline void SetLocalMounting(MountPoint mounting) { m_localMount = mounting; }
-			inline void SetParentMounting(MountPoint mounting) { m_parentMount = mounting; }
+
+			// Sets what part of this element will be used as the local origin
+			inline void SetLocalMounting(MountPoint mounting) { m_localMount = mounting; recalcTransform(); }
+
+			// Sets what part of the parent element the origin should be placed at
+			inline void SetParentMounting(MountPoint mounting) { m_parentMount = mounting; recalcTransform(); }
+
+			// Transform manipulators and accessors
 
 			void Resize(glm::vec2 size);
 			void MoveTo(glm::vec2 newPosition);
 			void Scale(float scaleFactor);
 			inline glm::vec2 GetSize() const { return m_size; }
 			inline glm::vec2 GetScale() const { return m_scale; }
+			// Helper to get scaled size, useful for auto positioning elements relative to each other
+			inline glm::vec2 GetScaledSize() const { return m_size * m_scale; }
 			inline glm::vec2 GetPosition() const { return m_position; }
 			inline void Rotate(float angle) { m_rotation += angle; recalcTransform(); }
 			inline void SetRotation(float angle) { m_rotation = angle; recalcTransform(); }
 			inline void SetScale(float scaleFactor) { m_scale = { scaleFactor, scaleFactor }; recalcTransform(); }
+			inline void SetVisible(bool visible) { m_visible = visible; }
 			
 			inline glm::mat4 GetTransform() const { return m_totalTransform; }
+			inline void SetTransform(const glm::mat4&& transform) { m_totalTransform = transform; }
 
 			std::vector<Child>& GetChildren();
 
@@ -112,6 +136,7 @@ namespace cage
 			static bool init;
 
 			bool m_textured;
+			bool m_visible;
 
 			void recalcTransform();
 			void drawChildren();

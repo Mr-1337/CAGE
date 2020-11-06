@@ -13,7 +13,11 @@
 class Editor : public cage::GameState
 {
 public:
-	Editor(std::pair<int, int> size);
+	Editor(cage::Game& game, std::pair<int, int> size);
+
+	void OnRevealed() override;
+	void OnHidden() override;
+
 	void ProcessEvents() override;
 	void Update(float dt) override;
 	void Draw() override;

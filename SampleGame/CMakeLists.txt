@@ -37,8 +37,6 @@ set(SRC_FILES
 
 add_executable (SampleGame ${SRC_FILES})
 
-install (DIRECTORY Assets/ DESTINATION ${CMAKE_BINARY_DIR}/Assets/)
-
 add_custom_command(TARGET SampleGame PRE_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy_directory
                        ${CMAKE_SOURCE_DIR}/SampleGame/Assets $<TARGET_FILE_DIR:SampleGame>/Assets)

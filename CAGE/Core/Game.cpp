@@ -16,19 +16,91 @@ MessageCallback(GLenum source,
 	const GLchar* message,
 	const void* userParam)
 {
-	fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
-		(type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
-		type, severity, message);
+	std::string typeString;
+	switch (type)
+	{
+	case GL_DEBUG_TYPE_ERROR:
+		typeString = "Error";
+		break;
+	case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
+		typeString = "Deprecated Behavior";
+		break;
+	case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
+		typeString = "Undefined Behavior";
+		break;
+	case GL_DEBUG_TYPE_PORTABILITY:
+		typeString = "Portability";
+		break;
+	case GL_DEBUG_TYPE_PERFORMANCE:
+		typeString = "Performance";
+		break;
+	case GL_DEBUG_TYPE_OTHER:
+		typeString = "Other";
+		break;
+	default:
+		typeString = "Unknown message type";
+	}
+
+	std::string severityString;
+	switch (severity)
+	{
+	case GL_DEBUG_SEVERITY_HIGH:
+		severityString = "High";
+		break;
+	case GL_DEBUG_SEVERITY_MEDIUM:
+		severityString = "Medium";
+		break;
+	case GL_DEBUG_SEVERITY_LOW:
+		severityString = "Low";
+		break;
+	case GL_DEBUG_SEVERITY_NOTIFICATION:
+		break;
+	default:
+		severityString = "Unknown severity";
+	}
+
+	if (!severityString.empty())
+	{
+		std::cerr << "GL Callback\n";
+		std::cerr << "Type: " << typeString << '\n';
+		std::cerr << "Severity: " << severityString << '\n';
+		std::cerr << "Message: " << message << '\n' << std::endl;
+	}
 }
 
 namespace cage
 {
-	Game::Game(const char* title, int argc, char** argv)
+	Game::Game(const char* title, int argc, char** argv) :
+		m_language("en-US")
 	{
 		try
 		{
+
+			//handleCMDArgs(argc, argv);
+
+			std::vector<std::string> names;
+			names = {
+				"Considerably Average Game Engine",
+				"Consistently Awful Game Engine",
+				"Categorically Atrocious Game Engine",
+				"Choose Another Game Engine",
+				"Confusingly Atypical Game Engine",
+				"Contentious Architecture Game Engine",
+				"Conceptually Abysmal Game Engine",
+				"Cordially Advertised Game Engine",
+				"Completely Antithetical Game Engine",
+				"Criminal Authored Game Engine",
+				"Consistently Avoided Game Engine",
+				"Crimes Against Game Engines",
+				"Creatively Aimless Game Engine",
+				"Conventionally Astray Game Engine",
+				"Clumsily Adapted Game Engine",
+				"Computer Antagonizing Game Engine",
+				"Carelessly Authored Game Engine"
+			};
+
 			initSDL();
-			m_window = new Window(title, 1024, 768);
+			m_window = std::make_unique<Window>(title, 1024, 720);
 			gladLoadGLLoader(SDL_GL_GetProcAddress);
 
 			printf("Vendor:   %s\n", glGetString(GL_VENDOR));
@@ -45,7 +117,31 @@ namespace cage
 
 	Game::~Game()
 	{
-		delete m_window;
+	}
+
+	const Window& Game::GetWindow()
+	{
+		return *m_window;
+	}
+
+	TextureManager& Game::GetTextureManager()
+	{
+		return m_textureManager;
+	}
+
+	SoundManager& Game::GetSoundManager()
+	{
+		return m_soundManager;
+	}
+
+	Language& Game::GetLanguage()
+	{
+		return m_language;
+	}
+
+	audio::PlaybackEngine& Game::GetPlaybackEngine()
+	{
+		return m_playbackEngine;
 	}
 
 	void Game::initSDL()

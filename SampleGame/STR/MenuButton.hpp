@@ -17,7 +17,7 @@ public:
 			std::make_shared<cage::Texture>(IMG_Load("Assets/button/hover.png")), 
 			std::make_shared<cage::Texture>(IMG_Load("Assets/button/pressed.png")))
 	{
-		auto s_font = TTF_OpenFont("Assets/sans.ttf", 36);
+		auto s_font = cage::Font("Assets/sans.ttf", 36);
 		auto t = std::make_shared<cage::ui::Text>(s_font);
 		t->SetText(text);
 		Add(t);

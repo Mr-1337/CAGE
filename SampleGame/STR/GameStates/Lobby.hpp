@@ -16,7 +16,10 @@ class Lobby : public cage::GameState
 {
 public:
 
-	Lobby(std::pair<int, int> size);
+	Lobby(cage::Game& game, std::pair<int, int> size);
+
+	void OnRevealed() override;
+	void OnHidden() override;
 
 	void ProcessEvents() override;
 	void Update(float delta) override;

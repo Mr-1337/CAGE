@@ -1,21 +1,21 @@
 #include "Editor.hpp"
 
-Editor::Editor(std::pair<int, int> size) : m_wireframe(false), m_selectedNode(0)
+Editor::Editor(cage::Game& game, std::pair<int, int> size) : cage::GameState(game), m_wireframe(false), m_selectedNode(0)
 {
 	glClearColor(0.1f, 0.3f, 0.1f, 1.0f);
 
 	
 	{
-		cage::Shader genVer(cage::Shader::VERTEX);
-		cage::Shader genFrag(cage::Shader::FRAGMENT);
+		cage::Shader genVer(cage::Shader::ShaderType::VERTEX);
+		cage::Shader genFrag(cage::Shader::ShaderType::FRAGMENT);
 
 		genVer.CompileFromFile("Assets/generic3D.vert");
 		genFrag.CompileFromFile("Assets/generic3D.frag");
 
 		m_genericShader = std::make_shared<cage::Generic3DShader>(genVer, genFrag);
 
-		cage::Shader spriteVer(cage::Shader::VERTEX);
-		cage::Shader spriteFrag(cage::Shader::FRAGMENT);
+		cage::Shader spriteVer(cage::Shader::ShaderType::VERTEX);
+		cage::Shader spriteFrag(cage::Shader::ShaderType::FRAGMENT);
 
 		spriteVer.CompileFromFile("Assets/sprite.vert");
 		spriteFrag.CompileFromFile("Assets/sprite.frag");
@@ -55,7 +55,7 @@ void Editor::ProcessEvents()
 		switch (e.type)
 		{
 		case SDL_QUIT:
-			m_quit = true;
+			quit();
 			break;
 		case SDL_WINDOWEVENT:
 			switch (e.window.event)
@@ -92,6 +92,16 @@ void Editor::ProcessEvents()
 			m_input.Raise(e);
 		}
 	}
+}
+
+void Editor::OnRevealed()
+{
+
+}
+
+void Editor::OnHidden()
+{
+
 }
 
 static float tot = 0;

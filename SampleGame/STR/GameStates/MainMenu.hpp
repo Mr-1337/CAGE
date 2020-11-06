@@ -11,7 +11,10 @@ class MainMenu : public cage::GameState
 	using Ref = std::shared_ptr<cage::ui::UIElement>;
 public:
 
-	MainMenu(std::pair<int, int> size);
+	MainMenu(cage::Game&, std::pair<int, int> size);
+
+	void OnRevealed() override;
+	void OnHidden() override;
 
 	void ProcessEvents() override;
 	void Update(float delta) override;

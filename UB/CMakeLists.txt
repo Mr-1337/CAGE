@@ -6,9 +6,51 @@ set (SRC_FILES
     "Main.cpp"
     "UB.hpp"
     "UB.cpp"
-)
+    "WorldShader.hpp"
+    "World.hpp"
+    "World.cpp"
+    "Scripting/ScriptManager.hpp"
+    "Scripting/ScriptManager.cpp"
+    "Scripting/ScriptAction.hpp"
+    "Scripting/ScriptAction.cpp"
+    "Scripting/StartAction.hpp"
+    "Scripting/StartAction.cpp"
+    "Scripting/EntMoveAction.hpp"
+    "Scripting/EntMoveAction.cpp"
+    "Scripting/EntTeleportAction.hpp"
+    "Scripting/EntTeleportAction.cpp"
+    "Scripting/SoundAction.hpp"
+    "Scripting/SoundAction.cpp"
+    "GameStates/MainMenu.hpp"
+    "GameStates/MainMenu.cpp"
+    "GameStates/Gameplay.hpp"
+    "GameStates/Gameplay.cpp"
+    "GameStates/Editor.hpp"
+    "GameStates/Editor.cpp"
+    "UI/TilePanel.hpp" 
+    "UI/TilePanel.cpp"
+    "UI/EditorTab.hpp" 
+    "UI/StructurePanel.hpp" 
+    "UI/StructurePanel.cpp" 
+    "UI/ScriptPanel.hpp" 
+    "UI/ScriptPanel.cpp"
+    "UI/RightPanel.hpp" 
+    "UI/EditorPanel.hpp")
+
+set (CMAKE_CXX_STANDARD 17)
+set (CMAKE_CXX_EXTENSIONS OFF)
 
 add_executable (UB ${SRC_FILES})
+target_compile_options(UB PUBLIC "/permissive-")
+
+
+add_custom_command(TARGET UB PRE_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E copy_directory
+                       ${CMAKE_SOURCE_DIR}/UB/Assets $<TARGET_FILE_DIR:UB>/Assets)
+
+add_custom_command(TARGET UB PRE_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E copy_directory
+                       ${CMAKE_SOURCE_DIR}/lib/Dlls $<TARGET_FILE_DIR:UB>)
 
 # SDL libraries
 set (SDL_LIBS SDL2/SDL2 SDL2/SDL2main SDL2/SDL2_mixer SDL2/SDL2_image SDL2/SDL2_ttf SDL2/SDL2_net)

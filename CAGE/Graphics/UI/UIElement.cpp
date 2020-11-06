@@ -32,12 +32,12 @@ namespace cage::ui
 		UIElement::init = true;
 	}
 
-	UIElement::UIElement() : UIElement(true)
+	UIElement::UIElement() : UIElement(false)
 	{
 
 	}
 
-	UIElement::UIElement(bool textured) : m_textured(textured)
+	UIElement::UIElement(bool textured) : m_textured(textured), m_visible(true)
 	{
 		if (!UIElement::init)
 			UIElement::initSharedData();
@@ -48,6 +48,7 @@ namespace cage::ui
 		m_totalTransform = glm::identity<glm::mat4>();
 		m_mountOffset = { 0.f, 0.f };
 		m_parentMountOffset = { 0.f, 0.f };
+		m_color = { 0.f, 1.f, 0.f, 1.f };
 
 		m_localMount = MountPoint::CENTER;
 		m_parentMount = MountPoint::CENTER;
@@ -57,6 +58,7 @@ namespace cage::ui
 
 	void UIElement::LoadTexture(SDL_Surface* surface)
 	{
+		m_textured = true;
 		m_currentTexture = std::make_shared<Texture>(surface, true);
 		auto size = m_currentTexture->GetSize();
 		m_size = glm::vec2((float)size.first, (float)size.second);
@@ -150,6 +152,7 @@ namespace cage::ui
 	{
 		child->SetParent(this);
 		child->SetDepth(GetDepth() + 1);
+		child->recalcTransform();
 		m_children.emplace_back(child);
 	}
 
@@ -166,8 +169,12 @@ namespace cage::ui
 				m_currentTexture->Bind();
 			else
 				Texture::MissingTexture->Bind();
+			shader->Textured->value = m_textured;
+			shader->Textured->ForwardToShader();
+			shader->Color->value = m_color;
+			shader->Color->ForwardToShader();
 			sharedVAO->Bind();
-			if (m_textured)
+			if (m_visible)
 			{
 				shader->SpriteSize->value = m_size;
 				shader->SpriteSize->ForwardToShader();

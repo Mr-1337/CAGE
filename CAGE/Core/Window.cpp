@@ -4,8 +4,6 @@
 namespace cage
 {
 
-	static bool didIt = false;
-
 	Window::Window(const char* title, int w, int h) :
 		m_width(w), m_height(h)
 	{
@@ -21,13 +19,9 @@ namespace cage
 
 		SDL_assert(m_context != NULL);
 
-		//if (!didIt)
-		{
-			gladLoadGLLoader(SDL_GL_GetProcAddress);
-			didIt = true;
-		}
+		gladLoadGLLoader(SDL_GL_GetProcAddress);
 
-		SDL_GL_SetSwapInterval(0);
+		SDL_GL_SetSwapInterval(1);
 	}
 
 	Window::~Window()
@@ -65,5 +59,10 @@ namespace cage
 		int w, h;
 		SDL_GetWindowSize(m_rawHandle, &w, &h);
 		return { w, h };
+	}
+
+	void Window::SetOpacity(float opacity)
+	{
+		SDL_SetWindowOpacity(m_rawHandle, opacity);
 	}
 }

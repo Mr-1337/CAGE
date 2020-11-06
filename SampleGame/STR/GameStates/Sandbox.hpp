@@ -6,7 +6,6 @@
 #include <SteamAudio/phonon.h>
 #include <chrono>
 
-#include "../CAGE/Audio/AudioSource.hpp"
 #include "../CAGE/Graphics/Models/Model.hpp"
 #include "../Car.hpp"
 #include "../CAGE/Graphics/Camera/Camera.hpp"
@@ -20,7 +19,10 @@ class Sandbox : public cage::GameState
 {
 public:
 
-	Sandbox(std::pair<int, int> size);
+	Sandbox(cage::Game& game, std::pair<int, int> size);
+
+	void OnRevealed() override;
+	void OnHidden() override;
 
 	void ProcessEvents() override;
 	void Update(float delta) override;
@@ -63,14 +65,12 @@ private:
 
 	Mix_Chunk shrekSong;
 
-	cage::AudioSource s1, s2, s3, s4;
-	cage::Listener listener;
 
 	cage::ui::UIElement m_root;
 	std::shared_ptr<cage::ui::UIElement> m_speedometer, m_needle, m_menuOverlay;
 	std::shared_ptr<cage::ui::Text> m_fpsCounter;
 
-	TTF_Font* m_font;
+	cage::Font* m_font;
 	const SDL_Color FONT_COLOR = { 255, 0, 0, 255 };
 
 	unsigned int m_eboid;

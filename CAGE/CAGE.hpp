@@ -5,4 +5,14 @@
 
 #include "Core/Game.hpp"
 
+namespace cage
+{
+	template <typename T>
+	void PlayGame(int argc, char** argv)
+	{
+		T game;
+		game.Run();
+	}
+}
+
 // TODO: Reference additional headers your program requires here.

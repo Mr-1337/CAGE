@@ -12,6 +12,9 @@ class STR : public cage::Game
 public:
 	STR(int argc, char** argv);
 	~STR();
+
+	void handleCMDArgs(int argc, char** argv) override;
+
 	void Run() override;
 private:
 	bool m_running;

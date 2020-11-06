@@ -8,9 +8,44 @@
 Shrektris::Shrektris(int argc, char** argv) : 
 	Game("Shrektris", argc, argv),
 	m_running(true), 
-	m_vrMode(false)
+	m_vrMode(false),
+	m_win2("Window 2", 200, 200),
+	m_win3("Window 3", 300, 300)
 {
 	auto size = m_window->GetSize();
+
+	std::string shrekStr = R"(
+
+                      _____
+                   ,-'     `._
+                 ,'           `.        ,-.
+               ,'               \       ),.\
+     ,.       /                  \     /(  \;
+    /'\\     ,o.        ,ooooo.   \  ,'  `-')
+    )) )`. d8P"Y8.    ,8P"""""Y8.  `'  .--"'
+   (`-'   `Y'  `Y8    dP       `'     /
+    `----.(   __ `    ,' ,---.       (
+           ),--.`.   (  ;,---.        )
+          / \O_,' )   \  \O_,'        |
+         ;  `-- ,'       `---'        |
+         |    -'         `.           |
+        _;    ,            )          :
+     _.'|     `.:._   ,.::" `..       |
+  --'   |   .'     """         `      |`.
+        |  :;      :   :     _.       |`.`.-'--.
+        |  ' .     :   :__.,'|/       |  \
+        `     \--.__.-'|_|_|-/        /   )
+         \     \_   `--^"__,'        ,    |
+         ;  `    `--^---'          ,'     |
+          \  `                    /      /
+           \   `    _ _          /
+            \           `       /
+             \           '    ,'
+              `.       ,   _,'
+                `-.___.---'
+	)";
+
+	std::cout << std::endl << shrekStr << std::endl;
 
 	m_context = m_window->GetGLContext();
 	m_window->MakeContextCurrent(m_context);
@@ -24,10 +59,10 @@ Shrektris::Shrektris(int argc, char** argv) :
 	m_rootNode = new cage::ui::UIElement();
 	grid = new cage::Mesh<cage::Vertex3UVNormal>("grid");
 
-	cage::Shader vertexShader(cage::Shader::VERTEX);
-	cage::Shader fragShader(cage::Shader::FRAGMENT);
-	cage::Shader spriteVS(cage::Shader::VERTEX);
-	cage::Shader spriteFS(cage::Shader::FRAGMENT);
+	cage::Shader vertexShader(cage::Shader::ShaderType::VERTEX);
+	cage::Shader fragShader(cage::Shader::ShaderType::FRAGMENT);
+	cage::Shader spriteVS(cage::Shader::ShaderType::VERTEX);
+	cage::Shader spriteFS(cage::Shader::ShaderType::FRAGMENT);
 
 	glEnable(GL_DEPTH_TEST);
 	
@@ -38,7 +73,7 @@ Shrektris::Shrektris(int argc, char** argv) :
 
 	cage::Texture::MissingTexture = new cage::Texture(IMG_Load("Assets/missing.png"));
 
-	//glViewport(0, 0, 2560, 1440);
+	glViewport(0, 0, 2560, 1440);
 
 	vr::EVRInitError eError = vr::VRInitError_None;
 
@@ -89,7 +124,12 @@ Shrektris::Shrektris(int argc, char** argv) :
 	{
 		m_nRenderWidth = size.first;
 		m_nRenderHeight = size.second;
+
+		m_nRenderWidth = 2560;
+		m_nRenderHeight = 1440;
 	}
+
+	CreateFrameBuffer(m_nRenderWidth, m_nRenderHeight, leftEyeDesc);
 
 	shrek.LoadModel("Assets/shrek.obj");
 	thanos.LoadModel("Assets/thanos.obj");
@@ -733,9 +773,10 @@ void Shrektris::draw(float t)
 	}
 	else
 	{
-		/*
-		m_w2.SetPosition(1000 + 200 * sin(totalTime), 1000 + 200 * cos(totalTime));
-		m_w3.SetSize(400 + 200 * sin(totalTime), 400 + 200 * cos(totalTime));
+		
+		m_win2.SetPosition(1000 + 200 * sin(totalTime), 1000 + 200 * cos(totalTime));
+		m_win2.SetOpacity(0.5 * (cos(totalTime) + 1.0));
+		m_win3.SetSize(400 + 200 * sin(totalTime), 400 + 200 * cos(totalTime));
 
 		
 		glBindFramebuffer(GL_FRAMEBUFFER, leftEyeDesc.m_nRenderFramebufferId);
@@ -756,27 +797,27 @@ void Shrektris::draw(float t)
 		glBlitFramebuffer(pos.first, HEIGHT - (pos.second + size.second), pos.first + size.first, HEIGHT-pos.second, 0, 0, size.first, size.second, GL_COLOR_BUFFER_BIT, interp);
 		m_window->SwapBuffers();
 
-		size = m_w2.GetSize();
-		pos = m_w2.GetPosition();
+		size = m_win2.GetSize();
+		pos = m_win2.GetPosition();
 
-		m_w2.MakeContextCurrent(m_context);
+		m_win2.MakeContextCurrent(m_context);
 		glViewport(0, 0, size.first, size.second);
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 		glBlitFramebuffer(pos.first, HEIGHT - (pos.second + size.second), pos.first + size.first, HEIGHT - pos.second, 0, 0, size.first, size.second, GL_COLOR_BUFFER_BIT, interp);
-		m_w2.SwapBuffers();
+		m_win2.SwapBuffers();
 
-		size = m_w3.GetSize();
-		pos = m_w3.GetPosition();
+		size = m_win3.GetSize();
+		pos = m_win3.GetPosition();
 
-		m_w3.MakeContextCurrent(m_context);
+		m_win3.MakeContextCurrent(m_context);
 		glViewport(0, 0, size.first, size.second);
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 		glBlitFramebuffer(pos.first, HEIGHT - (pos.second + size.second), pos.first + size.first, HEIGHT - pos.second, 0, 0, size.first, size.second, GL_COLOR_BUFFER_BIT, interp);
-		m_w3.SwapBuffers();
-		*/
+		m_win3.SwapBuffers();
+		
 
-		drawScene(vr::Eye_Left, t);
-		m_window->SwapBuffers();
+		//drawScene(vr::Eye_Left, t);
+		//m_window->SwapBuffers();
 
 	}
 

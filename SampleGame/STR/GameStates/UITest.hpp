@@ -13,7 +13,10 @@
 class UITest : public cage::GameState
 {
 public:
-	UITest(std::pair<int, int> size);
+	UITest(cage::Game& game, std::pair<int, int> size);
+
+	void OnRevealed() override;
+	void OnHidden() override;
 
 	void ProcessEvents() override;
 	void Update(float dt) override;

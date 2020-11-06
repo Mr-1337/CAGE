@@ -19,6 +19,21 @@ namespace cage::uniforms
 		glUniform1i(m_location, value);
 	}
 
+	/////////////////////////////////////////////////////////////
+	/////////////// BOOL ////////////////////////////////////////
+	/////////////////////////////////////////////////////////////
+
+	BoolUniform::BoolUniform(unsigned int program, const std::string& name)
+		: Uniform<bool>(program, name)
+	{
+		value = false;
+	}
+
+	void BoolUniform::ForwardToShader()
+	{
+		glUniform1i(m_location, value);
+	}
+
 
 	/////////////////////////////////////////////////////////////
 	///////////////  FLOAT  /////////////////////////////////////
@@ -78,5 +93,20 @@ namespace cage::uniforms
 	void Vec3Uniform::ForwardToShader()
 	{
 		glUniform3fv(m_location, 1, glm::value_ptr(value));
+	}
+
+	/////////////////////////////////////////////////////////////
+	///////////////   Vec4  /////////////////////////////////////
+	/////////////////////////////////////////////////////////////
+
+	Vec4Uniform::Vec4Uniform(unsigned int program, const std::string& name)
+		: Uniform<glm::vec4>(program, name)
+	{
+		value = glm::vec4{ 0.f };
+	}
+
+	void Vec4Uniform::ForwardToShader()
+	{
+		glUniform4fv(m_location, 1, glm::value_ptr(value));
 	}
 }

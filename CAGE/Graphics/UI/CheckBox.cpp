@@ -1,18 +1,18 @@
 #include "CheckBox.hpp"
-#include <SDL2/SDL_image.h>
 
 namespace cage
 {
 	namespace ui
 	{
-		CheckBox::CheckBoxButton::CheckBoxButton()
-			: Button(std::make_shared<Texture>(IMG_Load("Assets/checkbox.png")), std::nullopt, std::make_shared<Texture>(IMG_Load("Assets/check.png"))), m_selected(false)
+		CheckBox::CheckBoxButton::CheckBoxButton(TextureManager& texManager) : 
+			Button(texManager.Get("checkbox.png"), std::nullopt, texManager.Get("check.png")), 
+			m_selected(false)
 		{
 		}
 
 		bool CheckBox::CheckBoxButton::onClick()
 		{
-			if (m_hovering)
+			if (hovering())
 			{
 				if (m_selected)
 				{
@@ -25,7 +25,7 @@ namespace cage
 					m_selected = true;
 				}
 			}
-			return m_hovering;
+			return hovering();
 		}
 
 		void CheckBox::CheckBoxButton::onHover()
@@ -43,20 +43,18 @@ namespace cage
 			return false;
 		}
 
-		CheckBox::CheckBox(const std::string& label, TTF_Font* font)
-			: UIElement(false), m_label(label), m_font(font)
+		CheckBox::CheckBox(TextureManager& texManager, const std::string& label, const Font& font)
+			: LayoutGroup(new FlowLayout()), m_label(label)
 		{
-			auto t = std::make_shared<Text>(font);
-			t->SetText(label);
-			Add(t);
-			t->SetLocalMounting(MountPoint::TOP_LEFT);
-			m_button = std::make_shared<CheckBoxButton>();
-			m_button->SetLocalMounting(MountPoint::TOP_LEFT);
-			t->MoveTo({ m_button->GetSize().x * 1.5, 0.f });
+			SetVisible(false);
+
+			auto text = std::make_shared<Text>(font);
+			text->SetText(label);
+
+			m_button = std::make_shared<CheckBoxButton>(texManager);
+
 			Add(m_button);
-			float w = m_button->GetSize().x + t->GetSize().x;
-			float h = glm::max(m_button->GetSize().y, t->GetSize().y);
-			Resize({ w, h });
+			Add(text);
 		}
 
 		bool CheckBox::HandleEvent(Event& e)

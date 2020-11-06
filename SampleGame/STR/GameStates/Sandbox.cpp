@@ -1,6 +1,7 @@
 #include "Sandbox.hpp"
 
-Sandbox::Sandbox(std::pair<int, int> size) :
+Sandbox::Sandbox(cage::Game& game, std::pair<int, int> size) : 
+	cage::GameState(game),
 	verShader(cage::Shader::ShaderType::VERTEX),
 	fragShader(cage::Shader::ShaderType::FRAGMENT),
 	spriteVerShader(cage::Shader::ShaderType::VERTEX),
@@ -92,7 +93,7 @@ Sandbox::Sandbox(std::pair<int, int> size) :
 	spec.samples = 1024;
 	spec.callback = nullptr;
 
-	m_font = TTF_OpenFont("Assets/sans.ttf", 36);
+	m_font = new cage::Font("Assets/sans.ttf", 36);
 	music = Mix_LoadWAV("Assets/thanos.ogg");
 
 	program = new cage::Generic3DShader(verShader, fragShader);
@@ -111,13 +112,13 @@ Sandbox::Sandbox(std::pair<int, int> size) :
 	m_needle = std::make_shared<cage::ui::UIElement>();
 	m_needle->LoadTexture(IMG_Load("Assets/needle.png"));
 
-	m_fpsCounter = std::make_shared<cage::ui::Text>(m_font);
+	m_fpsCounter = std::make_shared<cage::ui::Text>(*m_font);
 	m_root.Add(m_fpsCounter);
 	m_fpsCounter->SetLocalMounting(cage::ui::MountPoint::TOP_LEFT);
 	m_fpsCounter->SetParentMounting(cage::ui::MountPoint::TOP_LEFT);
 	//m_fpsCounter->MoveTo({ 20, 20 });
 
-	spriteVerShader.CompileFromFile("Assets/sprite.ver");
+	spriteVerShader.CompileFromFile("Assets/sprite.vert");
 	spriteFragShader.CompileFromFile("Assets/sprite.frag");
 
 	spriteProgram = std::make_shared<cage::SpriteShader>(spriteVerShader, spriteFragShader);
@@ -155,7 +156,7 @@ void Sandbox::ProcessEvents()
 	{
 		if (e.type == SDL_QUIT)
 		{
-			m_quit = true;
+			quit();
 		}
 
 		m_input.Raise(e);
@@ -163,7 +164,7 @@ void Sandbox::ProcessEvents()
 		switch (e.type)
 		{
 		case SDL_QUIT:
-			m_quit = true;
+			quit();
 			break;
 		case SDL_KEYDOWN:
 			if (!e.key.repeat)
@@ -316,7 +317,6 @@ void Sandbox::Update(float delta)
 		totalTime = 0;
 	}
 
-	listener.MoveTo(camera->GetPosition()).LookAt(glm::normalize(camera->GetFront()), camera->GetRight());
 	//s1.UpdateListener(listener);
 	//s2.UpdateListener(listener);
 	//s3.UpdateListener(listener);
@@ -382,6 +382,16 @@ void Sandbox::Draw()
 	spriteProgram->Use();
 
 	m_root.Draw();
+}
+
+void Sandbox::OnRevealed()
+{
+
+}
+
+void Sandbox::OnHidden()
+{
+
 }
 
 std::vector<cage::Vertex3UVNormal> Sandbox::genTerrain()

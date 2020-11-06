@@ -6,11 +6,12 @@
 
 #include "UITest.hpp"
 #include "../MenuButton.hpp"
+#include "../CAGE/CAGE.hpp"
 
-UITest::UITest(std::pair<int, int> size)
+UITest::UITest(cage::Game& game, std::pair<int, int> size) : cage::GameState(game)
 {
 	{
-		cage::Shader ver(cage::Shader::VERTEX), frag(cage::Shader::FRAGMENT);
+		cage::Shader ver(cage::Shader::ShaderType::VERTEX), frag(cage::Shader::ShaderType::FRAGMENT);
 		ver.CompileFromFile("Assets/sprite.vert");
 		frag.CompileFromFile("Assets/sprite.frag");
 
@@ -31,15 +32,15 @@ UITest::UITest(std::pair<int, int> size)
 	//b4 = std::make_shared<cage::ui::Button>(std::make_shared<cage::Texture>(IMG_Load("Assets/simon.png")), std::make_shared<cage::Texture>(IMG_Load("Assets/simon2.png")), std::make_shared<cage::Texture>(IMG_Load("Assets/ms.png")));
 
 	b1 = std::make_shared<MenuButton>("1");
-	b2 = std::make_shared <MenuButton>("2");
-	b3 = std::make_shared <MenuButton>("3");
-	b4 = std::make_shared <MenuButton>("4");
+	b2 = std::make_shared<MenuButton>("2");
+	b3 = std::make_shared<MenuButton>("3");
+	b4 = std::make_shared<MenuButton>("4");
 
-	auto font = TTF_OpenFont("Assets/sans.ttf", 36);
+	auto font = cage::Font("Assets/sans.ttf", 36);
 
-	c1 = std::make_shared<cage::ui::CheckBox>("Yee", font);
-	c2 = std::make_shared<cage::ui::CheckBox>("Haw", font);
-	c3 = std::make_shared<cage::ui::CheckBox>("Frog", font);
+	c1 = std::make_shared<cage::ui::CheckBox>(getGame().GetTextureManager(), "Yee", font);
+	c2 = std::make_shared<cage::ui::CheckBox>(getGame().GetTextureManager(), "Haw", font);
+	c3 = std::make_shared<cage::ui::CheckBox>(getGame().GetTextureManager(), "Frog", font);
 
 	message = std::make_shared<cage::ui::Text>(font);
 	message->SetColor({ 0, 0, 255, 255 });
@@ -104,7 +105,7 @@ void UITest::ProcessEvents()
 		switch (e.type)
 		{
 		case SDL_QUIT:
-			m_quit = true;
+			quit();
 			break;
 		case SDL_WINDOWEVENT:
 			switch (e.window.event)
@@ -134,6 +135,16 @@ void UITest::ProcessEvents()
 			m_input.Raise(e);
 		}
 	}
+}
+
+void UITest::OnRevealed()
+{
+
+}
+
+void UITest::OnHidden()
+{
+
 }
 
 static float tot = 0;

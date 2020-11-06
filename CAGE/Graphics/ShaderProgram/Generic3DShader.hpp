@@ -17,5 +17,12 @@ namespace cage
 			View = new uniforms::Mat4Uniform(GetID(), "u_view");
 			Projection = new uniforms::Mat4Uniform(GetID(), "u_projection");
 		}
+
+		~Generic3DShader()
+		{
+			delete Projection;
+			delete View;
+			delete Model;
+		}
 	};
 }

@@ -6,6 +6,15 @@ namespace cage
 	Shader::Shader(ShaderType type)
 	{
 		m_id = glCreateShader((GLenum)type);
+		m_ownsShader = true;
+	}
+
+	Shader::Shader(Shader&& other)
+	{
+		// Move constructor, transfers ownership of the raw shader handles to this object
+		m_id = other.m_id;
+		m_ownsShader = true;
+		other.m_ownsShader = false;
 	}
 
 	void Shader::CompileFromFile(const std::string& path)
@@ -57,6 +66,7 @@ namespace cage
 
 	Shader::~Shader()
 	{
-		glDeleteShader(m_id);
+		if (m_ownsShader)
+			glDeleteShader(m_id);
 	}
 }

@@ -3,15 +3,16 @@
 #include "Lobby.hpp"
 #include "UITest.hpp"
 #include "Editor.hpp"
-#include "../../../CAGE/Core/StateMachine.hpp"
+#include "../CAGE/Core/StateMachine.hpp"
+#include "../CAGE/Core/Game.hpp"
 
-MainMenu::MainMenu(std::pair<int, int> size)
+MainMenu::MainMenu(cage::Game& game, std::pair<int, int> size) : cage::GameState(game)
 {
 	glClearColor(0.3f, 0.3f, 0.2f, 1.f);
 
 	cage::Texture::MissingTexture = new cage::Texture(IMG_Load("Assets/missing.png"));
 
-	cage::Shader vertex(cage::Shader::VERTEX), fragment(cage::Shader::FRAGMENT);
+	cage::Shader vertex(cage::Shader::ShaderType::VERTEX), fragment(cage::Shader::ShaderType::FRAGMENT);
 	vertex.CompileFromFile("Assets/sprite.vert");
 	fragment.CompileFromFile("Assets/sprite.frag");
 	m_spriteShader = std::make_shared<cage::SpriteShader>(vertex, fragment);
@@ -57,11 +58,11 @@ MainMenu::MainMenu(std::pair<int, int> size)
 	Add(button4);
 	Add(button5);
 
-	std::static_pointer_cast<MenuButton>(button1)->OnClick = [&, size]() { s_stateMachine->Push(new Sandbox(size)); };
-	std::static_pointer_cast<MenuButton>(button2)->OnClick = [&, size]() { s_stateMachine->Push(new Lobby(size)); };
-	std::static_pointer_cast<MenuButton>(button3)->OnClick = [&, size]() { s_stateMachine->Push(new UITest(size)); };
-	std::static_pointer_cast<MenuButton>(button4)->OnClick = [&, size]() { s_stateMachine->Push(new Editor(size)); };
-	std::static_pointer_cast<MenuButton>(button5)->OnClick = [&, size]() { m_quit = true; };
+	std::static_pointer_cast<MenuButton>(button1)->OnClick = [&, size]() { s_stateMachine->Push(new Sandbox(getGame(), size)); };
+	std::static_pointer_cast<MenuButton>(button2)->OnClick = [&, size]() { s_stateMachine->Push  (new Lobby(getGame(), size)); };
+	std::static_pointer_cast<MenuButton>(button3)->OnClick = [&, size]() { s_stateMachine->Push (new UITest(getGame(), size)); };
+	std::static_pointer_cast<MenuButton>(button4)->OnClick = [&, size]() { s_stateMachine->Push (new Editor(getGame(), size)); };
+	std::static_pointer_cast<MenuButton>(button5)->OnClick = [&, size]() { quit(); };
 
 	m_root.SetLocalMounting(cage::ui::MountPoint::CENTER);
 	m_root.Resize({ (float)size.first, (float)size.second });
@@ -77,7 +78,7 @@ void MainMenu::ProcessEvents()
 		switch (e.type)
 		{
 		case SDL_QUIT:
-			m_quit = true;
+			quit();
 			break;
 		case SDL_WINDOWEVENT:
 			switch (e.window.event)
@@ -96,6 +97,16 @@ void MainMenu::ProcessEvents()
 			m_input.Raise(e);
 		}
 	}
+}
+
+void MainMenu::OnRevealed()
+{
+
+}
+
+void MainMenu::OnHidden()
+{
+
 }
 
 void MainMenu::Add(Ref thingy)

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "UIElement.hpp"
-
-#include "../../IO/Events/EventListener.hpp"
+#include <optional>
+#include <functional>
 
 namespace cage
 {
@@ -17,10 +17,11 @@ namespace cage
 			{
 				m_lastX = 0;
 				m_lastY = 0;
-				SetActiveTexture(idleTexture.value());
+				if (idleTexture.has_value())
+					SetActiveTexture(*idleTexture);
 			}
 
-			virtual inline bool HandleEvent(Event& e)
+			virtual bool HandleEvent(Event& e)
 			{
 				if (auto mm = std::get_if<MouseMotionEvent>(&e))
 				{
@@ -28,21 +29,32 @@ namespace cage
 					m_lastY = mm->y;
 					if (inBounds(mm->x, mm->y))
 					{
+						if (OnHover && !hovering())
+							OnHover();
 						onHover();
 						m_hovering = true;
-						return true;
 					}
-					onUnHover();
-					m_hovering = false;
-					return false;
+					else
+					{
+						if (m_hovering && OnUnHover)
+							OnUnHover();
+						onUnHover();
+						m_hovering = false;
+					}
 				}
 				return false;
 			}
 
+			std::function<void(void)> OnHover, OnUnHover;
+
 		protected:
 
-			bool m_hovering;
 			std::optional<std::shared_ptr<Texture>> m_idleTexture, m_hoverTexture;
+
+			bool hovering()
+			{
+				return m_hovering;
+			}
 
 			virtual void onHover()
 			{
@@ -68,6 +80,7 @@ namespace cage
 
 			int m_lastX, m_lastY;
 
+			bool m_hovering;
 			void onTransform() override
 			{
 				Event e = MouseMotionEvent(m_lastX, m_lastY, 0, 0);

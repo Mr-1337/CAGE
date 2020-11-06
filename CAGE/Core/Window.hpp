@@ -15,6 +15,7 @@ namespace cage
 		std::pair<int, int> GetPosition() const;
 		std::pair<int, int> GetSize() const;
 		void SetSize(int w, int h);
+		void SetOpacity(float opacity);
 		void MakeContextCurrent(SDL_GLContext context);
 		inline SDL_GLContext GetGLContext() { return m_context; };
 		inline void SwapBuffers() { SDL_GL_SwapWindow(m_rawHandle); }

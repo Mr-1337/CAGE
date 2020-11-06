@@ -1,5 +1,6 @@
 #pragma once
 
+#include "UIElement.hpp"
 #include "Layout.hpp"
 
 namespace cage
@@ -9,10 +10,17 @@ namespace cage
 		class LayoutGroup : public UIElement
 		{
 		public:
-			LayoutGroup(const Layout& layout);
+			LayoutGroup(Layout* layout);
+			~LayoutGroup();
 			void Add(std::shared_ptr<UIElement> element) override;
+			void AddAbsolute(Child element);
+			void Update();
+			void Compress();
+
+			std::vector<Child> GetLayoutChildren();
 		private:
-			const Layout& m_layout;
+			Layout* m_layout;
+			std::vector<Child> m_layoutChildren;
 		};
 	}
 }

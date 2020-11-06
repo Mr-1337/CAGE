@@ -16,6 +16,37 @@
 #include "../CAGE/Graphics/ShaderProgram/SpriteShader.hpp"
 #include "../CAGE/IO/MeshLoader.hpp"
 
+/*
+					  _____
+				   ,-'     `._
+				 ,'           `.        ,-.
+			   ,'               \       ),.\
+	 ,.       /                  \     /(  \;
+	/'\\     ,o.        ,ooooo.   \  ,'  `-')
+	)) )`. d8P"Y8.    ,8P"""""Y8.  `'  .--"'
+   (`-'   `Y'  `Y8    dP       `'     /
+	`----.(   __ `    ,' ,---.       (
+		   ),--.`.   (  ;,---.        )
+		  / \O_,' )   \  \O_,'        |
+		 ;  `-- ,'       `---'        |
+		 |    -'         `.           |
+		_;    ,            )          :
+	 _.'|     `.:._   ,.::" `..       |
+  --'   |   .'     """         `      |`.
+		|  :;      :   :     _.       |`.`.-'--.
+		|  ' .     :   :__.,'|/       |  \
+		`     \--.__.-'|_|_|-/        /   )
+		 \     \_   `--^"__,'        ,    |
+         ;  `    `--^---'          ,'     |
+		  \  `                    /      /
+		   \   `    _ _          /
+			\           `       /
+			 \           '    ,'
+			  `.       ,   _,'
+				`-.___.---'
+
+*/
+
 const int BOARD_WIDTH = 10;
 const int BOARD_HEIGHT = 15;
 
@@ -26,12 +57,14 @@ public:
 	void Run() override;
 private:
 
+	void handleCMDArgs(int argc, char** argv) override {}
 	vr::IVRSystem* m_pHMD;
 
 	glm::mat4 projLeft, projRight, eyePosLeft, eyePosRight, hmdPose;
 	uint32_t m_nRenderWidth, m_nRenderHeight;
 
 	SDL_GLContext m_context;
+	cage::Window m_win2, m_win3;
 
 	bool m_vrMode;
 

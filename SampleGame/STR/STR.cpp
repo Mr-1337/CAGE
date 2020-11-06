@@ -25,6 +25,11 @@ STR::~STR()
 
 }
 
+void STR::handleCMDArgs(int argc, char** argv)
+{
+
+}
+
 void STR::Run()
 {
 	std::chrono::high_resolution_clock clock;
@@ -33,7 +38,7 @@ void STR::Run()
 	
 	SDL_Event e;
 
-	m_stateMachine.Push(new MainMenu(m_window->GetSize()));
+	m_stateMachine.Push(new MainMenu(*this, m_window->GetSize()));
 
 	while (m_running)
 	{

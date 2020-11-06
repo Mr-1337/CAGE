@@ -1,11 +1,11 @@
 #include "Lobby.hpp"
 #include "../../../CAGE/Core/StateMachine.hpp"
 
-Lobby::Lobby(std::pair<int, int> size) : WAIT_TIME(500), m_sound(nullptr)
+Lobby::Lobby(cage::Game& game, std::pair<int, int> size) : cage::GameState(game), WAIT_TIME(500), m_sound(nullptr)
 {
 	glClearColor(0.3f, 0.3f, 0.2f, 1.f);
 
-	cage::Shader vertex(cage::Shader::VERTEX), fragment(cage::Shader::FRAGMENT), vertexSprite(cage::Shader::VERTEX), fragmentSprite(cage::Shader::FRAGMENT);
+	cage::Shader vertex(cage::Shader::ShaderType::VERTEX), fragment(cage::Shader::ShaderType::FRAGMENT), vertexSprite(cage::Shader::ShaderType::VERTEX), fragmentSprite(cage::Shader::ShaderType::FRAGMENT);
 	vertexSprite.CompileFromFile("Assets/sprite.ver");
 	fragmentSprite.CompileFromFile("Assets/sprite.frag");
 
@@ -90,6 +90,16 @@ Lobby::Lobby(std::pair<int, int> size) : WAIT_TIME(500), m_sound(nullptr)
 
 }
 
+void Lobby::OnRevealed()
+{
+
+}
+
+void Lobby::OnHidden()
+{
+
+}
+
 void Lobby::ProcessEvents()
 {
 	SDL_Event e;
@@ -98,7 +108,7 @@ void Lobby::ProcessEvents()
 		switch (e.type)
 		{
 		case SDL_QUIT:
-			m_quit = true;
+			quit();
 			break;
 		/*
 		case SDL_MOUSEMOTION:
