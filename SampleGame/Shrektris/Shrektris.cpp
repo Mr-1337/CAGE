@@ -8,9 +8,7 @@
 Shrektris::Shrektris(int argc, char** argv) : 
 	Game("Shrektris", argc, argv),
 	m_running(true), 
-	m_vrMode(false),
-	m_win2("Window 2", 200, 200),
-	m_win3("Window 3", 300, 300)
+	m_vrMode(true)
 {
 	auto size = m_window->GetSize();
 
@@ -773,7 +771,7 @@ void Shrektris::draw(float t)
 	}
 	else
 	{
-		
+		/*
 		m_win2.SetPosition(1000 + 200 * sin(totalTime), 1000 + 200 * cos(totalTime));
 		m_win2.SetOpacity(0.5 * (cos(totalTime) + 1.0));
 		m_win3.SetSize(400 + 200 * sin(totalTime), 400 + 200 * cos(totalTime));
@@ -814,10 +812,10 @@ void Shrektris::draw(float t)
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 		glBlitFramebuffer(pos.first, HEIGHT - (pos.second + size.second), pos.first + size.first, HEIGHT - pos.second, 0, 0, size.first, size.second, GL_COLOR_BUFFER_BIT, interp);
 		m_win3.SwapBuffers();
-		
+		*/
 
-		//drawScene(vr::Eye_Left, t);
-		//m_window->SwapBuffers();
+		drawScene(vr::Eye_Left, t);
+		m_window->SwapBuffers();
 
 	}
 

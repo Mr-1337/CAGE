@@ -64,7 +64,6 @@ private:
 	uint32_t m_nRenderWidth, m_nRenderHeight;
 
 	SDL_GLContext m_context;
-	cage::Window m_win2, m_win3;
 
 	bool m_vrMode;
 
