@@ -14,5 +14,5 @@ void main()
 	float diffuse = max(dot(norm_o, normalize(-pos_world_o + vec3(200.0, 20.0, 200.0))), 0.1);
 	//colorOut = vec4(norm_o.r, norm_o.g, norm_o.b, 1.0);
 
-	colorOut = vec4(diffuse, diffuse * 0.6, diffuse * 0.7, 1.0) * texture(u_texture, uv_o);
+	colorOut = vec4(diffuse, diffuse, diffuse, 1.0) * texture(u_texture, uv_o);
 }

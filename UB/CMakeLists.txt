@@ -35,7 +35,9 @@ set (SRC_FILES
     "UI/ScriptPanel.hpp" 
     "UI/ScriptPanel.cpp"
     "UI/RightPanel.hpp" 
-    "UI/EditorPanel.hpp")
+    "UI/EditorPanel.hpp"
+    "Structure.cpp"
+    "Structure.hpp")
 
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_EXTENSIONS OFF)

@@ -18,7 +18,7 @@ namespace ub
 		m_worldSize(16, 16),
 		m_drawGrid(false),
 		m_dirty(false),
-		m_hackBuffer(6, cage::Vertex2UV(0, 0, 0, 0))
+		m_hackBuffer(6, cage::Vertex3UV(0, 0, 0, 0, 0))
 	{
 
 		m_worldShader = std::make_shared<WorldShader>();
@@ -37,7 +37,6 @@ namespace ub
 		m_worldShader->Use();
 
 
-
 		SetWinSize(winSize);
 
 		//glClearColor(0.2, 0.0, 0.5, 0.0);
@@ -45,6 +44,17 @@ namespace ub
 
 		GenWorld();
 		Resize(m_worldSize);
+
+		house.x = 15;
+		house.y = 10 - 2;
+		std::shared_ptr<cage::Texture> tex = std::make_shared<cage::Texture>(IMG_Load("Assets/Textures/House2.png"));
+		house.mesh = std::make_shared<cage::Mesh<cage::Vertex3UV>>("mesh");
+		house.mesh->LoadTexture(tex);
+		house.w = tex->GetSize().first;
+		house.h = tex->GetSize().second;
+
+		
+
 	}
 
 	void World::Zoom(int dy)
@@ -136,15 +146,15 @@ namespace ub
 			float uvx = (float)((unsigned char)tileType % 16) * size;
 			float uvy = (float)((unsigned char)tileType / 16) * size;
 
-			using cage::Vertex2UV;
+			using cage::Vertex3UV;
 
-			m_hackBuffer[0] = Vertex2UV(x * TILE_SIZE, y * TILE_SIZE, uvx, uvy);
-			m_hackBuffer[1] = Vertex2UV((x + 1) * TILE_SIZE, y * TILE_SIZE, uvx + size, uvy);
-			m_hackBuffer[2] = Vertex2UV(x * TILE_SIZE, (y + 1) * TILE_SIZE, uvx, uvy + size);
+			m_hackBuffer[0] = Vertex3UV(x * TILE_SIZE, y * TILE_SIZE, 0, uvx, uvy);
+			m_hackBuffer[1] = Vertex3UV((x + 1) * TILE_SIZE, y * TILE_SIZE, 0, uvx + size, uvy);
+			m_hackBuffer[2] = Vertex3UV(x * TILE_SIZE, (y + 1) * TILE_SIZE, 0, uvx, uvy + size);
 
-			m_hackBuffer[3] = Vertex2UV((x + 1) * TILE_SIZE, y * TILE_SIZE, uvx + size, uvy);
-			m_hackBuffer[4] = Vertex2UV(x * TILE_SIZE, (y + 1) * TILE_SIZE, uvx, uvy + size);
-			m_hackBuffer[5] = Vertex2UV((x + 1) * TILE_SIZE, (y + 1) * TILE_SIZE, uvx + size, uvy + size);
+			m_hackBuffer[3] = Vertex3UV((x + 1) * TILE_SIZE, y * TILE_SIZE, 0, uvx + size, uvy);
+			m_hackBuffer[4] = Vertex3UV(x * TILE_SIZE, (y + 1) * TILE_SIZE, 0, uvx, uvy + size);
+			m_hackBuffer[5] = Vertex3UV((x + 1) * TILE_SIZE, (y + 1) * TILE_SIZE, 0, uvx + size, uvy + size);
 
 			m_worldMesh.GetBuffer().Bind();
 			//for (int i = 0; i < 6; i++)
@@ -158,7 +168,40 @@ namespace ub
 
 	void World::GenWorld()
 	{	
-		std::vector<cage::Vertex2UV> geometry;
+		m_structureData.clear();
+		for (int i = 0; i < 10; i++)
+		{
+			Structure fence;
+			auto tex = std::make_shared<cage::Texture>(IMG_Load("Assets/Textures/fence.png"));
+			fence.x = 4 + i;
+			fence.y = 11;
+			fence.w = tex->GetSize().first;
+			fence.h = tex->GetSize().second;
+			fence.mesh = std::make_shared<cage::Mesh<cage::Vertex3UV>>("mesh");
+			fence.mesh->LoadTexture(tex);
+
+			std::vector<cage::Vertex3UV> geometry;
+
+			float fenceDepth = (float)(fence.y + (float)fence.h / TILE_SIZE) / m_worldSize.second;
+
+			const int FENCE_SIZE = 64;
+
+			geometry.emplace_back(fence.x * FENCE_SIZE, fence.y * TILE_SIZE, fenceDepth, 0.f, 0.f);
+			geometry.emplace_back(fence.x * FENCE_SIZE + fence.w, fence.y * TILE_SIZE, fenceDepth, 0.f + 1, 0.f);
+			geometry.emplace_back(fence.x * FENCE_SIZE, fence.y * TILE_SIZE + fence.h, fenceDepth, 0.f, 1);
+
+			geometry.emplace_back(fence.x * FENCE_SIZE + fence.w, fence.y * TILE_SIZE + 0.f, fenceDepth, 0.f + 1, 0.f);
+			geometry.emplace_back(fence.x * FENCE_SIZE + 0.f, fence.y * TILE_SIZE + fence.h, fenceDepth, 0.f, 1);
+			geometry.emplace_back(fence.x * FENCE_SIZE + fence.w, fence.y * TILE_SIZE + fence.h, fenceDepth, 1, 1);
+
+
+			fence.mesh->GetBuffer().Fill(geometry);
+
+			m_structureData.push_back(fence);
+		}
+
+
+		std::vector<cage::Vertex3UV> geometry;
 		geometry.reserve(m_worldSize.first * m_worldSize.second * 6);
 		auto makeTile = [&geometry, this](int x, int y, unsigned char tileType) -> void
 		{
@@ -166,19 +209,19 @@ namespace ub
 			float uvx = (float)(tileType % 16) * size;
 			float uvy = (float)(tileType / 16) * size;
 
-			geometry.emplace_back(x * TILE_SIZE, y * TILE_SIZE, uvx, uvy);
-			geometry.emplace_back((x + 1) * TILE_SIZE, y * TILE_SIZE, uvx + size, uvy);
-			geometry.emplace_back(x * TILE_SIZE, (y + 1) * TILE_SIZE, uvx, uvy + size);
+			geometry.emplace_back(x * TILE_SIZE, y * TILE_SIZE, 0, uvx, uvy);
+			geometry.emplace_back((x + 1) * TILE_SIZE, y * TILE_SIZE, 0, uvx + size, uvy);
+			geometry.emplace_back(x * TILE_SIZE, (y + 1) * TILE_SIZE, 0, uvx, uvy + size);
 
-			geometry.emplace_back((x + 1) * TILE_SIZE, y * TILE_SIZE, uvx + size, uvy);
-			geometry.emplace_back(x * TILE_SIZE, (y + 1) * TILE_SIZE, uvx, uvy + size);
-			geometry.emplace_back((x + 1) * TILE_SIZE, (y + 1) * TILE_SIZE, uvx + size, uvy + size);
+			geometry.emplace_back((x + 1) * TILE_SIZE, y * TILE_SIZE, 0, uvx + size, uvy);
+			geometry.emplace_back(x * TILE_SIZE, (y + 1) * TILE_SIZE, 0, uvx, uvy + size);
+			geometry.emplace_back((x + 1) * TILE_SIZE, (y + 1) * TILE_SIZE, 0, uvx + size, uvy + size);
 		};
 
 		auto makeLine = [&geometry, this](int x1, int x2, int y1, int y2) -> void
 		{
-			geometry.emplace_back(static_cast<float>(TILE_SIZE) * glm::vec2{ x1, y1 }, glm::vec2{ 0.f, 0.f });
-			geometry.emplace_back(static_cast<float>(TILE_SIZE) * glm::vec2{ x2, y2 }, glm::vec2{ 0.f, 0.f });
+			geometry.emplace_back(static_cast<float>(TILE_SIZE) * glm::vec3{ x1, y1, 0.01 }, glm::vec2{ 0.f, 0.f });
+			geometry.emplace_back(static_cast<float>(TILE_SIZE) * glm::vec3{ x2, y2, 0.01 }, glm::vec2{ 0.f, 0.f });
 		};
 
 		for (int y = 0; y < m_worldSize.second; y++)
@@ -252,34 +295,52 @@ namespace ub
 
 	void World::Draw()
 	{
-		glDisable(GL_DEPTH_TEST);
+		glEnable(GL_DEPTH_TEST);
 		m_worldShader->Use();
-		std::vector<cage::Vertex2UV> geometry;
+		std::vector<cage::Vertex3UV> geometry;
 		geometry.reserve(6);
 
-		geometry.emplace_back(m_position.x + 0.f, m_position.y + 0.f, 0.f, 0.f);
-		geometry.emplace_back(m_position.x + 28.f, m_position.y + 0.f, 0.f + 1, 0.f);
-		geometry.emplace_back(m_position.x + 0.f, m_position.y + 48.f, 0.f, 1);
+		float playerDepth = (m_position.y + 48.f) / (m_worldSize.second * TILE_SIZE);
 
-		geometry.emplace_back(m_position.x + 28.f, m_position.y + 0.f, 0.f + 1, 0.f);
-		geometry.emplace_back(m_position.x + 0.f, m_position.y + 48.f, 0.f, 1);
-		geometry.emplace_back(m_position.x + 28.f, m_position.y + 48.f, 1, 1);
+		geometry.emplace_back(m_position.x + 0.f, m_position.y + 0.f,  playerDepth, 0.f, 0.f);
+		geometry.emplace_back(m_position.x + 28.f, m_position.y + 0.f, playerDepth, 0.f + 1, 0.f);
+		geometry.emplace_back(m_position.x + 0.f, m_position.y + 48.f, playerDepth, 0.f, 1);
+
+		geometry.emplace_back(m_position.x + 28.f, m_position.y + 0.f,  playerDepth, 0.f + 1, 0.f);
+		geometry.emplace_back(m_position.x + 0.f, m_position.y + 48.f,  playerDepth, 0.f, 1);
+		geometry.emplace_back(m_position.x + 28.f, m_position.y + 48.f, playerDepth, 1, 1);
 
 		m_playerMesh.GetBuffer().Fill(geometry);
 
 		geometry.clear();
 		geometry.reserve(6);
 
-		geometry.emplace_back(m_pos2.x + 0.f, m_pos2.y + 0.f, 0.f, 0.f);
-		geometry.emplace_back(m_pos2.x + 28.f, m_pos2.y + 0.f, 0.f + 1, 0.f);
-		geometry.emplace_back(m_pos2.x + 0.f, m_pos2.y + 48.f, 0.f, 1);
+		geometry.emplace_back(m_pos2.x + 0.f, m_pos2.y + 0.f, 0.f, 0.f, 0.f);
+		geometry.emplace_back(m_pos2.x + 28.f, m_pos2.y + 0.f, 0.f, 0.f + 1, 0.f);
+		geometry.emplace_back(m_pos2.x + 0.f, m_pos2.y + 48.f, 0.f, 0.f, 1);
 
-		geometry.emplace_back(m_pos2.x + 28.f, m_pos2.y + 0.f, 0.f + 1, 0.f);
-		geometry.emplace_back(m_pos2.x + 0.f, m_pos2.y + 48.f, 0.f, 1);
-		geometry.emplace_back(m_pos2.x + 28.f, m_pos2.y + 48.f, 1, 1);
+		geometry.emplace_back(m_pos2.x + 28.f, m_pos2.y + 0.f, 0.f, 0.f + 1, 0.f);
+		geometry.emplace_back(m_pos2.x + 0.f, m_pos2.y + 48.f, 0.f, 0.f, 1);
+		geometry.emplace_back(m_pos2.x + 28.f, m_pos2.y + 48.f, 0.f, 1, 1);
 
 		m_uberMesh.GetBuffer().Fill(geometry);
 
+		geometry.clear();
+		geometry.reserve(6);
+
+
+		float houseDepth = (float)(house.y + (float)house.h / TILE_SIZE) / m_worldSize.second;
+
+		geometry.emplace_back(house.x * TILE_SIZE, house.y * TILE_SIZE, houseDepth, 0.f, 0.f);
+		geometry.emplace_back(house.x * TILE_SIZE + house.w, house.y * TILE_SIZE, houseDepth, 0.f + 1, 0.f);
+		geometry.emplace_back(house.x * TILE_SIZE , house.y * TILE_SIZE + house.h, houseDepth, 0.f, 1);
+
+		geometry.emplace_back(house.x * TILE_SIZE + house.w, house.y * TILE_SIZE + 0.f, houseDepth, 0.f + 1, 0.f);
+		geometry.emplace_back(house.x * TILE_SIZE + 0.f, house.y * TILE_SIZE + house.h, houseDepth, 0.f, 1);
+		geometry.emplace_back(house.x * TILE_SIZE + house.w, house.y * TILE_SIZE + house.h, houseDepth, 1, 1);
+
+
+		house.mesh->GetBuffer().Fill(geometry);
 
 		m_worldShader->m_ViewProjection->value = m_projection * m_view;
 		m_worldShader->m_ViewProjection->ForwardToShader();
@@ -291,6 +352,12 @@ namespace ub
 		m_worldMesh.Draw();
 		m_playerMesh.Draw();
 		m_uberMesh.Draw();
+		house.mesh->Draw();
+
+		for (auto& s : m_structureData)
+		{
+			s.mesh->Draw();
+		}
 
 		if (m_drawGrid)
 		{

@@ -19,9 +19,9 @@ namespace ub
 		m_selectionHighlight->SetColor({ 0.0f, 1.f, 0.f, 0.5f });
 
 		m_tileAtlas = IMG_Load("Assets/Textures/UBatlas.png");
-		for (std::uint8_t i = 0; i < static_cast<std::uint8_t>(20); i++)
+		for (std::uint8_t i = 0; i < static_cast<std::uint8_t>(16); i++)
 		{
-			makeTileButton(static_cast<World::Tile>(i%11));
+			makeTileButton(static_cast<World::Tile>(i));
 		}
 		m_selectionHighlight->MoveTo(GetLayoutChildren()[0]->GetPosition());
 		SDL_FreeSurface(m_tileAtlas);

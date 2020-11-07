@@ -8,7 +8,7 @@
 Shrektris::Shrektris(int argc, char** argv) : 
 	Game("Shrektris", argc, argv),
 	m_running(true), 
-	m_vrMode(true)
+	m_vrMode(false)
 {
 	auto size = m_window->GetSize();
 

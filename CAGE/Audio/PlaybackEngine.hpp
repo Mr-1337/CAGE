@@ -21,9 +21,9 @@ namespace cage
 
 			}
 
-			void Play(Sound& sound, int channel)
+			void Play(Sound& sound, int channel, int loops = 0)
 			{
-				Mix_PlayChannel(static_cast<int>(channel), sound.GetData(), 0);
+				Mix_PlayChannel(static_cast<int>(channel), sound.GetData(), loops);
 			}
 
 			void StopChannel(int channel)

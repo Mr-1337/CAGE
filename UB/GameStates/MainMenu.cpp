@@ -48,7 +48,7 @@ namespace ub
 		auto& playbackEngine = getGame().GetPlaybackEngine();
 		auto& soundManager = getGame().GetSoundManager();
 
-		playbackEngine.Play(*soundManager.Get("music.mp3"), 0);
+		playbackEngine.Play(*soundManager.Get("music.mp3"), 0, -1);
 		playbackEngine.SetChannelVolume(0, 7);
 
 		// initializing buttons
@@ -57,7 +57,7 @@ namespace ub
 
 			std::function<void(void)> callbacks[4] = {
 				[this]() { s_stateMachine->Push(new Gameplay(getGame())); },
-				[this, &playbackEngine, &soundManager]() { playbackEngine.Play(*soundManager.Get("XPHardwareDC.ogg"), 0);  },
+				[this, &playbackEngine, &soundManager]() { playbackEngine.Play(*soundManager.Get("XPHardwareDC.ogg"), 1);  },
 				[this]() { s_stateMachine->Push(new Editor(getGame())); },
 				[this]() { quit(); }
 			};

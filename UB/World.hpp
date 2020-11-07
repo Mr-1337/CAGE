@@ -2,6 +2,7 @@
 
 #include "WorldShader.hpp"
 #include "../CAGE/Graphics/Models/Mesh.hpp"
+#include "Structure.hpp"
 
 
 namespace ub
@@ -64,7 +65,7 @@ namespace ub
 		glm::mat4 calcViewMatrix();
 
 		std::shared_ptr<ub::WorldShader> m_worldShader;
-		cage::Mesh<cage::Vertex2UV> m_worldMesh, m_playerMesh, m_uberMesh, m_gridMesh;
+		cage::Mesh<cage::Vertex3UV> m_worldMesh, m_playerMesh, m_uberMesh, m_gridMesh;
 
 		glm::mat4 m_projection, m_view;
 		glm::vec2 m_cameraPos, m_position, m_pos2, m_velocity;
@@ -73,8 +74,11 @@ namespace ub
 
 		ScriptManager* m_scriptManager;
 
+		Structure house;
+
 		std::vector<Tile> m_tileData;
-		std::vector<cage::Vertex2UV> m_hackBuffer;
+		std::vector<Structure> m_structureData;
+		std::vector<cage::Vertex3UV> m_hackBuffer;
 
 		std::pair<int, int> m_winSize, m_worldSize;
 

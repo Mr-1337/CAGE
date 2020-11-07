@@ -258,12 +258,13 @@ namespace ub
 		auto size = getGame().GetWindow().GetSize();
 		glViewport(0, size.second - m_gameViewport.y, m_gameViewport.x, m_gameViewport.y);
 
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		m_world->Draw();
 		glViewport(0, 0, size.first, size.second);
 
 		cage::ui::UIElement::shader->Use();
+		glDisable(GL_DEPTH_TEST);
 		m_root.Draw();
 	}
 }

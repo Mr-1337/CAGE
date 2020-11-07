@@ -42,7 +42,7 @@ namespace cage
 
 		void LoadTexture(std::shared_ptr<Texture> texture)
 		{
-			m_texture = texture.get();
+			m_texture = texture;
 		}
 
 		void SetGeometry(const std::vector<VertexType>& geometry)

@@ -15,4 +15,6 @@ void main()
 		colorOut = texture(u_texture, o_uv);
 	else
 		colorOut = u_color;
+	if (colorOut.a <= 0.01f)
+		discard;
 }
