@@ -1,5 +1,5 @@
 #pragma once
-#include <GLAD/glad/glad.h>
+#include <Glad/glad/glad.h>
 #include <vector>
 
 namespace cage

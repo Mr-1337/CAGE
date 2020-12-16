@@ -33,7 +33,7 @@ namespace cage
 				throw std::runtime_error("Only local endpoints can receive!");
 			if (size = SDLNet_UDP_Recv(m_socket, m_recvPacket))
 			{
-				memcpy(dataBuffer, m_recvPacket->data, m_recvPacket->len);
+				SDL_memcpy(dataBuffer, m_recvPacket->data, m_recvPacket->len);
 				size = m_recvPacket->len;
 			}
 		}
