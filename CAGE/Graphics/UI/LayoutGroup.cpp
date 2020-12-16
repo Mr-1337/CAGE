@@ -4,6 +4,7 @@ namespace cage
 {
 	namespace ui
 	{
+
 		LayoutGroup::LayoutGroup(Layout* layout) :
 			m_layout(layout)
 		{
@@ -22,12 +23,12 @@ namespace cage
 			Update();
 		}
 
-		void LayoutGroup::AddAbsolute(LayoutGroup::Child element)
+		void LayoutGroup::AddAbsolute(std::shared_ptr<UIElement> element)
 		{
 			UIElement::Add(element);
 		}
 
-		std::vector<LayoutGroup::Child> LayoutGroup::GetLayoutChildren()
+		std::vector<std::shared_ptr<UIElement>> LayoutGroup::GetLayoutChildren()
 		{
 			return m_layoutChildren;
 		}

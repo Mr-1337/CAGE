@@ -15,7 +15,7 @@ namespace cage
 
 	Event InputManager::Convert(SDL_Event& e)
 	{
-		Event event = KeyDownEvent();
+		Event event = KeyDownEvent(65);
 
 		// click, motion, down, up, wheel
 		switch (e.type)
@@ -33,20 +33,26 @@ namespace cage
 			Uint8 sdlButton = e.button.button;
 			MouseClickEvent::MouseButton button = (MouseClickEvent::MouseButton)sdlButton;
 
-			event.emplace<MouseClickEvent>(MouseClickEvent(e.button.x, e.button.y, button, true));
+			event.emplace<MouseClickEvent>(e.button.x, e.button.y, button, true);
 			break;
 		}
 		case SDL_MOUSEMOTION:
 		{
-			event.emplace<MouseMotionEvent>(MouseMotionEvent(e.motion.x, e.motion.y, e.motion.xrel, e.motion.yrel));
+			event.emplace<MouseMotionEvent>(e.motion.x, e.motion.y, e.motion.xrel, e.motion.yrel);
 			break;
 		}
 		case SDL_MOUSEWHEEL:
 		{
-			event.emplace<ScrollEvent>(ScrollEvent(e.wheel.y));
+			event.emplace<ScrollEvent>(e.wheel.y);
+			break;
+		}
+		case SDL_TEXTINPUT:
+		{
+			event.emplace<TextEvent>(e.text.text);
 			break;
 		}
 		case SDL_KEYDOWN:
+			event.emplace<KeyDownEvent>(e.key.keysym.sym);
 			break;
 		case SDL_KEYUP:
 			break;

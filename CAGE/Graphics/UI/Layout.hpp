@@ -22,6 +22,7 @@ namespace cage
 			virtual void Update() = 0;
 		protected:
 			LayoutGroup* m_container;
+		private:
 		};
 	}
 }

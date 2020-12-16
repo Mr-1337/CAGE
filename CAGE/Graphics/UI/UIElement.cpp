@@ -10,6 +10,7 @@ namespace cage::ui
 
 	bool UIElement::init = false;
 	std::shared_ptr<SpriteShader> UIElement::shader = nullptr;
+	int UIElement::s_maskLayer = 0;
 
 	VertexBuffer<Vertex2>* sharedVBO;
 	VertexArray<Vertex2>* sharedVAO;
@@ -37,7 +38,7 @@ namespace cage::ui
 
 	}
 
-	UIElement::UIElement(bool textured) : m_textured(textured), m_visible(true)
+	UIElement::UIElement(bool textured) : m_textured(textured), m_visible(true), m_masking(false)
 	{
 		if (!UIElement::init)
 			UIElement::initSharedData();
@@ -48,7 +49,7 @@ namespace cage::ui
 		m_totalTransform = glm::identity<glm::mat4>();
 		m_mountOffset = { 0.f, 0.f };
 		m_parentMountOffset = { 0.f, 0.f };
-		m_color = { 0.f, 1.f, 0.f, 1.f };
+		m_color = { 0.f, 0.f, 0.f, 0.f };
 
 		m_localMount = MountPoint::CENTER;
 		m_parentMount = MountPoint::CENTER;
@@ -127,7 +128,6 @@ namespace cage::ui
 
 	void UIElement::recalcTransform()
 	{
-		onTransform();
 		m_mountOffset = GetMountOffset(m_localMount, m_size, m_scale);
 		if (m_parent != nullptr)
 			m_parentMountOffset = -GetMountOffset(m_parentMount, m_parent->GetSize(), { 1.f, 1.f });
@@ -146,6 +146,7 @@ namespace cage::ui
 		{
 			c->recalcTransform();
 		}
+		onTransform();
 	}
 
 	void UIElement::Add(Child child)
@@ -163,6 +164,15 @@ namespace cage::ui
 
 	void UIElement::Draw()
 	{
+		if (m_masking)
+		{
+			glEnable(GL_STENCIL_TEST);
+			glStencilOp(GL_KEEP, GL_KEEP, GL_INCR);
+			glStencilFunc(GL_ALWAYS, 0, 0xFF);
+			s_maskLayer++;
+			glStencilMask(0xFF);
+		}
+
 		if (m_parent != nullptr)
 		{
 			if (m_currentTexture)
@@ -183,7 +193,19 @@ namespace cage::ui
 				glDrawArrays(GL_TRIANGLES, 0, 6);
 			}
 		}
-		drawChildren();
+		if (m_masking)
+		{
+			glStencilFunc(GL_EQUAL, s_maskLayer, 0xFF);
+			glStencilMask(0x00);
+			drawChildren();
+			glStencilMask(0xFF);
+			glDisable(GL_STENCIL_TEST);
+			s_maskLayer--;
+		}
+		else
+		{
+			drawChildren();
+		}
 	}
 
 }

@@ -4,10 +4,12 @@
 namespace ub
 {
 	TilePanel::TilePanel(World* world) : 
-		EditorPanel(new cage::ui::GridLayout({ 15.f, 15.f }, 4), world, "Tiles"),
+		EditorPanel({ 200.f, 400.f }, world, "Tiles"),
 		m_tileAtlas(nullptr),
 		m_selection(World::Tile::INVALID)
 	{
+
+		m_content = std::make_shared<cage::ui::LayoutGroup>(new cage::ui::GridLayout({ 10.f, 10.f }, 4));
 
 		m_hoverHighlight->Resize({ World::TILE_SIZE, World::TILE_SIZE });
 		m_hoverHighlight->Scale({ 1.2f });
@@ -19,21 +21,26 @@ namespace ub
 		m_selectionHighlight->SetColor({ 0.0f, 1.f, 0.f, 0.5f });
 
 		m_tileAtlas = IMG_Load("Assets/Textures/UBatlas.png");
-		for (std::uint8_t i = 0; i < static_cast<std::uint8_t>(16); i++)
+		for (std::uint8_t i = 0; i < static_cast<std::uint8_t>(128); i++)
 		{
-			makeTileButton(static_cast<World::Tile>(i));
+			makeTileButton(static_cast<World::Tile>(i % 0x2f));
 		}
+		m_content->AddAbsolute(m_hoverHighlight);
+		m_content->AddAbsolute(m_selectionHighlight);
 		m_selectionHighlight->MoveTo(GetLayoutChildren()[0]->GetPosition());
+		m_selectionHighlight->SetParentMounting(cage::ui::MountPoint::TOP_LEFT);
+		Add(m_content);
 		SDL_FreeSurface(m_tileAtlas);
 	}
 
 	bool TilePanel::HandleEvent(cage::Event& e)
 	{
-		if (auto se = std::get_if<cage::ScrollEvent>(&e))
-		{
-			auto position = GetPosition();
-			//MoveTo(position + (32.f + 10.f) * glm::vec2{ 0.f, se->amount});
+		if (EditorPanel::HandleEvent(e))
 			return true;
+		for (auto c : m_content->GetChildren())
+		{
+			if (c->HandleEvent(e))
+				return true;
 		}
 		return false;
 	}
@@ -67,7 +74,7 @@ namespace ub
 		button->OnClick = [type, this, button]() { m_selection = type; m_selectionHighlight->MoveTo(button->GetPosition()); };
 		button->OnHover = [this, button]() { m_hoverHighlight->SetVisible(true); m_hoverHighlight->MoveTo(button->GetPosition()); };
 		button->OnUnHover = [this, button]() { m_hoverHighlight->SetVisible(false); };
-		Add(button);
+		m_content->Add(button);
 
 		SDL_FreeSurface(surface);
 	}

@@ -1,5 +1,6 @@
 #include "Window.hpp"
 #include <Glad/glad/glad.h>
+#include <SDL2/SDL_image.h>
 
 namespace cage
 {
@@ -13,6 +14,7 @@ namespace cage
 
 		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
 		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
+		SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 
 		m_rawHandle = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, m_width, m_height, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_INPUT_FOCUS);
 		m_context = SDL_GL_CreateContext(m_rawHandle);
@@ -34,6 +36,13 @@ namespace cage
 	void Window::MakeContextCurrent(SDL_GLContext context)
 	{
 		SDL_GL_MakeCurrent(m_rawHandle, context);
+	}
+
+	void Window::SetIcon(const char* path)
+	{
+		auto icon = IMG_Load(path);
+		SDL_SetWindowIcon(m_rawHandle, icon);
+		SDL_FreeSurface(icon);
 	}
 
 	void Window::SetPosition(int x, int y)

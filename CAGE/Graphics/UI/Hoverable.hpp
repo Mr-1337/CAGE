@@ -71,7 +71,7 @@ namespace cage
 				auto mat = glm::inverse(GetTransform());
 				glm::vec4 temp{ (float)x, (float)y, 0.f, 1.0f };
 				temp = mat * temp;
-				temp /= glm::vec4{ GetSize(), 0.f, 1.0f };
+				temp /= glm::vec4{ GetSize(), 1.0f, 1.0f };
 
 				return (temp.x >= -0.5 && temp.x <= 0.5) && (temp.y >= -0.5 && temp.y <= 0.5);
 			}
@@ -83,8 +83,8 @@ namespace cage
 			bool m_hovering;
 			void onTransform() override
 			{
-				Event e = MouseMotionEvent(m_lastX, m_lastY, 0, 0);
-				HandleEvent(e);
+				//Event e = MouseMotionEvent(m_lastX, m_lastY, 0, 0);
+				//HandleEvent(e);
 			}
 
 		};

@@ -3,6 +3,8 @@
 #include "../CAGE/Core/StateMachine.hpp"
 #include "../CAGE/Core/Platform.hpp"
 #include "../CAGE/Core/Game.hpp"
+#include "../CAGE/Graphics/UI/GridLayout.hpp"
+#include "../CAGE/Graphics/UI/TextField.hpp"
 #include "MainMenu.hpp"
 #include "Gameplay.hpp"
 #include "Editor.hpp"
@@ -11,7 +13,7 @@ namespace ub
 {
 	MainMenu::MainMenu(cage::Game& game) : 
 		cage::GameState(game),
-		k_buttonSpacing(50.f)
+		m_font("Assets/Fonts/consola.ttf", 64)
 	{
 
 		std::cout << "\n\n\nMain menu allocated\n\n\n";
@@ -36,7 +38,6 @@ namespace ub
 		cage::ui::UIElement::shader = m_shader;
 
 		m_selector = std::make_shared<cage::ui::UIElement>();
-		m_selector->SetActiveTexture(m_textureManager.Get("MenuSelector.png"));
 
 		m_root.SetLocalMounting(cage::ui::MountPoint::CENTER);
 		m_root.Resize({ (float)winSize.first, (float)winSize.second });
@@ -48,12 +49,15 @@ namespace ub
 		auto& playbackEngine = getGame().GetPlaybackEngine();
 		auto& soundManager = getGame().GetSoundManager();
 
-		playbackEngine.Play(*soundManager.Get("music.mp3"), 0, -1);
+		//playbackEngine.Play(*soundManager.Get("music.mp3"), 0, -1);
 		playbackEngine.SetChannelVolume(0, 7);
 
 		// initializing buttons
 		{
-			const std::string names[4] = { "MenuPlay.png", "MenuOptions.png", "MenuEditor.png", "MenuQuit.png" };
+
+			SDL_Color color = { 192, 192, 192, 255 };
+
+			const std::string names[4] = { "Play", "Options", "Editor", "Quit" };
 
 			std::function<void(void)> callbacks[4] = {
 				[this]() { s_stateMachine->Push(new Gameplay(getGame())); },
@@ -62,22 +66,31 @@ namespace ub
 				[this]() { quit(); }
 			};
 
+			auto buttonGroup = std::make_shared<cage::ui::LayoutGroup>(new cage::ui::GridLayout({ 0.f, 50.f }, 1));
+
 			for (int i = 0; i < 4; i++)
 			{
-				m_buttons[i] = std::make_shared<cage::ui::Button>(m_textureManager.Get(names[i]), std::nullopt, std::nullopt);
-				m_root.Add(m_buttons[i]);
+				auto texture = m_font.Render(names[i], color);
+				m_buttons[i] = std::make_shared<cage::ui::Button>(texture, std::nullopt, std::nullopt);
+				buttonGroup->Add(m_buttons[i]);
 				m_input.Subscribe(m_buttons[i].get());
-				m_buttons[i]->Scale(0.25f);
-				m_buttons[i]->MoveTo({ 0.f, k_buttonSpacing * (-1.5f + i) });
 				m_buttons[i]->OnClick = callbacks[i];
 				m_buttons[i]->OnHover = [i, this]() { updateSelector(i); };
 			}
+			m_root.Add(buttonGroup);
+			buttonGroup->AddAbsolute(m_selector);
+			m_selector->SetActiveTexture(m_font.Render(">", color));
+			m_selector->SetParentMounting(cage::ui::MountPoint::TOP_LEFT);
+			m_selector->SetLocalMounting(cage::ui::MountPoint::CENTER_RIGHT);
+
+
+			auto tf = std::make_shared<cage::ui::TextField>(m_font);
+			m_root.Add(tf);
+			m_input.Subscribe(tf.get());
 		}
 
-		m_root.Add(m_selector);
-		m_selector->Scale(0.25f);
 
-		glClearColor(0.0, 0.0, 0.0, 1.0);
+		glClearColor(0.0, 0.0, 0.0, 0.0);
 		glViewport(0, 0, winSize.first, winSize.second);
 
 		updateSelector(0);
@@ -163,8 +176,12 @@ namespace ub
 	void MainMenu::updateSelector(int selection)
 	{
 		m_selection = selection;
-		m_selector->MoveTo({ -25.f, k_buttonSpacing * (-1.5f + m_selection) });
+		auto pos = m_buttons[selection]->GetPosition();
+		pos.x -= cage::ui::UIElement::GetMountOffset(cage::ui::MountPoint::CENTER_LEFT, m_buttons[selection]->GetSize(), m_buttons[selection]->GetScale()).x;
+		m_selector->MoveTo(pos);
 	}
+
+	static float time = 0;
 
 	void MainMenu::Update(float dt)
 	{
@@ -175,11 +192,13 @@ namespace ub
 		else
 			m_selector->SetVisible(true);
 		m_root.Update(dt);
+		time += dt;
+		//m_scroll->MoveTo({ 0., 100.f * sin(time)});
 	}
 
 	void MainMenu::Draw()
 	{
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 		glDisable(GL_DEPTH_TEST);
 
 		m_shader->Use();

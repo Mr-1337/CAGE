@@ -18,7 +18,7 @@ namespace ub
 		lang.LoadFile("editor.lang");
 
 		m_world->SetWinSize(size);
-		m_rightPanel = std::make_shared<cage::ui::LayoutGroup>(new cage::ui::GridLayout({ 0.f, 0.f }, 1));
+		m_rightPanel = std::make_shared<cage::ui::LayoutGroup>(new cage::ui::FlowLayout({ 0.f, 0.f }, cage::ui::FlowLayout::Orientation::VERTICAL, false));
 		m_rightPanel->SetParentMounting(cage::ui::MountPoint::TOP_RIGHT);
 		m_rightPanel->SetLocalMounting(cage::ui::MountPoint::TOP_RIGHT);
 
@@ -31,7 +31,7 @@ namespace ub
 		m_tilePanel = std::make_shared<TilePanel>(m_world.get());
 
 		auto font = cage::Font("Assets/Fonts/consola.ttf", 16);
-		glClearColor(0.0, 0.0, 0.0, 1.0);
+		glClearColor(0.0, 0.0, 0.0, 0.0);
 
 		m_tabBar = std::make_shared<cage::ui::LayoutGroup>(new cage::ui::FlowLayout({ 5.f, 0.f }, true));
 		//m_tabBar->Scale(0.25f);
@@ -49,7 +49,7 @@ namespace ub
 		//m_rightPanel->Resize(m_tilePanel->GetSize());
 
 		std::for_each(m_rightPanel->GetChildren().begin(), m_rightPanel->GetChildren().end(), [this](auto c) { m_input.Subscribe(c.get()); });
-		std::for_each(m_tilePanel->GetChildren().begin(), m_tilePanel->GetChildren().end(), [this](auto c) { m_input.Subscribe(c.get()); });
+		//std::for_each(m_tilePanel->GetChildren().begin(), m_tilePanel->GetChildren().end(), [this](auto c) { m_input.Subscribe(c.get()); });
 
 		m_bottomPanel = std::make_shared<cage::ui::LayoutGroup>(new cage::ui::GridLayout({ 0.f, 15.f }, 1));
 		m_bottomPanel->SetParentMounting(cage::ui::MountPoint::BOTTOM);
@@ -86,12 +86,20 @@ namespace ub
 		auto selHigh = std::make_shared<cage::ui::UIElement>();
 		selHigh->Resize(m_hand->GetScaledSize() * 1.3f);
 		selHigh->SetParentMounting(cage::ui::MountPoint::CENTER_LEFT);
-		selHigh->SetLocalMounting(cage::ui::MountPoint::CENTER_LEFT);
 		selHigh->SetVisible(true);
 		selHigh->SetColor({ 0, 0.5, 0, 0.5 });
 
-		m_hand->OnClick = [this, selHigh]()		{ m_currentTool = m_handTool.get();		selHigh->MoveTo(m_hand->GetPosition()); };
-		m_pencil->OnClick = [this, selHigh]()	{ m_currentTool = m_pencilTool.get();	selHigh->MoveTo(m_pencil->GetPosition()); };
+		auto select = [this, selHigh](std::shared_ptr<cage::ui::UIElement> button, Tool* tool)
+		{
+			glm::vec2 pos = button->GetPosition();
+			pos += cage::ui::UIElement::GetMountOffset(cage::ui::MountPoint::CENTER_LEFT, button->GetSize(), button->GetScale());
+			selHigh->MoveTo(pos);
+			m_currentTool = tool;
+		};
+
+		select(m_hand, m_handTool.get());
+		m_hand->OnClick = [this, select]()	  { select(m_hand, m_handTool.get()); };
+		m_pencil->OnClick = [this, select]() { select(m_pencil, m_pencilTool.get()); };
 
 		toolBar->Add(m_pencil);
 		toolBar->Add(m_hand);
@@ -142,6 +150,7 @@ namespace ub
 			panelColor = { 0.47, 0.47, 0.47, 1.0 };
 
 		m_rightPanel->SetColor(bgColor);
+		//m_rightPanel->SetMasking(true);
 		m_bottomPanel->SetColor(bgColor);
 		m_tabBar->SetColor(fgColor);
 		m_tilePanel->SetColor(fgColor);
@@ -258,7 +267,7 @@ namespace ub
 		auto size = getGame().GetWindow().GetSize();
 		glViewport(0, size.second - m_gameViewport.y, m_gameViewport.x, m_gameViewport.y);
 
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 		m_world->Draw();
 		glViewport(0, 0, size.first, size.second);

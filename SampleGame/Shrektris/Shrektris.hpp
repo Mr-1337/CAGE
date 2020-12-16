@@ -10,11 +10,13 @@
 #include <OpenVR/openvr.h>
 #include "../CAGE/CAGE.hpp"
 
-#include "../CAGE/Graphics/Models/Model.hpp"
 #include "../CAGE/Graphics/UI/UIElement.hpp"
 #include "../CAGE/Graphics/ShaderProgram/Generic3DShader.hpp"
 #include "../CAGE/Graphics/ShaderProgram/SpriteShader.hpp"
+#include "../CAGE/Graphics/ShaderProgram/SkyboxShader.hpp"
 #include "../CAGE/IO/MeshLoader.hpp"
+#include "../CAGE/Graphics/Models/Skybox.hpp"
+#include "../CAGE/Graphics/Models/Model.hpp"
 
 /*
 					  _____
@@ -44,6 +46,13 @@
 			 \           '    ,'
 			  `.       ,   _,'
 				`-.___.---'
+
+   _____ _              _    _        _
+  / ____| |            | |  | |      (_)	
+ | (___ | |__  _ __ ___| | _| |_ _ __ _ ___	
+  \___ \| '_ \| '__/ _ \ |/ / __| '__| / __|
+  ____) | | | | | |  __/   <| |_| |  | \__ \
+ |_____/|_| |_|_|  \___|_|\_\\__|_|  |_|___/
 
 */
 
@@ -127,6 +136,38 @@ private:
 	vr::TrackedDevicePose_t m_rTrackedDevicePose[vr::k_unMaxTrackedDeviceCount];
 
 	FramebufferDesc leftEyeDesc, rightEyeDesc;
+
+	glm::mat4 GetCurrentProjection(vr::Hmd_Eye eye)
+	{
+		glm::mat4 p;
+		if (eye == vr::Eye_Left)
+		{
+			p = projLeft;
+			//mvp = hmdPose * eyePosLeft * projLeft;
+		}
+		else if (eye == vr::Eye_Right)
+		{
+			p = projRight;
+			//mvp = hmdPose * eyePosRight * projRight;
+		}
+		return p;
+	}
+
+	glm::mat4 GetCurrentView(vr::Hmd_Eye eye)
+	{
+		glm::mat4 v;
+		if (eye == vr::Eye_Left)
+		{
+			v = eyePosLeft * hmdPose;
+			//mvp = hmdPose * eyePosLeft * projLeft;
+		}
+		else if (eye == vr::Eye_Right)
+		{
+			v = eyePosRight * hmdPose;
+			//mvp = hmdPose * eyePosRight * projRight;
+		}
+		return v;
+	}
 
 	glm::mat4 GetCurrentViewProjection(vr::Hmd_Eye eye)
 	{
@@ -343,9 +384,11 @@ private:
 	TTF_Font* m_font;
 	unsigned int m_score, m_level, m_levelCounter;
 	SDL_Color fontColor = { 12, 160, 18, 255 };
-	cage::Model shrek, thanos; 
+	cage::Model shrek, thanos;
+	cage::Skybox skybox;
 	cage::Mesh<cage::Vertex3UVNormal>* grid;
 	std::unique_ptr<cage::Generic3DShader> program;
+	std::unique_ptr<cage::SkyboxShader> skyProgram;
 	std::shared_ptr<cage::SpriteShader> spriteProgram;
 	bool m_running;
 };

@@ -11,6 +11,6 @@
 namespace cage
 {
 	// A CAGE event. Application layer events system to remove dependence on OS specific event functionality
-	using Event = std::variant<MouseClickEvent, MouseMotionEvent, KeyDownEvent, KeyUpEvent, ScrollEvent>;
+	using Event = std::variant<MouseClickEvent, MouseMotionEvent, KeyDownEvent, KeyUpEvent, TextEvent, ScrollEvent>;
 
 }

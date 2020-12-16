@@ -27,10 +27,10 @@ namespace ub
 	private:
 
 		cage::ui::UIElement m_root;
-		std::shared_ptr<cage::ui::LayoutGroup> m_tabBar, m_bottomPanel;
+		std::shared_ptr<cage::ui::LayoutGroup> m_tabBar, m_bottomPanel, m_rightPanel;
 		std::shared_ptr<cage::ui::Button> m_play, m_pause, m_stop, m_hand, m_file, m_pencil;
 		std::shared_ptr<TilePanel> m_tilePanel;
-		std::shared_ptr<cage::ui::UIElement> m_rightPanel, m_tileHighlight;
+		std::shared_ptr<cage::ui::UIElement> m_tileHighlight;
 		std::shared_ptr<cage::ui::CheckBox> m_gridToggle;
 
 		class Tool
@@ -91,6 +91,8 @@ namespace ub
 				{
 					if (m_mouseDown)
 						paint(me->x, me->y);
+
+					m_editor->m_tileHighlight->SetVisible(inViewport({ me->x, me->y }));
 
 					m_indices = m_world->ToTileIndices(me->x, me->y);
 					m_editor->m_tileHighlight->Resize((float)World::TILE_SIZE * glm::vec2{ (float)2 * m_radius + 1 });

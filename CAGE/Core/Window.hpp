@@ -14,6 +14,7 @@ namespace cage
 		void SetPosition(int x, int y);
 		std::pair<int, int> GetPosition() const;
 		std::pair<int, int> GetSize() const;
+		void SetIcon(const char* path);
 		void SetSize(int w, int h);
 		void SetOpacity(float opacity);
 		void MakeContextCurrent(SDL_GLContext context);

@@ -128,7 +128,7 @@ void UITest::ProcessEvents()
 			else
 			{
 				b1->Scale(0.99f);
-				message->SetText("REEEEEE");
+				message->SetText("REEEEEEEEEEEEEEEEEEEEEE");
 			}
 			break;
 		default:

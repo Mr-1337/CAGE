@@ -18,21 +18,6 @@ namespace cage
 			}
 
 			std::function<void(void)> OnClick;
-
-			
-			bool HandleEvent(Event& e) override
-			{
-				if (Hoverable::HandleEvent(e))
-					return true;
-				if (auto ce = std::get_if<MouseClickEvent>(&e))
-				{
-					if (ce->wasRelease)
-						return onRelease();
-					else
-						return onClick();
-				}
-				return false;
-			}
 			
 
 		protected:
@@ -53,7 +38,7 @@ namespace cage
 				//SDL_SetCursor(s_cursor2);
 			}
 
-			virtual bool onClick() override
+			virtual bool onClick(int x, int y) override
 			{
 				if (hovering())
 				{

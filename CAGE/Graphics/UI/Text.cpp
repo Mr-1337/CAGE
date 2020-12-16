@@ -4,7 +4,7 @@ namespace cage
 {
 	namespace ui
 	{
-		Text::Text(const Font& font) : m_font(font), m_color{ 255, 255, 255, 255}
+		Text::Text(const Font& font) : m_font(font), m_color{ 255, 255, 255, 255 }
 		{
 
 		}

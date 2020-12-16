@@ -12,7 +12,7 @@ namespace cage
 		public:
 			LayoutGroup(Layout* layout);
 			~LayoutGroup();
-			void Add(std::shared_ptr<UIElement> element) override;
+			void Add(Child element) override;
 			void AddAbsolute(Child element);
 			void Update();
 			void Compress();

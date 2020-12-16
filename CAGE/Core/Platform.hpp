@@ -7,6 +7,7 @@ namespace cage
 {
 	namespace platform
 	{
+		void Init();
 		std::string GetUsername();
 	}
 }

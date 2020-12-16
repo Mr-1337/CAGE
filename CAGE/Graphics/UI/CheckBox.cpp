@@ -10,7 +10,7 @@ namespace cage
 		{
 		}
 
-		bool CheckBox::CheckBoxButton::onClick()
+		bool CheckBox::CheckBoxButton::onClick(int x, int y)
 		{
 			if (hovering())
 			{

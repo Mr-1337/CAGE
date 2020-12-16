@@ -7,6 +7,8 @@
 #include "../CAGE/IO/Assets/TextureManager.hpp"
 #include "../CAGE/IO/Assets/SoundManager.hpp"
 #include "../CAGE/Audio/PlaybackEngine.hpp"
+#include "../CAGE/Graphics/UI/ScrollPanel.hpp"
+#include "../CAGE/Graphics/Font/Font.hpp"
 
 namespace ub
 {
@@ -30,6 +32,7 @@ namespace ub
 
 		std::array<std::shared_ptr<cage::ui::Button>, 4> m_buttons;
 		std::shared_ptr<cage::ui::UIElement> m_selector;
+		cage::Font m_font;
 
 		enum class AudioChannels
 		{
@@ -42,7 +45,6 @@ namespace ub
 
 		void updateSelector(int selection);
 		unsigned int m_selection;
-		const float k_buttonSpacing;
 
 		std::chrono::milliseconds m_blinkTimer;
 

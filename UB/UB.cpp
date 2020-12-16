@@ -10,12 +10,12 @@ namespace ub
 		cage::Game("Undefined Behavior", argc, argv), 
 		m_running(true)
 	{
-
-		glDisable(GL_DEPTH_TEST);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		cage::Texture::MissingTexture = new cage::Texture(IMG_Load("Assets/Textures/missing.png"));
+		m_window->SetIcon("Assets/Textures/icon.png");
+		
 
 		auto size = m_window->GetSize();
 		m_stateMachine.Push(new MainMenu(*this));

@@ -80,7 +80,11 @@ set(SRC_FILES
 	"Graphics/UI/FlowLayout.cpp" 
 	"IO/Events/ScrollEvent.hpp" 
 	"IO/Localization/Language.cpp"
-	"IO/Localization/Language.hpp")
+	"IO/Localization/Language.hpp" 
+	"Graphics/Cubemaps/Cubemap.hpp" 
+	"Graphics/Cubemaps/Cubemap.cpp" 
+	"Graphics/Models/Skybox.hpp" 
+	"Graphics/ShaderProgram/SkyboxShader.hpp" "Graphics/UI/ScrollPanel.hpp" "Graphics/UI/Dragable.hpp" "Graphics/UI/TextField.hpp")
 
 # Add source to this project's library.
 add_library (CAGE STATIC ${SRC_FILES})

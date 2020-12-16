@@ -2,15 +2,15 @@
 
 #include <string>
 #include "../World.hpp"
-#include "../../CAGE/Graphics/UI/LayoutGroup.hpp"
+#include "../../CAGE/Graphics/UI/ScrollPanel.hpp"
 
 namespace ub
 {
-	class EditorPanel : public cage::ui::LayoutGroup
+	class EditorPanel : public cage::ui::ScrollPanel
 	{
 	public:
-		EditorPanel(cage::ui::Layout* layout, World* world, const std::string& name) :
-			LayoutGroup(layout),
+		EditorPanel(glm::vec2 size, World* world, const std::string& name) :
+			ScrollPanel(size),
 			m_world(world),
 			m_name(name)
 		{
@@ -19,18 +19,18 @@ namespace ub
 
 			m_hoverHighlight = std::make_shared<cage::ui::UIElement>();
 			m_hoverHighlight->SetParentMounting(cage::ui::MountPoint::TOP_LEFT);
-
-			AddAbsolute(m_selectionHighlight);
-			AddAbsolute(m_hoverHighlight);
 		}
-			std::string GetPanelName()
+
+		std::string GetPanelName()
 		{
 			return m_name;
 		};
+
 	private:
 		const std::string m_name;
 	protected:
 		World* m_world;
 		std::shared_ptr<cage::ui::UIElement> m_selectionHighlight, m_hoverHighlight;
+		std::shared_ptr<cage::ui::LayoutGroup> m_content;
 	};
 }

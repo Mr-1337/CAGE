@@ -8,7 +8,8 @@
 Shrektris::Shrektris(int argc, char** argv) : 
 	Game("Shrektris", argc, argv),
 	m_running(true), 
-	m_vrMode(false)
+	m_vrMode(false),
+	skybox(std::filesystem::current_path().append("Assets/skybox"))
 {
 	auto size = m_window->GetSize();
 
@@ -41,6 +42,13 @@ Shrektris::Shrektris(int argc, char** argv) :
              \           '    ,'
               `.       ,   _,'
                 `-.___.---'
+   _____ _              _    _        _
+  / ____| |            | |  | |      (_)	
+ | (___ | |__  _ __ ___| | _| |_ _ __ _ ___	
+  \___ \| '_ \| '__/ _ \ |/ / __| '__| / __|
+  ____) | | | | | |  __/   <| |_| |  | \__ \
+ |_____/|_| |_|_|  \___|_|\_\\__|_|  |_|___/
+
 	)";
 
 	std::cout << std::endl << shrekStr << std::endl;
@@ -149,6 +157,13 @@ Shrektris::Shrektris(int argc, char** argv) :
 	program->Projection->ForwardToShader();
 	program->Model->value = glm::scale(program->Model->value, { 1.f, 0.6f, 1.f });
 	program->Model->ForwardToShader();
+
+	skyProgram = std::make_unique<cage::SkyboxShader>();
+
+	skyProgram->Use();
+
+	skyProgram->Projection->value = program->Projection->value;
+	skyProgram->Projection->ForwardToShader();
 
 	spriteVS.CompileFromFile("Assets/sprite.vert");
 	spriteFS.CompileFromFile("Assets/sprite.frag");
@@ -614,8 +629,25 @@ void Shrektris::drawScene(vr::EVREye eye, float t)
 		program->Projection->ForwardToShader();
 	}
 
+	glDepthMask(GL_FALSE);
+	skyProgram->Use();
+	if (!m_vrMode)
+		skyProgram->View->value = program->View->value;
+	else
+	{
+		skyProgram->View->value = GetCurrentView(eye);
+		skyProgram->Projection->value = GetCurrentProjection(eye);
+		skyProgram->Projection->ForwardToShader();
+	}
+
+	skyProgram->View->ForwardToShader();
+	skybox.Draw();
+	glDepthMask(GL_TRUE);
+
 	// draw the main game board
 	
+	program->Use();
+
 	for (int y = 0; y < 15; y++)
 	{
 		for (int x = 0; x < 10; x++)
@@ -759,7 +791,7 @@ void Shrektris::draw(float t)
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 
-		//drawScene(vr::Eye_Right, t);
+		drawScene(vr::Eye_Right, t);
 
 		vr::Texture_t leftEyeTexture = { (void*)(uintptr_t)leftEyeDesc.m_nResolveTextureId, vr::TextureType_OpenGL, vr::ColorSpace_Gamma };
 		vr::VRCompositor()->Submit(vr::Eye_Left, &leftEyeTexture);

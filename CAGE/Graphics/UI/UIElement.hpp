@@ -70,8 +70,7 @@ namespace cage
 				{
 					m_textured = true;
 					m_currentTexture = texture;
-					m_size.x = texture->GetSize().first;
-					m_size.y = texture->GetSize().second;
+					Resize({ texture->GetSize().first, texture->GetSize().second });
 				}
 			}
 
@@ -109,6 +108,7 @@ namespace cage
 			inline void SetRotation(float angle) { m_rotation = angle; recalcTransform(); }
 			inline void SetScale(float scaleFactor) { m_scale = { scaleFactor, scaleFactor }; recalcTransform(); }
 			inline void SetVisible(bool visible) { m_visible = visible; }
+			inline void SetMasking(bool masking) { m_masking = masking; }
 			
 			inline glm::mat4 GetTransform() const { return m_totalTransform; }
 			inline void SetTransform(const glm::mat4&& transform) { m_totalTransform = transform; }
@@ -137,10 +137,13 @@ namespace cage
 
 			bool m_textured;
 			bool m_visible;
+			bool m_masking;
 
 			void recalcTransform();
 			void drawChildren();
 			void updateChildren(float deltaTime);
+
+			static int s_maskLayer;
 
 		protected:
 			virtual void onTransform();

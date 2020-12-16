@@ -1,11 +1,13 @@
 #include <iostream>
-#include <exception>
+#include <stdexcept>
 #include <Glad/glad/glad.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_mixer.h>
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_net.h>
+
 #include "Game.hpp"
+#include "Platform.hpp"
 
 static void GLAPIENTRY
 MessageCallback(GLenum source,
@@ -108,6 +110,9 @@ namespace cage
 			printf("Version:  %s\n", glGetString(GL_VERSION));
 			glEnable(GL_DEBUG_OUTPUT);
 			glDebugMessageCallback(MessageCallback, 0);
+
+			platform::Init();
+
 		}
 		catch (const std::exception& e)
 		{

@@ -22,7 +22,7 @@ namespace cage
 
 				bool m_selected;
 
-				bool onClick() override;
+				bool onClick(int x, int y) override;
 				void onHover() override;
 				void onUnHover() override;
 				bool onRelease() override;
