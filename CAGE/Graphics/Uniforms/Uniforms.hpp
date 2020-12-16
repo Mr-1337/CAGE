@@ -16,8 +16,6 @@ namespace cage::uniforms
 		{
 			m_location = glGetUniformLocation(m_program, m_name.c_str());
 		}
-
-		Uniform<T>& operator=(Uniform<T> other) = delete;
 		
 		virtual Uniform<T>& operator=(T value)
 		{
