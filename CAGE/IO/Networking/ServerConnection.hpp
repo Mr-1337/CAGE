@@ -19,7 +19,7 @@ namespace cage
 			}
 			virtual void Receive(void* dataBuffer, size_t size)
 			{
-
+				m_local.Receive(dataBuffer, size);
 			}
 			virtual void Send(void* dataBuffer, size_t size)
 			{

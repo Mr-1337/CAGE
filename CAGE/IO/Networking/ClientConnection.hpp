@@ -13,10 +13,18 @@ namespace cage
 			// Opens a connection to the given server. This should only be used by clients.
 			ClientConnection(Endpoint server) : m_local(0), m_server(server)
 			{
+				char payload[6] = "Shrek";
+				Send(payload, 6);
 			}
 
-			virtual void Receive(void* dataBuffer, size_t size) = 0;
-			virtual void Send(void* dataBuffer, size_t size) = 0;
+			void Receive(void* dataBuffer, size_t size)
+			{
+
+			}
+			void Send(void* dataBuffer, size_t size)
+			{
+				m_local.Send((char*)dataBuffer, size, m_server);
+			}
 		};
 	}
 }

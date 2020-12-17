@@ -20,6 +20,7 @@ Lobby::Lobby(cage::Game& game) : cage::GameState(game), m_font("Assets/sans.ttf"
 			cage::ui::transforms::Move t({ -m_root.GetSize().x / 2.f - m_hostPanel->GetSize().x / 2.0f, 0.f }, 0.f, 0.5f, cage::ui::transforms::Interpolation::CUBIC);
 			m_buttonGroup->ScheduleTransform(std::move(std::make_unique<cage::ui::transforms::Move>(t)));
 			m_hostPanel->ScheduleTransform(std::move(std::make_unique<cage::ui::transforms::Move>(t)));
+			m_serverConnection = std::make_unique<cage::networking::ServerConnection>(25570);
 		}
 	};
 
@@ -41,7 +42,10 @@ Lobby::Lobby(cage::Game& game) : cage::GameState(game), m_font("Assets/sans.ttf"
 	auto backC = std::make_shared<MenuButton>("Back");
 	connect->OnClick = [this]()
 	{
-		acceptConnection(m_ipTextField->GetText());
+		//acceptConnection(m_ipTextField->GetText());
+		IPaddress ip;
+		SDLNet_ResolveHost(&ip, m_ipTextField->GetText().c_str(), 25570);
+		m_clientConnection = std::make_unique<cage::networking::ClientConnection>(cage::networking::Endpoint(ip));
 	};
 	backC->OnClick = [this]()
 	{
@@ -135,6 +139,16 @@ void Lobby::ProcessEvents()
 void Lobby::Update(float delta)
 {
 	m_root.Update(delta);
+	switch (m_mode)
+	{
+	case HOST:
+		char packet[128];
+		m_serverConnection->Receive(packet, 128);
+
+		acceptConnection("Welcome, TO MY SWAMP!");
+		acceptConnection(packet);
+		break;
+	}
 }
 void Lobby::Draw()
 {

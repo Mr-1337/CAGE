@@ -40,6 +40,8 @@ private:
 	};
 
 	Mode m_mode;
+	std::unique_ptr<cage::networking::ClientConnection> m_clientConnection;
+	std::unique_ptr<cage::networking::ServerConnection> m_serverConnection;
 
 	void acceptConnection(const std::string& name);
 
