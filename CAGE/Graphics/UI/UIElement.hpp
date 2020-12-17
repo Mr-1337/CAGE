@@ -3,11 +3,13 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <queue>
 #include <GLM/glm/glm.hpp>
 
 #include "../../IO/Events/EventListener.hpp"
 #include "../ShaderProgram/SpriteShader.hpp"
 #include "../Textures/Texture.hpp"
+#include "Transforms.hpp"
 
 namespace cage
 {
@@ -55,6 +57,8 @@ namespace cage
 			glm::vec4 m_color;
 
 			float m_rotation;
+
+			std::queue<std::unique_ptr<transforms::Transform>> m_transformQueue;
 
 		public:
 			UIElement();
@@ -109,6 +113,8 @@ namespace cage
 			inline void SetScale(float scaleFactor) { m_scale = { scaleFactor, scaleFactor }; recalcTransform(); }
 			inline void SetVisible(bool visible) { m_visible = visible; }
 			inline void SetMasking(bool masking) { m_masking = masking; }
+
+			void ScheduleTransform(std::unique_ptr<transforms::Transform> transform);
 			
 			inline glm::mat4 GetTransform() const { return m_totalTransform; }
 			inline void SetTransform(const glm::mat4&& transform) { m_totalTransform = transform; }

@@ -4,36 +4,15 @@ cmake_minimum_required (VERSION 3.10)
 
 set(SRC_FILES
 	"Main.cpp" 
+	"MenuButton.hpp"
 	"Shrektris/Shrektris.cpp" 
 	"Shrektris/Shrektris.hpp"
-	"STR/STR.cpp"
-	"STR/STR.hpp" 
-	"STR/Car.cpp" 
-	"STR/Car.hpp" 
-	"STR/Perlin.cpp" 
-	"STR/Perlin.hpp"
-
-	"STR/Racers/Racer.hpp"
-	"STR/Racers/Racer.cpp"
-	"STR/Racers/Shrek.cpp"
-	"STR/Racers/Shrek.hpp"
-
-	"STR/Track/Track.hpp"
-	"STR/Track/Track.cpp"
-
-	"STR/GameStates/Sandbox.cpp"
-	"STR/GameStates/Sandbox.hpp"
-	"STR/GameStates/MainMenu.cpp"
-	"STR/GameStates/MainMenu.hpp"
-	"STR/GameStates/Lobby.cpp"
-	"STR/GameStates/Lobby.hpp"
-	"STR/GameStates/UITest.hpp"
-	"STR/GameStates/UITest.cpp"
-	"STR/GameStates/Editor.hpp"
-	"STR/GameStates/Editor.cpp"
-
-	"STR/MenuButton.hpp"
-)
+	"Shrektris/ShrekMenu.hpp" 
+	"Shrektris/ShrekMenu.cpp" 
+	"Shrektris/Gameplay.hpp" 
+	"Shrektris/Gameplay.cpp"
+	"Shrektris/Lobby.hpp" 
+	"Shrektris/Lobby.cpp")
 
 add_executable (SampleGame ${SRC_FILES})
 
@@ -50,7 +29,7 @@ set (SDL_LIBS SDL2/SDL2 SDL2/SDL2main SDL2/SDL2_mixer SDL2/SDL2_image SDL2/SDL2_
 
 # Steam libraries
 
-set (STEAM_LIBS Steam/phonon Steam/openvr_api)
+set (STEAM_LIBS Steam/openvr_api)
 
 # link against CAGE, SDL and its extensions
 target_link_libraries (SampleGame PUBLIC CAGE ${SDL_LIBS} ${STEAM_LIBS})

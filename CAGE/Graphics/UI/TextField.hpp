@@ -9,16 +9,29 @@ namespace cage
 		class TextField : public UIElement
 		{
 		public:
-			TextField(const Font& font) :
-				m_selected(false)
+			TextField(const Font& font, int width) :
+				m_selected(false),
+				m_maxChars(width)
 			{
 				m_backBox = std::make_shared<UIElement>();
-				m_backBox->SetColor({ 255, 255, 255, 255 });
+				m_backBox->SetColor({ 1.0, 1.0, 1.0, 1.0 });
 				m_text = std::make_shared<Text>(font);
 				Add(m_backBox);
 				Add(m_text);
-				Resize({ 50.f, 50.f });
-				m_text->SetColor({ 0, 255, 0, 255 });
+				std::string dummy;
+				for (int i = 0; i < m_maxChars; i++)
+					dummy.append("_");
+				m_text->SetText(dummy);
+				m_text->SetParentMounting(MountPoint::CENTER_LEFT);
+				m_text->SetLocalMounting(MountPoint::CENTER_LEFT);
+				Resize(m_text->GetSize());
+				m_text->SetText("");
+				m_text->SetColor({ 0.0, 1.0, 0.0, 1.0 });
+			}
+
+			TextField(const Font& font) : TextField(font, 20)
+			{
+
 			}
 
 			bool HandleEvent(Event& e) override
@@ -33,16 +46,36 @@ namespace cage
 
 				if (auto ce = std::get_if<MouseClickEvent>(&e))
 				{
-					m_selected = inBounds(ce->x, ce->y);
-					return true;
+					if (inBounds(ce->x, ce->y))
+					{
+						m_selected = true;
+						return true;
+					}
+					else
+					{
+						if (m_selected)
+						{
+							m_selected = false;
+							return true;
+						}
+						else
+						{
+							return false;
+						}
+					}
+				}
+				else if (auto he = std::get_if<MouseMotionEvent>(&e))
+				{
+					return m_selected;
 				}
 				else if (auto te = std::get_if<TextEvent>(&e))
 				{
-					if (m_selected)
+					if (m_selected && m_textString.length() < m_maxChars)
 					{
 						m_textString += te->text;
 						m_text->SetText(m_textString);
-						Resize(m_text->GetSize());
+						auto size = glm::max(GetSize(), m_text->GetSize());
+						Resize(size);
 						return true;
 					}
 				}
@@ -52,11 +85,15 @@ namespace cage
 					{
 						m_textString.pop_back();
 						m_text->SetText(m_textString);
-						Resize(m_text->GetSize());
 						return true;
 					}
 				}
 				return false;
+			}
+
+			std::string GetText()
+			{
+				return m_textString;
 			}
 
 		private:
@@ -67,6 +104,7 @@ namespace cage
 			}
 
 			bool m_selected;
+			int m_maxChars;
 			std::string m_textString;
 			Child m_backBox;
 			std::shared_ptr<Text> m_text;

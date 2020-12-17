@@ -83,6 +83,18 @@ namespace cage::ui
 
 	void UIElement::Update(float deltaTime)
 	{
+		if (!m_transformQueue.empty())
+		{
+			m_transformQueue.front()->UpdateLifetime(deltaTime);
+			m_transformQueue.front()->Apply();
+			if (m_transformQueue.front()->Complete())
+			{
+				m_transformQueue.pop();
+				if (!m_transformQueue.empty())
+					m_transformQueue.front()->Init();
+			}
+		}
+		updateChildren(deltaTime);
 	}
 
 	void UIElement::Resize(glm::vec2 size)
@@ -147,6 +159,14 @@ namespace cage::ui
 			c->recalcTransform();
 		}
 		onTransform();
+	}
+
+	void UIElement::ScheduleTransform(std::unique_ptr<transforms::Transform> transform)
+	{
+		transform->SetElement(this);
+		if (m_transformQueue.empty())
+			transform->Init();
+		m_transformQueue.push(std::move(transform));
 	}
 
 	void UIElement::Add(Child child)

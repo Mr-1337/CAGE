@@ -1,0 +1,46 @@
+#pragma once
+
+#include <utility>
+#include <GLM/glm/gtc/matrix_transform.hpp>
+#include "../../CAGE/Core/GameState.hpp"
+#include "../../CAGE/Graphics/UI/FlowLayout.hpp"
+#include "../../CAGE/Graphics/UI/LayoutGroup.hpp"
+#include "../../CAGE/IO/Networking/ClientConnection.hpp"
+#include "../../CAGE/IO/Networking/ServerConnection.hpp"
+#include "../../CAGE/Graphics/UI/TextField.hpp"
+
+#include "../MenuButton.hpp"
+
+class Lobby : public cage::GameState
+{
+public:
+
+	Lobby(cage::Game& game);
+
+	void OnRevealed() override;
+	void OnHidden() override;
+
+	void ProcessEvents() override;
+	void Update(float delta) override;
+	void Draw() override;
+
+private:
+	cage::ui::UIElement m_root;
+	std::shared_ptr<cage::SpriteShader> m_spriteShader;
+	std::shared_ptr<cage::ui::LayoutGroup> m_buttonGroup;
+	std::shared_ptr<cage::ui::TextField> m_ipTextField;
+	std::shared_ptr<cage::ui::LayoutGroup> m_hostPanel, m_connectPanel;
+	cage::Font m_font;
+
+	enum Mode
+	{
+		MAIN,
+		HOST,
+		JOIN
+	};
+
+	Mode m_mode;
+
+	void acceptConnection(const std::string& name);
+
+};

@@ -12,10 +12,10 @@ namespace cage
 			bool m_local;
 		public:
 			// Constructs a local endpoint listening on the given port
-			Endpoint(int port);
+			Endpoint(unsigned short port);
 			// Constructs a remote endpoint that we can send data to
 			Endpoint(IPaddress address);
-			~Endpoint() = default;
+			~Endpoint();
 
 			inline IPaddress GetIP() const { return m_address; }
 			inline bool IsLocal() const { return m_local; }

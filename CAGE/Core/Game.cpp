@@ -124,7 +124,7 @@ namespace cage
 	{
 	}
 
-	const Window& Game::GetWindow()
+	Window& Game::GetWindow()
 	{
 		return *m_window;
 	}

@@ -5,11 +5,8 @@
  *
  */
 
-
 #include <iostream>
 #include "Shrektris/Shrektris.hpp"
-#include "STR/STR.hpp"
-
 
 template<typename T>
 void PlayGame(int argc, char** argv)

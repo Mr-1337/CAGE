@@ -19,7 +19,7 @@ namespace cage
 		// Runs the main game loop
 		virtual void Run() = 0;
 
-		const Window& GetWindow();
+		Window& GetWindow();
 		TextureManager& GetTextureManager();
 		SoundManager& GetSoundManager();
 		Language& GetLanguage();

@@ -5,16 +5,21 @@ namespace cage
 {
 	namespace networking
 	{
-		Endpoint::Endpoint(int port) : m_local(true), m_address({0, 0})
+		Endpoint::Endpoint(unsigned short port) : m_local(true), m_address({0, 0})
 		{
 			m_socket = SDLNet_UDP_Open(port);
-			m_sendPacket = SDLNet_AllocPacket(4096);
-			m_recvPacket = SDLNet_AllocPacket(4096);
+			m_sendPacket = SDLNet_AllocPacket(512);
+			m_recvPacket = SDLNet_AllocPacket(512);
 		}
 
 		Endpoint::Endpoint(IPaddress address) : m_local(false), m_address(address), m_recvPacket(nullptr), m_sendPacket(nullptr)
 		{
 
+		}
+
+		Endpoint::~Endpoint()
+		{
+			SDLNet_UDP_Close(m_socket);
 		}
 
 		void Endpoint::Send(char* dataBuffer, size_t size, const Endpoint& destination)
