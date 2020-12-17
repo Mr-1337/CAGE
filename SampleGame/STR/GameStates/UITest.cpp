@@ -43,7 +43,7 @@ UITest::UITest(cage::Game& game, std::pair<int, int> size) : cage::GameState(gam
 	c3 = std::make_shared<cage::ui::CheckBox>(getGame().GetTextureManager(), "Frog", font);
 
 	message = std::make_shared<cage::ui::Text>(font);
-	message->SetColor({ 0, 0, 255, 255 });
+	message->SetColor({ 0, 0, 1.0, 1.0 });
 	message->SetText("Still waiting...");
 
 	//b4->MoveTo({ 300, 300 });

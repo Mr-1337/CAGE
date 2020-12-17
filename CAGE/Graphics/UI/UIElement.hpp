@@ -74,7 +74,7 @@ namespace cage
 				}
 			}
 
-			inline void SetColor(glm::vec4 color)
+			virtual void SetColor(glm::vec4 color)
 			{
 				m_color = color;
 			}

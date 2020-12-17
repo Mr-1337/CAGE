@@ -62,7 +62,6 @@ Shrektris::Shrektris(int argc, char** argv) :
 	levelTime = 1.5f - (m_level - 1) * 0.1f;
 	totalTime = 0;
 
-	m_rootNode = new cage::ui::UIElement();
 	grid = new cage::Mesh<cage::Vertex3UVNormal>("grid");
 
 	cage::Shader vertexShader(cage::Shader::ShaderType::VERTEX);
@@ -79,7 +78,7 @@ Shrektris::Shrektris(int argc, char** argv) :
 
 	cage::Texture::MissingTexture = new cage::Texture(IMG_Load("Assets/missing.png"));
 
-	glViewport(0, 0, 2560, 1440);
+	glViewport(0, 0, size.first, size.second);
 
 	vr::EVRInitError eError = vr::VRInitError_None;
 
@@ -130,9 +129,6 @@ Shrektris::Shrektris(int argc, char** argv) :
 	{
 		m_nRenderWidth = size.first;
 		m_nRenderHeight = size.second;
-
-		m_nRenderWidth = 2560;
-		m_nRenderHeight = 1440;
 	}
 
 	CreateFrameBuffer(m_nRenderWidth, m_nRenderHeight, leftEyeDesc);
@@ -142,7 +138,7 @@ Shrektris::Shrektris(int argc, char** argv) :
 
 	populateGrid();
 
-	m_font = TTF_OpenFont("Assets/sans.ttf", 32);
+	m_font = new cage::Font("Assets/sans.ttf", 32);
 
 	std::srand(std::time(nullptr));
 
@@ -196,26 +192,28 @@ Shrektris::Shrektris(int argc, char** argv) :
 	currentPiece.y = 1;
 	currentPiece.x = 5;
 
-	scoreText = std::make_shared<cage::ui::UIElement>();
-	levelText = std::make_shared<cage::ui::UIElement>();
+	scoreText = std::make_shared<cage::ui::Text>(*m_font);
+	scoreText->SetColor(fontColor);
+	levelText = std::make_shared<cage::ui::Text>(*m_font);
+	levelText->SetColor(fontColor);
 
-	scoreText->SetLocalMounting(cage::ui::MountPoint::CENTER_RIGHT);
-	levelText->SetLocalMounting(cage::ui::MountPoint::CENTER_RIGHT);
+	m_rightPanel = std::make_shared<cage::ui::LayoutGroup>(new cage::ui::FlowLayout(glm::vec2{ 30.f, 50.f }, cage::ui::FlowLayout::Orientation::VERTICAL, false));
 
-	scoreText->SetParentMounting(cage::ui::MountPoint::CENTER_RIGHT);
-	levelText->SetParentMounting(cage::ui::MountPoint::CENTER_RIGHT);
+	m_rightPanel->Add(scoreText);
+	m_rightPanel->Add(levelText);
+	m_rightPanel->SetColor({ 1.0, 0.0, 0.0, 1.0 });
+	m_rightPanel->SetParentMounting(cage::ui::MountPoint::CENTER_RIGHT);
+	m_rightPanel->SetLocalMounting(cage::ui::MountPoint::CENTER_RIGHT);
 
-	scoreText->MoveTo({ -200.f, 0.f });
-	levelText->MoveTo({ -200.f, 50.f });
+	m_rootNode.Resize(glm::vec2{ m_nRenderWidth, m_nRenderHeight });
+	m_rootNode.SetLocalMounting(cage::ui::MountPoint::TOP_LEFT);
 
-	m_rootNode->Add(scoreText);
-	m_rootNode->Add(levelText);
+	m_rootNode.Add(m_rightPanel);
 
-	m_rootNode->Resize(glm::vec2{ m_nRenderWidth, m_nRenderHeight });
-	m_rootNode->MoveTo(0.5f * glm::vec2{ m_nRenderWidth, m_nRenderHeight });
-
-	scoreText->LoadTexture(TTF_RenderText_Blended(m_font, "Score: 0 ", fontColor));
-	levelText->LoadTexture(TTF_RenderText_Blended(m_font, "Level: 1", fontColor));
+	scoreText->SetText("Score: 0 ");
+	levelText->SetText("Level: 1");
+	m_rightPanel->Compress();
+	m_rightPanel->Resize({ m_rightPanel->GetSize().x, m_nRenderHeight });
 
 	m_wireframe = false;
 
@@ -302,6 +300,30 @@ void Shrektris::handleInput(float& t)
 			else if (e.key.keysym.scancode == SDL_SCANCODE_E)
 			{
 				rotate(currentPiece);
+			}
+		}
+		if (e.type == SDL_WINDOWEVENT)
+		{
+			if (e.window.event == SDL_WINDOWEVENT_RESIZED)
+			{
+				m_nRenderWidth = e.window.data1;
+				m_nRenderHeight = e.window.data2;
+				glViewport(0, 0, m_nRenderWidth, m_nRenderHeight);
+				program->Use();
+				program->Projection->value = glm::perspective(glm::quarter_pi<float>(), (float)m_nRenderWidth / (float)m_nRenderHeight, m_near, m_far);
+				program->Projection->ForwardToShader();
+
+				skyProgram->Use();
+
+				skyProgram->Projection->value = program->Projection->value;
+				skyProgram->Projection->ForwardToShader();
+
+				spriteProgram->Use();
+
+				spriteProgram->Projection->value = glm::ortho(0.0f, (float)m_nRenderWidth, (float)m_nRenderHeight, 0.0f);
+				spriteProgram->Projection->ForwardToShader();
+
+				m_rootNode.Resize({ m_nRenderWidth, m_nRenderHeight });
 			}
 		}
 
@@ -482,7 +504,6 @@ void Shrektris::gameOver()
 	Mix_PlayChannel(4, donkey, 0);
 	SDL_Delay(7000);
 	m_running = false;
-	return;
 }
 
 static int frameCount = 0;
@@ -495,7 +516,7 @@ void Shrektris::logic(float& t)
 
 	if (frameCount >= 100)
 	{
-		scoreText->LoadTexture(TTF_RenderText_Blended(m_font, std::string("FPS: ").append(std::to_string(fps)).c_str(), { 255, 0, 0, 255 }));
+		//scoreText->SetText(std::string("FPS: ").append(std::to_string(fps)));
 		frameCount = 0;
 	}
 
@@ -519,7 +540,7 @@ void Shrektris::logic(float& t)
 			levelTime -= 0.1f;
 			m_levelCounter = 0;
 			Mix_PlayChannel(5, levels[rand() % 4], 0);
-			levelText->LoadTexture(TTF_RenderText_Blended(m_font, std::string("Level: ").append(std::to_string(m_level)).c_str(), fontColor));
+			levelText->SetText(std::string("Level: ").append(std::to_string(m_level)));
 		}
 		//std::cout << "MOVE" << std::endl;
 		if (!movePieceDown(currentPiece))
@@ -582,7 +603,7 @@ void Shrektris::logic(float& t)
 
 			if (breakTotal > 0)
 			{
-				//scoreText->LoadTexture(TTF_RenderText_Blended(m_font, std::string("Score: ").append(std::to_string(m_score)).c_str(), fontColor));
+				scoreText->SetText(std::string("Score: ").append(std::to_string(m_score)));
 			}
 
 			// make a new piece
@@ -726,7 +747,7 @@ void Shrektris::drawScene(vr::EVREye eye, float t)
 
 	spriteProgram->Use();
 	glDisable(GL_DEPTH_TEST);
-	m_rootNode->Draw();
+	m_rootNode.Draw();
 }
 
 void Shrektris::draw(float t)
@@ -803,52 +824,8 @@ void Shrektris::draw(float t)
 	}
 	else
 	{
-		/*
-		m_win2.SetPosition(1000 + 200 * sin(totalTime), 1000 + 200 * cos(totalTime));
-		m_win2.SetOpacity(0.5 * (cos(totalTime) + 1.0));
-		m_win3.SetSize(400 + 200 * sin(totalTime), 400 + 200 * cos(totalTime));
-
-		
-		glBindFramebuffer(GL_FRAMEBUFFER, leftEyeDesc.m_nRenderFramebufferId);
-		glViewport(0, 0, 2560, 1440);
-		drawScene(vr::Eye_Left, t);
-
-		auto size = m_window->GetSize();
-		auto pos = m_window->GetPosition();
-		
-		const int WIDTH = 2560;
-		const int HEIGHT = 1440;
-
-		auto interp = GL_LINEAR;
-
-		m_window->MakeContextCurrent(m_context);
-		glViewport(0, 0, size.first, size.second);
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-		glBlitFramebuffer(pos.first, HEIGHT - (pos.second + size.second), pos.first + size.first, HEIGHT-pos.second, 0, 0, size.first, size.second, GL_COLOR_BUFFER_BIT, interp);
-		m_window->SwapBuffers();
-
-		size = m_win2.GetSize();
-		pos = m_win2.GetPosition();
-
-		m_win2.MakeContextCurrent(m_context);
-		glViewport(0, 0, size.first, size.second);
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-		glBlitFramebuffer(pos.first, HEIGHT - (pos.second + size.second), pos.first + size.first, HEIGHT - pos.second, 0, 0, size.first, size.second, GL_COLOR_BUFFER_BIT, interp);
-		m_win2.SwapBuffers();
-
-		size = m_win3.GetSize();
-		pos = m_win3.GetPosition();
-
-		m_win3.MakeContextCurrent(m_context);
-		glViewport(0, 0, size.first, size.second);
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-		glBlitFramebuffer(pos.first, HEIGHT - (pos.second + size.second), pos.first + size.first, HEIGHT - pos.second, 0, 0, size.first, size.second, GL_COLOR_BUFFER_BIT, interp);
-		m_win3.SwapBuffers();
-		*/
-
 		drawScene(vr::Eye_Left, t);
 		m_window->SwapBuffers();
-
 	}
 
 }

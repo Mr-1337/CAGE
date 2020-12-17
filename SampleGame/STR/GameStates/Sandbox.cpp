@@ -332,7 +332,7 @@ void Sandbox::Update(float delta)
 
 	auto v = camera->GetPosition() + glm::vec3{ 0.0f, -0.7f, 3.0f };
 
-	int xIndex = std::floorf(v.x / 5.f), zIndex = std::floorf(v.z / 5.f);
+	int xIndex = std::floor(v.x / 5.f), zIndex = std::floor(v.z / 5.f);
 	float dx = v.x / 5.f - xIndex;
 	float dz = v.z / 5.f - zIndex;
 	float yInterp1 = (1.0f - dx) * world.GetBuffer()[xIndex + (100 * zIndex)].position.y + dx * world.GetBuffer()[xIndex + 1 + (100 * zIndex)].position.y;

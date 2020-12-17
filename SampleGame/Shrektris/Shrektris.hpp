@@ -11,6 +11,9 @@
 #include "../CAGE/CAGE.hpp"
 
 #include "../CAGE/Graphics/UI/UIElement.hpp"
+#include "../CAGE/Graphics/UI/FlowLayout.hpp"
+#include "../CAGE/Graphics/UI/LayoutGroup.hpp"
+#include "../CAGE/Graphics/UI/Text.hpp"
 #include "../CAGE/Graphics/ShaderProgram/Generic3DShader.hpp"
 #include "../CAGE/Graphics/ShaderProgram/SpriteShader.hpp"
 #include "../CAGE/Graphics/ShaderProgram/SkyboxShader.hpp"
@@ -379,11 +382,12 @@ private:
 	Mix_Chunk *music, *layers1, *layers2, *layers3, *bigLayers, *donkey;
 	Mix_Chunk* levels[4];
 	SDL_Surface* scoreSurface, * levelSurface;
-	cage::ui::UIElement* m_rootNode;
-	std::shared_ptr<cage::ui::UIElement> scoreText, levelText;
-	TTF_Font* m_font;
+	cage::ui::UIElement m_rootNode;
+	std::shared_ptr<cage::ui::Text> scoreText, levelText;
+	std::shared_ptr<cage::ui::LayoutGroup> m_rightPanel;
+	cage::Font* m_font;
 	unsigned int m_score, m_level, m_levelCounter;
-	SDL_Color fontColor = { 12, 160, 18, 255 };
+	glm::vec4 fontColor = { 12/255.f, 160/255.f, 18/255.f, 1.0 };
 	cage::Model shrek, thanos;
 	cage::Skybox skybox;
 	cage::Mesh<cage::Vertex3UVNormal>* grid;

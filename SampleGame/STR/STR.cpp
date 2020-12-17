@@ -34,7 +34,7 @@ void STR::Run()
 {
 	std::chrono::high_resolution_clock clock;
 	float deltaTime = 1.0f / 60.f;
-	std::chrono::time_point<std::chrono::steady_clock> lastTime = clock.now();
+	std::chrono::time_point<std::chrono::high_resolution_clock> lastTime = clock.now();
 	
 	SDL_Event e;
 

@@ -43,7 +43,10 @@ set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_EXTENSIONS OFF)
 
 add_executable (UB ${SRC_FILES})
-target_compile_options(UB PUBLIC "/permissive-")
+
+if (MSVC)
+    target_compile_options(UB PUBLIC "/permissive-")
+endif()
 
 
 add_custom_command(TARGET UB PRE_BUILD

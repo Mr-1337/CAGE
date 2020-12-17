@@ -11,7 +11,7 @@ namespace cage
 		{
 		public:
 			Text(const Font& font);
-			void SetColor(SDL_Color color);
+			void SetColor(glm::vec4 color) override;
 			void SetText(const std::string& text);
 		private:
 			std::string m_text;
