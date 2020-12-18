@@ -17,8 +17,8 @@ class Server
 		case PacketType::QUERY:
 		{
 			QueryResponse response;
-			auto temp = name.substr(0, 15).c_str();
-			SDL_memcpy(response.name, temp, 16);
+			std::string temp = name;
+			SDL_memcpy(response.name, temp.c_str(), 16);
 			m_connection.Send(&response, sizeof(response), packet->address);
 		}
 			break;

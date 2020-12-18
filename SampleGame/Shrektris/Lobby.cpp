@@ -1,5 +1,7 @@
 #include "Lobby.hpp"
 #include "../../CAGE/Core/Game.hpp"
+#include "../../CAGE/Graphics/UI/FlowLayout.hpp"
+#include "../../CAGE/Graphics/UI/GridLayout.hpp"
 
 Lobby::Lobby(cage::Game& game) : cage::GameState(game), m_font("Assets/sans.ttf", 32)
 {
@@ -35,7 +37,7 @@ Lobby::Lobby(cage::Game& game) : cage::GameState(game), m_font("Assets/sans.ttf"
 		}
 	};
 
-	m_connectPanel = std::make_shared <cage::ui::LayoutGroup>(new cage::ui::FlowLayout({ 10.f, 20.f }, cage::ui::FlowLayout::Orientation::HORIZONTAL, true));
+	m_connectPanel = std::make_shared <cage::ui::LayoutGroup>(new cage::ui::GridLayout({ 10.f, 20.f }, 3));
 	auto preText = std::make_shared<cage::ui::Text>(m_font);
 	m_ipTextField = std::make_shared<cage::ui::TextField>(m_font, 15);
 	auto connect = std::make_shared<MenuButton>("Connect");
@@ -149,6 +151,7 @@ void Lobby::Update(float delta)
 	switch (m_mode)
 	{
 	case HOST:
+		m_server->name = m_lobbyField->GetText();
 		m_server->Listen();
 		break;
 	case JOIN:
@@ -163,7 +166,15 @@ void Lobby::Update(float delta)
 			case PacketType::QUERY_RESPONSE:
 				QueryResponse p;
 				SDL_memcpy(&p, recv->data, sizeof(p));
-				m_connectPanel->Add(std::make_shared<MenuButton>(std::string("Connect to ") + std::string(p.name)));
+				auto joinLobby = std::make_shared<MenuButton>(std::string("Connect to ") + std::string(p.name));
+				joinLobby->Scale(0.4);
+				joinLobby->OnClick = [this]()
+				{
+					ConnectionRequest req;
+					m_clientConnection->Send(&req, sizeof(req));
+				};
+				m_input.Subscribe(joinLobby.get());
+				m_connectPanel->Add(joinLobby);
 				break;
 			}
 		}

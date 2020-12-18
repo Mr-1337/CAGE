@@ -19,7 +19,7 @@ namespace cage
 
 			void Receive(UDPpacket* packet)
 			{
-
+				m_local.Receive(packet);
 			}
 			void Send(void* dataBuffer, size_t size)
 			{
