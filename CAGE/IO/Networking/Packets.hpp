@@ -34,14 +34,14 @@ namespace cage
 			struct ConnectionRequest
 			{
 				PacketType type = PacketType::CONNECTION_REQUEST;
-				const char* message = "Shrek is love";
+				char message[14] = "Shrek is love";
 			};
 
 			struct ConnectionAccept
 			{
 				PacketType type = PacketType::CONNECTION_ACCEPT;
 				int playerID;
-				const char* message = "Shrek is life";
+				char message[14] = "Shrek is life";
 			};
 
 			struct RosterSync

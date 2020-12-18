@@ -27,7 +27,7 @@ namespace cage
 
 			void AddClient(Endpoint client)
 			{
-				if (std::find(m_clients.begin(), m_clients.end(), client) == m_clients.end())
+				//if (std::find(m_clients.begin(), m_clients.end(), client) == m_clients.end())
 				{
 					m_clients.emplace_back(std::move(client));
 				}
