@@ -116,6 +116,7 @@ void Lobby::makeConnectPanel()
 
 	m_input.Subscribe(connect.get());
 	m_input.Subscribe(backC.get());
+	m_input.Subscribe(m_ipTextField.get());
 }
 
 void Lobby::makeLobbyPanel()
