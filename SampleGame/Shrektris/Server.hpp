@@ -5,9 +5,9 @@
 
 class Server
 {
-	void processPacket(UDPpacket* packet)
+	bool processPacket(UDPpacket* packet)
 	{
-
+		bool val = false;
 		using namespace cage::networking::packets;
 		using namespace cage::networking;
 
@@ -28,9 +28,11 @@ class Server
 			ConnectionAccept accept;
 			m_connection.Send(&accept, sizeof(accept), m_nextClient);
 			m_nextClient++;
+			val = true;
 		}
 			break;
 		}
+		return val;
 	}
 
 	cage::networking::ServerConnection m_connection;
@@ -48,12 +50,13 @@ public:
 		std::cout << "Closing Shrektris game server" << std::endl;
 	}
 
-	void Listen()
+	bool Listen()
 	{
 		UDPpacket* packet = SDLNet_AllocPacket(2048);
 		m_connection.Receive(packet);
-		processPacket(packet);
+		bool res = processPacket(packet);
 		SDLNet_FreePacket(packet);
+		return res;
 	}
 
 	std::string name;

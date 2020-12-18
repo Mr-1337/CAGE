@@ -30,8 +30,12 @@ private:
 	std::shared_ptr<cage::ui::LayoutGroup> m_buttonGroup;
 	std::shared_ptr<cage::ui::TextField> m_ipTextField;
 	std::shared_ptr<cage::ui::TextField> m_lobbyField;
-	std::shared_ptr<cage::ui::LayoutGroup> m_hostPanel, m_connectPanel;
+	std::shared_ptr<cage::ui::LayoutGroup> m_hostPanel, m_connectPanel, m_lobbyPanel;
 	cage::Font m_font;
+
+	void makeHostPanel();
+	void makeConnectPanel();
+	void makeLobbyPanel();
 
 	enum Mode
 	{

@@ -53,7 +53,7 @@ namespace cage
 			struct GameStart
 			{
 				PacketType type = PacketType::GAME_START;
-				int boardW, boardH;
+				int boardW, boardH, playerCount;
 			};
 
 			struct PlayerPos

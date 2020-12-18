@@ -36,7 +36,52 @@ Lobby::Lobby(cage::Game& game) : cage::GameState(game), m_font("Assets/sans.ttf"
 			m_connectPanel->ScheduleTransform(std::move(std::make_unique<cage::ui::transforms::Move>(t)));
 		}
 	};
+	
+	makeConnectPanel();
+	makeHostPanel();
+	makeLobbyPanel();
 
+	auto size = getGame().GetWindow().GetSize();
+	m_spriteShader = cage::ui::UIElement::shader;
+	m_root.Resize({ size.first, size.second });
+	m_root.SetLocalMounting(cage::ui::MountPoint::TOP_LEFT);
+
+	m_root.Add(m_buttonGroup);
+
+	m_root.Add(m_connectPanel);
+	m_root.Add(m_hostPanel);
+	m_root.Add(m_lobbyPanel);
+
+	m_input.Subscribe(host.get());
+	m_input.Subscribe(join.get());
+
+}
+
+void Lobby::makeHostPanel()
+{
+	m_hostPanel = std::make_shared<cage::ui::LayoutGroup>(new cage::ui::FlowLayout({ 10.f, 20.f }, cage::ui::FlowLayout::Orientation::VERTICAL, false));
+	m_hostPanel->SetParentMounting(cage::ui::MountPoint::CENTER_RIGHT);
+	m_hostPanel->SetLocalMounting(cage::ui::MountPoint::CENTER_LEFT);
+	m_lobbyField = std::make_shared<cage::ui::TextField>(m_font, 15);
+
+	auto backH = std::make_shared<MenuButton>("Back");
+	backH->OnClick = [this]()
+	{
+		m_mode = MAIN;
+		cage::ui::transforms::Move t({ m_root.GetSize().x / 2.f + m_hostPanel->GetSize().x / 2.0f, 0.f }, 0.f, 0.5f, cage::ui::transforms::Interpolation::CUBIC);
+		m_buttonGroup->ScheduleTransform(std::move(std::make_unique<cage::ui::transforms::Move>(t)));
+		m_hostPanel->ScheduleTransform(std::move(std::make_unique<cage::ui::transforms::Move>(t)));
+		m_server = nullptr;
+	};
+
+	m_hostPanel->Add(m_lobbyField);
+	m_hostPanel->Add(backH);
+	m_input.Subscribe(backH.get());
+	m_input.Subscribe(m_lobbyField.get());
+}
+
+void Lobby::makeConnectPanel()
+{
 	m_connectPanel = std::make_shared <cage::ui::LayoutGroup>(new cage::ui::GridLayout({ 10.f, 20.f }, 3));
 	auto preText = std::make_shared<cage::ui::Text>(m_font);
 	m_ipTextField = std::make_shared<cage::ui::TextField>(m_font, 15);
@@ -69,47 +114,49 @@ Lobby::Lobby(cage::Game& game) : cage::GameState(game), m_font("Assets/sans.ttf"
 	m_connectPanel->SetParentMounting(cage::ui::MountPoint::CENTER_RIGHT);
 	m_connectPanel->SetLocalMounting(cage::ui::MountPoint::CENTER_LEFT);
 
-	m_hostPanel = std::make_shared<cage::ui::LayoutGroup>(new cage::ui::FlowLayout({ 10.f, 20.f }, cage::ui::FlowLayout::Orientation::VERTICAL, false));
-	m_hostPanel->SetParentMounting(cage::ui::MountPoint::CENTER_RIGHT);
-	m_hostPanel->SetLocalMounting(cage::ui::MountPoint::CENTER_LEFT);
-	m_lobbyField = std::make_shared<cage::ui::TextField>(m_font, 15);
-
-	auto backH = std::make_shared<MenuButton>("Back");
-	backH->OnClick = [this]()
-	{
-		m_mode = MAIN;
-		cage::ui::transforms::Move t({ m_root.GetSize().x / 2.f + m_hostPanel->GetSize().x / 2.0f, 0.f }, 0.f, 0.5f, cage::ui::transforms::Interpolation::CUBIC);
-		m_buttonGroup->ScheduleTransform(std::move(std::make_unique<cage::ui::transforms::Move>(t)));
-		m_hostPanel->ScheduleTransform(std::move(std::make_unique<cage::ui::transforms::Move>(t)));
-		m_server = nullptr;
-	};
-
-	m_hostPanel->Add(m_lobbyField);
-	m_hostPanel->Add(backH);
-
-	auto size = getGame().GetWindow().GetSize();
-	m_spriteShader = cage::ui::UIElement::shader;
-	m_root.Resize({ size.first, size.second });
-	m_root.SetLocalMounting(cage::ui::MountPoint::TOP_LEFT);
-
-	m_root.Add(m_buttonGroup);
-	m_root.Add(m_connectPanel);
-	m_root.Add(m_hostPanel);
-
-	m_input.Subscribe(host.get());
-	m_input.Subscribe(join.get());
-	m_input.Subscribe(m_ipTextField.get());
 	m_input.Subscribe(connect.get());
 	m_input.Subscribe(backC.get());
-	m_input.Subscribe(backH.get());
-	m_input.Subscribe(m_lobbyField.get());
+}
+
+void Lobby::makeLobbyPanel()
+{
+	m_lobbyPanel = std::make_shared<cage::ui::LayoutGroup>(new cage::ui::GridLayout({ 0.0f, 30.f }, 1));
+	m_lobbyPanel->SetParentMounting(cage::ui::MountPoint::TOP);
+	m_lobbyPanel->SetLocalMounting(cage::ui::MountPoint::BOTTOM);
+
+	auto text = std::make_shared<cage::ui::Text>(m_font);
+	text->SetText("unspecified");
+
+	auto text2 = std::make_shared<cage::ui::Text>(m_font);
+	text2->SetText("unknown amount of players");
+
+	auto start = std::make_shared<MenuButton>("START THE GAME ALREADY!");
+
+	m_lobbyPanel->Add(text);
+	m_lobbyPanel->Add(text2);
+	m_lobbyPanel->Add(start);
+
 }
 
 void Lobby::acceptConnection(const std::string& name)
 {
-	auto text = std::make_shared<cage::ui::Text>(m_font);
-	text->SetText(name);
-	m_hostPanel->Add(text);
+	switch (m_mode)
+	{
+	case HOST:
+	{
+		cage::ui::transforms::Move t({ 0.0, m_root.GetSize().y / 2.f + m_lobbyPanel->GetSize().y / 2.0f }, 0.f, 0.5f, cage::ui::transforms::Interpolation::CUBIC);
+		m_lobbyPanel->ScheduleTransform(std::move(std::make_unique<cage::ui::transforms::Move>(t)));
+		m_hostPanel->ScheduleTransform(std::move(std::make_unique<cage::ui::transforms::Move>(t)));
+	}
+		break;
+	case JOIN:
+	{
+		cage::ui::transforms::Move t({ 0.0, m_root.GetSize().y / 2.f + m_lobbyPanel->GetSize().y / 2.0f }, 0.f, 0.5f, cage::ui::transforms::Interpolation::CUBIC);
+		m_lobbyPanel->ScheduleTransform(std::move(std::make_unique<cage::ui::transforms::Move>(t)));
+		m_connectPanel->ScheduleTransform(std::move(std::make_unique<cage::ui::transforms::Move>(t)));
+	}
+		break;
+	}
 }
 
 void Lobby::OnRevealed()
@@ -152,7 +199,10 @@ void Lobby::Update(float delta)
 	{
 	case HOST:
 		m_server->name = m_lobbyField->GetText();
-		m_server->Listen();
+		if (m_server->Listen())
+		{
+			acceptConnection("SERVER");
+		}
 		break;
 	case JOIN:
 		if (m_clientConnection)
@@ -161,12 +211,15 @@ void Lobby::Update(float delta)
 			m_clientConnection->Receive(recv);
 			using namespace cage::networking;
 			using namespace cage::networking::packets;
+
+			std::shared_ptr<MenuButton> joinLobby;
+			QueryResponse p;
+
 			switch ((PacketType)recv->data[0])
 			{
 			case PacketType::QUERY_RESPONSE:
-				QueryResponse p;
 				SDL_memcpy(&p, recv->data, sizeof(p));
-				auto joinLobby = std::make_shared<MenuButton>(std::string("Connect to ") + std::string(p.name));
+				joinLobby = std::make_shared<MenuButton>(std::string("Connect to ") + std::string(p.name));
 				joinLobby->Scale(0.4);
 				joinLobby->OnClick = [this]()
 				{
@@ -175,6 +228,9 @@ void Lobby::Update(float delta)
 				};
 				m_input.Subscribe(joinLobby.get());
 				m_connectPanel->Add(joinLobby);
+				break;
+			case PacketType::CONNECTION_ACCEPT:
+				acceptConnection("Joined");
 				break;
 			}
 		}
