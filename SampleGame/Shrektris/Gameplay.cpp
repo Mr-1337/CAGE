@@ -21,7 +21,7 @@ Gameplay::Gameplay(cage::Game& game, int w, int h) :
 	m_frameCount = 0;
 	m_fallTimer = 0.0;
 
-	board = new int[BOARD_HEIGHT * BOARD_WIDTH];
+	board = new char[BOARD_HEIGHT * BOARD_WIDTH];
 	for (int i = 0; i < BOARD_HEIGHT * BOARD_WIDTH; i++)
 		board[i] = 0;
 
@@ -344,9 +344,9 @@ void Gameplay::logic()
 					// we cleared the row
 
 					// copy the board into itself but 1 row lower
-					memcpy(&board[BOARD_WIDTH + 0], board, (i * BOARD_WIDTH * sizeof(int)));
+					memcpy(&board[BOARD_WIDTH + 0], board, (i * BOARD_WIDTH * sizeof(char)));
 					// zero the now empty top
-					memset(board, 0, (BOARD_WIDTH * sizeof(int)));
+					memset(board, 0, (BOARD_WIDTH * sizeof(char)));
 					i++;
 					breakTotal++;
 				}

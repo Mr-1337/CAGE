@@ -20,7 +20,7 @@ Lobby::Lobby(cage::Game& game) : cage::GameState(game), m_font("Assets/sans.ttf"
 			cage::ui::transforms::Move t({ -m_root.GetSize().x / 2.f - m_hostPanel->GetSize().x / 2.0f, 0.f }, 0.f, 0.5f, cage::ui::transforms::Interpolation::CUBIC);
 			m_buttonGroup->ScheduleTransform(std::move(std::make_unique<cage::ui::transforms::Move>(t)));
 			m_hostPanel->ScheduleTransform(std::move(std::make_unique<cage::ui::transforms::Move>(t)));
-			m_serverConnection = std::make_unique<cage::networking::ServerConnection>(25570);
+			m_server = std::make_unique<Server>(25570);
 		}
 	};
 
@@ -53,6 +53,7 @@ Lobby::Lobby(cage::Game& game) : cage::GameState(game), m_font("Assets/sans.ttf"
 		cage::ui::transforms::Move t({ m_root.GetSize().x / 2.f + m_connectPanel->GetSize().x / 2.0f, 0.f }, 0.f, 0.5f, cage::ui::transforms::Interpolation::CUBIC);
 		m_buttonGroup->ScheduleTransform(std::move(std::make_unique<cage::ui::transforms::Move>(t)));
 		m_connectPanel->ScheduleTransform(std::move(std::make_unique<cage::ui::transforms::Move>(t)));
+		m_clientConnection = nullptr;
 	};
 	connect->Scale(0.4);
 	backC->Scale(0.4);
@@ -69,6 +70,8 @@ Lobby::Lobby(cage::Game& game) : cage::GameState(game), m_font("Assets/sans.ttf"
 	m_hostPanel = std::make_shared<cage::ui::LayoutGroup>(new cage::ui::FlowLayout({ 10.f, 20.f }, cage::ui::FlowLayout::Orientation::VERTICAL, false));
 	m_hostPanel->SetParentMounting(cage::ui::MountPoint::CENTER_RIGHT);
 	m_hostPanel->SetLocalMounting(cage::ui::MountPoint::CENTER_LEFT);
+	m_lobbyField = std::make_shared<cage::ui::TextField>(m_font, 15);
+
 	auto backH = std::make_shared<MenuButton>("Back");
 	backH->OnClick = [this]()
 	{
@@ -76,7 +79,10 @@ Lobby::Lobby(cage::Game& game) : cage::GameState(game), m_font("Assets/sans.ttf"
 		cage::ui::transforms::Move t({ m_root.GetSize().x / 2.f + m_hostPanel->GetSize().x / 2.0f, 0.f }, 0.f, 0.5f, cage::ui::transforms::Interpolation::CUBIC);
 		m_buttonGroup->ScheduleTransform(std::move(std::make_unique<cage::ui::transforms::Move>(t)));
 		m_hostPanel->ScheduleTransform(std::move(std::make_unique<cage::ui::transforms::Move>(t)));
+		m_server = nullptr;
 	};
+
+	m_hostPanel->Add(m_lobbyField);
 	m_hostPanel->Add(backH);
 
 	auto size = getGame().GetWindow().GetSize();
@@ -94,6 +100,7 @@ Lobby::Lobby(cage::Game& game) : cage::GameState(game), m_font("Assets/sans.ttf"
 	m_input.Subscribe(connect.get());
 	m_input.Subscribe(backC.get());
 	m_input.Subscribe(backH.get());
+	m_input.Subscribe(m_lobbyField.get());
 }
 
 void Lobby::acceptConnection(const std::string& name)
@@ -142,11 +149,24 @@ void Lobby::Update(float delta)
 	switch (m_mode)
 	{
 	case HOST:
-		char packet[128];
-		m_serverConnection->Receive(packet, 128);
-
-		acceptConnection("Welcome, TO MY SWAMP!");
-		acceptConnection(packet);
+		m_server->Listen();
+		break;
+	case JOIN:
+		if (m_clientConnection)
+		{
+			UDPpacket* recv = SDLNet_AllocPacket(2048);
+			m_clientConnection->Receive(recv);
+			using namespace cage::networking;
+			using namespace cage::networking::packets;
+			switch ((PacketType)recv->data[0])
+			{
+			case PacketType::QUERY_RESPONSE:
+				QueryResponse p;
+				SDL_memcpy(&p, recv->data, sizeof(p));
+				m_connectPanel->Add(std::make_shared<MenuButton>(std::string("Connect to ") + std::string(p.name)));
+				break;
+			}
+		}
 		break;
 	}
 }

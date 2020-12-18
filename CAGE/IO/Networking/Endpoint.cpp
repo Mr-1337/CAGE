@@ -1,4 +1,5 @@
 #include <stdexcept>
+#include <iostream>
 #include "Endpoint.hpp"
 
 namespace cage
@@ -10,16 +11,33 @@ namespace cage
 			m_socket = SDLNet_UDP_Open(port);
 			m_sendPacket = SDLNet_AllocPacket(512);
 			m_recvPacket = SDLNet_AllocPacket(512);
+			m_dirty = false;
+			std::cout << "Opened socket locally on port " << port << std::endl;
 		}
 
-		Endpoint::Endpoint(IPaddress address) : m_local(false), m_address(address), m_recvPacket(nullptr), m_sendPacket(nullptr)
+		Endpoint::Endpoint(IPaddress address) : m_local(false), m_address(address), m_recvPacket(nullptr), m_sendPacket(nullptr), m_dirty(false)
 		{
+			std::cout << "Created remote endpoint" << std::endl;
+		}
 
+		Endpoint::Endpoint(Endpoint& other)
+		{
+			m_local = other.m_local;
+			m_address = other.m_address;
+			m_recvPacket = other.m_recvPacket;
+			m_sendPacket = other.m_sendPacket;
+			m_socket = other.m_socket;
+			other.m_dirty = true;
+			m_dirty = false;
 		}
 
 		Endpoint::~Endpoint()
 		{
-			SDLNet_UDP_Close(m_socket);
+			if (!m_dirty && m_local)
+			{
+				std::cout << "Closed socket" << std::endl;
+				SDLNet_UDP_Close(m_socket);
+			}
 		}
 
 		void Endpoint::Send(char* dataBuffer, size_t size, const Endpoint& destination)
@@ -32,14 +50,15 @@ namespace cage
 			SDLNet_UDP_Send(m_socket, -1, m_sendPacket);
 		}
 
-		void Endpoint::Receive(void* dataBuffer, size_t& size)
+		void Endpoint::Receive(UDPpacket* packet)
 		{
 			if (!IsLocal())
 				throw std::runtime_error("Only local endpoints can receive!");
-			if (size = SDLNet_UDP_Recv(m_socket, m_recvPacket))
+			if (SDLNet_UDP_Recv(m_socket, m_recvPacket))
 			{
-				SDL_memcpy(dataBuffer, m_recvPacket->data, m_recvPacket->len);
-				size = m_recvPacket->len;
+				SDL_memcpy(packet->data, m_recvPacket->data, m_recvPacket->len);
+				packet->len = m_recvPacket->len;
+				packet->address = m_recvPacket->address;
 			}
 		}
 	}

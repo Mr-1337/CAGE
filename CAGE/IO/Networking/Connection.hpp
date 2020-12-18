@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Endpoint.hpp"
+#include "Packets.hpp"
 
 namespace cage
 {
@@ -17,7 +18,7 @@ namespace cage
 
 			}
 
-			virtual void Receive(void* dataBuffer, size_t size) = 0;
+			virtual void Receive(UDPpacket* packet) = 0;
 			virtual void Send(void* dataBuffer, size_t size) = 0;
 
 			// Returns true if the timer advanced and the connection is still active. Returns false if the connection appears to have timed out.

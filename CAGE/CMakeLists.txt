@@ -84,7 +84,7 @@ set(SRC_FILES
 	"Graphics/Cubemaps/Cubemap.hpp" 
 	"Graphics/Cubemaps/Cubemap.cpp" 
 	"Graphics/Models/Skybox.hpp" 
-	"Graphics/ShaderProgram/SkyboxShader.hpp" "Graphics/UI/ScrollPanel.hpp" "Graphics/UI/Dragable.hpp" "Graphics/UI/TextField.hpp" "IO/Networking/Connection.hpp" "IO/Networking/ClientConnection.hpp" "IO/Networking/ServerConnection.hpp" "IO/Networking/Packets.hpp" "Graphics/UI/Transforms.hpp" "Graphics/UI/Transforms.cpp")
+	"Graphics/ShaderProgram/SkyboxShader.hpp" "Graphics/UI/ScrollPanel.hpp" "Graphics/UI/Dragable.hpp" "Graphics/UI/TextField.hpp" "IO/Networking/Connection.hpp" "IO/Networking/ClientConnection.hpp" "IO/Networking/ServerConnection.hpp" "IO/Networking/Packets.hpp" "Graphics/UI/Transforms.hpp" "Graphics/UI/Transforms.cpp" )
 
 # Add source to this project's library.
 add_library (CAGE STATIC ${SRC_FILES})

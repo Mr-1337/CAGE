@@ -12,7 +12,7 @@ set(SRC_FILES
 	"Shrektris/Gameplay.hpp" 
 	"Shrektris/Gameplay.cpp"
 	"Shrektris/Lobby.hpp" 
-	"Shrektris/Lobby.cpp")
+	"Shrektris/Lobby.cpp" "Shrektris/Player.hpp" "Shrektris/Server.hpp" "Shrektris/Client.hpp")
 
 add_executable (SampleGame ${SRC_FILES})
 

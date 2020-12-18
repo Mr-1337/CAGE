@@ -10,6 +10,7 @@
 #include "../../CAGE/Graphics/UI/TextField.hpp"
 
 #include "../MenuButton.hpp"
+#include "Server.hpp"
 
 class Lobby : public cage::GameState
 {
@@ -29,6 +30,7 @@ private:
 	std::shared_ptr<cage::SpriteShader> m_spriteShader;
 	std::shared_ptr<cage::ui::LayoutGroup> m_buttonGroup;
 	std::shared_ptr<cage::ui::TextField> m_ipTextField;
+	std::shared_ptr<cage::ui::TextField> m_lobbyField;
 	std::shared_ptr<cage::ui::LayoutGroup> m_hostPanel, m_connectPanel;
 	cage::Font m_font;
 
@@ -41,7 +43,7 @@ private:
 
 	Mode m_mode;
 	std::unique_ptr<cage::networking::ClientConnection> m_clientConnection;
-	std::unique_ptr<cage::networking::ServerConnection> m_serverConnection;
+	std::unique_ptr<Server> m_server;
 
 	void acceptConnection(const std::string& name);
 

@@ -39,7 +39,7 @@ private:
 	const int BOARD_WIDTH;
 	const int BOARD_HEIGHT;
 
-	int* board;
+	char* board;
 
 	struct Tetromino
 	{

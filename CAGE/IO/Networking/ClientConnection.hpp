@@ -11,13 +11,13 @@ namespace cage
 			Endpoint m_server, m_local;
 		public:
 			// Opens a connection to the given server. This should only be used by clients.
-			ClientConnection(Endpoint server) : m_local(0), m_server(server)
+			ClientConnection(Endpoint server) : m_local(0), m_server(std::move(server))
 			{
-				char payload[6] = "Shrek";
-				Send(payload, 6);
+				packets::Query query;
+				Send(&query, sizeof(packets::Query));
 			}
 
-			void Receive(void* dataBuffer, size_t size)
+			void Receive(UDPpacket* packet)
 			{
 
 			}
