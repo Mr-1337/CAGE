@@ -671,8 +671,8 @@ void Gameplay::applyShake()
 	if (m_shaking)
 	{
 		int octaves = 4;
-		m_shakeOffset.x = Perlin::OctavePerlin(position.x, m_shakeTimer, octaves, 0.6);
-		m_shakeOffset.z = Perlin::OctavePerlin(position.z, m_shakeTimer, octaves, 0.6);
+		// m_shakeOffset.x = Perlin::OctavePerlin(position.x, m_shakeTimer, octaves, 0.6);
+		// m_shakeOffset.z = Perlin::OctavePerlin(position.z, m_shakeTimer, octaves, 0.6);
 	}
 }
 
