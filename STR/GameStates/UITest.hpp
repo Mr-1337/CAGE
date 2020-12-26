@@ -1,7 +1,7 @@
 #include <SDL2/SDL_mixer.h>
 
-#include "../../../CAGE/Core/GameState.hpp"
-#include "../../../CAGE/Graphics/ShaderProgram/SpriteShader.hpp"
+#include "../../CAGE/Core/GameState.hpp"
+#include "../../CAGE/Graphics/ShaderProgram/SpriteShader.hpp"
 
 #include "../CAGE/Graphics/UI/Button.hpp"
 #include "../CAGE/Graphics/UI/CheckBox.hpp"

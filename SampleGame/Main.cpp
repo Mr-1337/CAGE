@@ -6,6 +6,7 @@
  */
 
 #include <iostream>
+#include <SDL2/SDL.h>
 #include "Shrektris/Shrektris.hpp"
 
 template<typename T>

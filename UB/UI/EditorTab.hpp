@@ -12,7 +12,7 @@ namespace ub
 			cage::ui::Button(std::nullopt, std::nullopt, std::nullopt)
 		{
 			auto text = std::make_shared<cage::ui::Text>(font);
-			text->SetColor({ 255, 255, 255, 255 });
+			text->SetColor(glm::vec4{ 255, 255, 255, 255 } /= 255.f);
 			text->SetText(label);
 			auto width = text->GetSize().x * 1.2;
 			auto height = text->GetSize().y * 1.2;

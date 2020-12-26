@@ -1,10 +1,5 @@
 #include "Shrektris.hpp"
 #include "ShrekMenu.hpp"
-#include <Glad/glad/glad.h>
-#include <ctime>
-#include <chrono>
-#include <GLM/glm/gtc/type_ptr.hpp>
-#include <filesystem>
 
 Shrektris::Shrektris(int argc, char** argv) : 
 	Game("Shrektris", argc, argv),

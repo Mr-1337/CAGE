@@ -2,7 +2,7 @@
 
 #include <GLM/glm/glm.hpp>
 
-#include "../../../CAGE/Graphics/Models/Model.hpp"
+#include "../../CAGE/Graphics/Models/Model.hpp"
 
 class SplineSegment
 {

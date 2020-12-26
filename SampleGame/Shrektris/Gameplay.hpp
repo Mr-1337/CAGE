@@ -18,13 +18,28 @@
 #include "../CAGE/IO/MeshLoader.hpp"
 #include "../CAGE/Graphics/Models/Skybox.hpp"
 #include "../CAGE/Graphics/Models/Model.hpp"
+#include "../CAGE/IO/Networking/Packets.hpp"
+
+#include "Client.hpp"
+#include "Server.hpp"
 
 class Gameplay : public cage::GameState
 {
 	using Ref = std::shared_ptr<cage::ui::UIElement>;
 public:
 
-	Gameplay(cage::Game&, int w, int h);
+	enum Mode
+	{
+		OFFLINE,
+		CLIENT,
+		SERVER
+	};
+
+	Gameplay(cage::Game& game, int w, int h, Mode mode = OFFLINE);
+
+	Gameplay(cage::Game& game, cage::networking::packets::GameStart startPacket, std::unique_ptr<Client> client);
+	Gameplay(cage::Game& game, cage::networking::packets::GameStart startPacket, std::unique_ptr<Server> client);
+
 	~Gameplay();
 
 	void OnRevealed() override;
@@ -36,8 +51,26 @@ public:
 
 private:
 
+	friend class Client;
+	friend class Server;
+
+	std::unique_ptr<Client> m_client;
+	std::unique_ptr<Server> m_server;
+
+	void boardSync(cage::networking::packets::BoardSync& sync);
+	void playerSync(cage::networking::packets::PlayerPiecePos& sync);
+	void compress(char* compressed);
+
+	int m_numPlayers;
+	int m_playerID;
 	const int BOARD_WIDTH;
 	const int BOARD_HEIGHT;
+
+	Mode m_mode;
+	bool m_vrMode;
+	float m_near = 0.1, m_far = 100.f;
+	float fps;
+	uint32_t m_nRenderWidth, m_nRenderHeight;
 
 	char* board;
 
@@ -106,6 +139,8 @@ private:
 		return true;
 	};
 
+	void networkPieceSync();
+
 	auto movePieceDown(Tetromino& t)
 	{
 		// removes current piece from board
@@ -124,6 +159,7 @@ private:
 
 		// the piece successfully moved down, put it into the board
 		//setBoardValOverPiece(t, 1);
+		networkPieceSync();
 		return true;
 	};
 
@@ -145,6 +181,7 @@ private:
 
 		// the piece successfully moved, put it into the board
 		//setBoardValOverPiece(t, 1);
+		networkPieceSync();
 		return true;
 	};
 
@@ -169,20 +206,17 @@ private:
 
 		// place new piece onto the board
 		//setBoardValOverPiece(t, 1);
-
+		networkPieceSync();
 		return true;
 
 	};
+
+	
 
 #pragma region VR Shit
 	vr::IVRSystem* m_pHMD;
 
 	glm::mat4 projLeft, projRight, eyePosLeft, eyePosRight, hmdPose;
-	uint32_t m_nRenderWidth, m_nRenderHeight;
-
-	bool m_vrMode;
-
-	float fps;
 
 	vr::VRActionHandle_t m_move, m_leftPoseAct, m_rightPoseAct, m_rotateAct, m_moveBlockLeftAct, m_moveBlockRightAct, m_moveBlockDownAct;
 	vr::VRActionSetHandle_t m_main;
@@ -291,7 +325,7 @@ private:
 		return mvp;
 	}
 
-	float m_near = 0.1, m_far = 100.f;
+
 
 	bool CreateFrameBuffer(int nWidth, int nHeight, FramebufferDesc& framebufferDesc)
 	{
@@ -334,6 +368,8 @@ private:
 	void populateGrid();
 
 	void drawScene(vr::EVREye eye);
+	void shake(float strength, float duration);
+	void applyShake();
 	void drawGrid();
 
 	void logic();
@@ -341,6 +377,13 @@ private:
 
 	float levelTime;
 	float m_fallTimer;
+
+	float m_shakeTimer;
+	float m_shakeDuration;
+	float m_shakeStrength;
+	bool m_shaking;
+	glm::vec3 m_shakeOffset;
+
 	float totalTime;
 	bool m_wireframe, m_spin;
 	int m_frameCount;
@@ -349,6 +392,7 @@ private:
 		target = glm::vec3(0, 0, -1),
 		velocity = glm::vec3(0, 0, 0);
 	Tetromino currentPiece, nextPiece, visualizer;
+	Tetromino playerParts[8];
 	Mix_Chunk* music, * layers1, * layers2, * layers3, * bigLayers, * donkey;
 	Mix_Chunk* levels[4];
 	cage::ui::UIElement m_rootNode;

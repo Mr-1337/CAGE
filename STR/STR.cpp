@@ -6,8 +6,7 @@
 #include "Perlin.hpp"
 
 STR::STR(int argc, char** argv) : 
-	Game("ShrekTech Racing", argc, argv), 
-	m_running(true)
+	Game("ShrekTech Racing", argc, argv)
 {
 	auto size = m_window->GetSize();
 	glViewport(0, 0, size.first, size.second);
@@ -40,9 +39,8 @@ void STR::Run()
 
 	m_stateMachine.Push(new MainMenu(*this, m_window->GetSize()));
 
-	while (m_running)
+	while (!m_stateMachine.Quit())
 	{
-		m_running = !m_stateMachine.Quit();
 		m_stateMachine.ProcessEvents();
 		m_stateMachine.Update(deltaTime);
 		m_stateMachine.Draw();

@@ -13,6 +13,7 @@ namespace cage
 			LayoutGroup(Layout* layout);
 			~LayoutGroup();
 			void Add(Child element) override;
+			void Remove(Child element) override;
 			void AddAbsolute(Child element);
 			void Update();
 			void Compress();

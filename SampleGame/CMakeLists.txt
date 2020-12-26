@@ -12,9 +12,20 @@ set(SRC_FILES
 	"Shrektris/Gameplay.hpp" 
 	"Shrektris/Gameplay.cpp"
 	"Shrektris/Lobby.hpp" 
-	"Shrektris/Lobby.cpp" "Shrektris/Player.hpp" "Shrektris/Server.hpp" "Shrektris/Client.hpp")
+	"Shrektris/Lobby.cpp" 
+	"Shrektris/Player.hpp" 
+	"Shrektris/Server.hpp" 
+	"Shrektris/Client.hpp" 
+	"MenuButton.cpp" "Shrektris/Server.cpp" "Shrektris/Client.cpp" "Perlin.hpp" "Perlin.cpp")
+
+set (CMAKE_CXX_STANDARD 17)
+set (CMAKE_CXX_EXTENSIONS OFF)
 
 add_executable (SampleGame ${SRC_FILES})
+
+if (MSVC)
+    target_compile_options(SampleGame PUBLIC "/permissive-")
+endif()
 
 add_custom_command(TARGET SampleGame PRE_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy_directory

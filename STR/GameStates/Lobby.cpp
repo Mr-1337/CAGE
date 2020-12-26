@@ -1,12 +1,12 @@
 #include "Lobby.hpp"
-#include "../../../CAGE/Core/StateMachine.hpp"
+#include "../../CAGE/Core/StateMachine.hpp"
 
 Lobby::Lobby(cage::Game& game, std::pair<int, int> size) : cage::GameState(game), WAIT_TIME(500), m_sound(nullptr)
 {
 	glClearColor(0.3f, 0.3f, 0.2f, 1.f);
 
 	cage::Shader vertex(cage::Shader::ShaderType::VERTEX), fragment(cage::Shader::ShaderType::FRAGMENT), vertexSprite(cage::Shader::ShaderType::VERTEX), fragmentSprite(cage::Shader::ShaderType::FRAGMENT);
-	vertexSprite.CompileFromFile("Assets/sprite.ver");
+	vertexSprite.CompileFromFile("Assets/sprite.vert");
 	fragmentSprite.CompileFromFile("Assets/sprite.frag");
 
 	std::string

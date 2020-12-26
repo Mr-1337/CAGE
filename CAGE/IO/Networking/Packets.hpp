@@ -48,6 +48,7 @@ namespace cage
 			{
 				PacketType type = PacketType::ROSTER_SYNC;
 				bool players[8];
+				char lobbyName[16];
 			};
 
 			struct GameStart
@@ -67,13 +68,13 @@ namespace cage
 			{
 				PacketType type = PacketType::PLAYER_PIECE_POS;
 				int playerID;
-				int x, y, orientation;
+				int x, y, orientation, shape;
 			};
 
 			struct BoardSync
 			{
 				PacketType type = PacketType::BOARD_SYNC;
-				char board[1600];
+				char board[200];
 			};
 
 			struct PlayerSync

@@ -5,7 +5,7 @@
 #include <SDL2/SDL_ttf.h>
 
 #include "UITest.hpp"
-#include "../../MenuButton.hpp"
+#include "../MenuButton.hpp"
 #include "../CAGE/CAGE.hpp"
 
 UITest::UITest(cage::Game& game, std::pair<int, int> size) : cage::GameState(game)

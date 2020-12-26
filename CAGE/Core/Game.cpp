@@ -102,6 +102,7 @@ namespace cage
 			};
 
 			initSDL();
+
 			m_window = std::make_unique<Window>(title, 1024, 720);
 			gladLoadGLLoader(SDL_GL_GetProcAddress);
 
@@ -122,6 +123,7 @@ namespace cage
 
 	Game::~Game()
 	{
+		unloadSDL();
 	}
 
 	Window& Game::GetWindow()
@@ -154,6 +156,7 @@ namespace cage
 
 		// Base SDL
 
+		
 		if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
 			throw std::runtime_error("Failed to initialize SDL.");
 

@@ -8,9 +8,9 @@
 #include <chrono>
 
 #include "../CAGE/Core/GameState.hpp"
-#include "../../../CAGE/Graphics/Camera/Camera.hpp"
-#include "../../../CAGE/Graphics/Models/Model.hpp"
-#include "../../MenuButton.hpp"
+#include "../../CAGE/Graphics/Camera/Camera.hpp"
+#include "../../CAGE/Graphics/Models/Model.hpp"
+#include "../MenuButton.hpp"
 
 class Lobby : public cage::GameState
 {

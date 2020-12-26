@@ -177,6 +177,11 @@ namespace cage::ui
 		m_children.emplace_back(child);
 	}
 
+	void UIElement::Remove(Child child)
+	{
+		m_children.erase(std::remove(m_children.begin(), m_children.end(), child));
+	}
+
 	std::vector<UIElement::Child>& UIElement::GetChildren()
 	{
 		return m_children;

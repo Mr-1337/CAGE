@@ -1,13 +1,5 @@
 #pragma once
 
-#include <array>
-#include <string>
-#include <memory>
-#include <SDL2/SDL_mixer.h>
-#include <SDL2/SDL_ttf.h>
-#include <GLM/glm/glm.hpp>
-#include <GLM/glm/gtc/matrix_transform.hpp>
-#include <OpenVR/openvr.h>
 #include "../CAGE/CAGE.hpp"
 
 /*

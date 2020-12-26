@@ -7,19 +7,21 @@
 
 class MenuButton : public cage::ui::Button
 {
+	float m_width;
 public:
 	
-	//inline static TTF_Font* s_font = TTF_OpenFont("Assets/sans.ttf", 72);
+	static const cage::Font* s_font; 
 
-	MenuButton(const std::string& text) : 
-		cage::ui::Button(
-			std::make_shared<cage::Texture>(IMG_Load("Assets/button/idle.png")), 
-			std::make_shared<cage::Texture>(IMG_Load("Assets/button/hover.png")), 
-			std::make_shared<cage::Texture>(IMG_Load("Assets/button/pressed.png")))
+	MenuButton(const std::string& text);
+
+	virtual inline void SetActiveTexture(std::shared_ptr<cage::Texture> texture) override
 	{
-		auto s_font = cage::Font("Assets/sans.ttf", 36);
-		auto t = std::make_shared<cage::ui::Text>(s_font);
-		t->SetText(text);
-		Add(t);
+		if (texture)
+		{
+			setTextured(true);
+			m_currentTexture = texture;
+			//Resize({ texture->GetSize().first, texture->GetSize().second });
+		}
 	}
+
 };

@@ -76,16 +76,18 @@ namespace cage
 				return (temp.x >= -0.5 && temp.x <= 0.5) && (temp.y >= -0.5 && temp.y <= 0.5);
 			}
 
-		private:
-
-			int m_lastX, m_lastY;
-
-			bool m_hovering;
 			void onTransform() override
 			{
 				//Event e = MouseMotionEvent(m_lastX, m_lastY, 0, 0);
 				//HandleEvent(e);
 			}
+
+		private:
+
+			int m_lastX, m_lastY;
+
+			bool m_hovering;
+
 
 		};
 	}

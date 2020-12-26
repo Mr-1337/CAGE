@@ -9,18 +9,17 @@ namespace cage
 		Endpoint::Endpoint(unsigned short port) : m_local(true), m_address({0, 0})
 		{
 			m_socket = SDLNet_UDP_Open(port);
-			m_sendPacket = SDLNet_AllocPacket(512);
-			m_recvPacket = SDLNet_AllocPacket(512);
+			m_sendPacket = SDLNet_AllocPacket(2048);
+			m_recvPacket = SDLNet_AllocPacket(2048);
 			m_dirty = false;
 			std::cout << "Opened socket locally on port " << port << std::endl;
 		}
 
 		Endpoint::Endpoint(IPaddress address) : m_local(false), m_address(address), m_recvPacket(nullptr), m_sendPacket(nullptr), m_dirty(false)
 		{
-			std::cout << "Created remote endpoint" << std::endl;
 		}
 
-		Endpoint::Endpoint(Endpoint& other)
+		Endpoint::Endpoint(Endpoint&& other) noexcept
 		{
 			m_local = other.m_local;
 			m_address = other.m_address;
@@ -40,6 +39,24 @@ namespace cage
 			}
 		}
 
+		std::string Endpoint::GetIPAsString() const
+		{
+			std::string ip;
+			Uint32 host = GetIP().host;
+			host = SDLNet_Read32(&host);
+			Uint16 port = GetIP().port;
+
+			for (int i = 3; i >= 0; i--)
+			{
+				Uint8 byte = (host >> (i * 8)) & 0xFF;
+				ip += std::to_string(byte);
+				ip += ".";
+			}
+
+			ip.pop_back();
+			return ip;
+		}
+
 		void Endpoint::Send(char* dataBuffer, size_t size, const Endpoint& destination)
 		{
 			if (!IsLocal())
@@ -50,7 +67,7 @@ namespace cage
 			SDLNet_UDP_Send(m_socket, -1, m_sendPacket);
 		}
 
-		void Endpoint::Receive(UDPpacket* packet)
+		bool Endpoint::Receive(UDPpacket* packet)
 		{
 			if (!IsLocal())
 				throw std::runtime_error("Only local endpoints can receive!");
@@ -59,7 +76,9 @@ namespace cage
 				SDL_memcpy(packet->data, m_recvPacket->data, m_recvPacket->len);
 				packet->len = m_recvPacket->len;
 				packet->address = m_recvPacket->address;
+				return true;
 			}
+			return false;
 		}
 	}
 }

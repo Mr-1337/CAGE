@@ -36,11 +36,11 @@ add_executable (STR ${SRC_FILES})
 
 add_custom_command(TARGET STR PRE_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy_directory
-                       ${CMAKE_SOURCE_DIR}/STR/Assets $<TARGET_FILE_DIR:SampleGame>/Assets)
+                       ${CMAKE_SOURCE_DIR}/STR/Assets $<TARGET_FILE_DIR:STR>/Assets)
 
 add_custom_command(TARGET STR PRE_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy_directory
-                       ${CMAKE_SOURCE_DIR}/lib/Dlls $<TARGET_FILE_DIR:SampleGame>)
+                       ${CMAKE_SOURCE_DIR}/lib/Dlls $<TARGET_FILE_DIR:STR>)
 
 # SDL libraries
 set (SDL_LIBS SDL2/SDL2 SDL2/SDL2main SDL2/SDL2_mixer SDL2/SDL2_image SDL2/SDL2_ttf SDL2/SDL2_net)

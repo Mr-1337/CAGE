@@ -4,7 +4,7 @@
 #include <GLM/glm/gtc/matrix_transform.hpp>
 #include "../CAGE/Core/GameState.hpp"
 
-#include "../../MenuButton.hpp"
+#include "../MenuButton.hpp"
 
 class MainMenu : public cage::GameState
 {

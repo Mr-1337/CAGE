@@ -40,6 +40,7 @@ namespace cage
 		void Raise(SDL_Event& e);
 		void Raise(Event& e);
 		void Subscribe(EventListener* listener);
+		void Unsubscribe(EventListener* listener);
 		Event Convert(SDL_Event& e);
 		MouseState GetMouseState();
 

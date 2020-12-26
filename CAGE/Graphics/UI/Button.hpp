@@ -18,7 +18,6 @@ namespace cage
 			}
 
 			std::function<void(void)> OnClick;
-			
 
 		protected:
 

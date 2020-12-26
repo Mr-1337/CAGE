@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../CAGE/Graphics/Models/Model.hpp"
+#include "../CAGE/Graphics/Models/Model.hpp"
 
 class Car
 {

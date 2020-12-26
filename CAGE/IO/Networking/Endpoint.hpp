@@ -1,11 +1,13 @@
 #pragma once
 
 #include <SDL2/SDL_net.h>
+#include <string>
 
 namespace cage
 {
 	namespace networking
 	{
+		// One end of a connection, either the local end or the remote end
 		class Endpoint
 		{
 			IPaddress m_address;
@@ -18,15 +20,16 @@ namespace cage
 			// Constructs a remote endpoint that we can send data to
 			Endpoint(IPaddress address);
 
-			Endpoint(Endpoint& other);
+			Endpoint(Endpoint&& other) noexcept;
 
 			~Endpoint();
 
 			inline IPaddress GetIP() const { return m_address; }
+			std::string GetIPAsString() const;
 			inline bool IsLocal() const { return m_local; }
 			bool m_dirty;
 			void Send(char* dataBuffer, size_t size, const Endpoint& destination);
-			void Receive(UDPpacket* packet);
+			bool Receive(UDPpacket* packet);
 
 			bool operator==(const Endpoint& rhs)
 			{

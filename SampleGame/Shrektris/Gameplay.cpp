@@ -3,16 +3,35 @@
 #include "Lobby.hpp"
 #include "../CAGE/Core/StateMachine.hpp"
 #include "../CAGE/Core/Game.hpp"
+#include "../Perlin.hpp"
 
-Gameplay::Gameplay(cage::Game& game, int w, int h) : 
+Gameplay::Gameplay(cage::Game& game, cage::networking::packets::GameStart start, std::unique_ptr<Client> client) : Gameplay(game, start.boardW, start.boardH, CLIENT)
+{
+	m_numPlayers = start.playerCount;
+	m_client = std::move(client);
+	m_client->SetGameplay(this);
+	m_server = nullptr;
+	m_playerID = m_client->GetID();
+}
+
+Gameplay::Gameplay(cage::Game& game, cage::networking::packets::GameStart start, std::unique_ptr<Server> server) : Gameplay(game, start.boardW, start.boardH, SERVER)
+{
+	m_numPlayers = start.playerCount;
+	m_server = std::move(server);
+	m_server->SetGameplay(this);
+	m_client = nullptr;
+	m_playerID = 0;
+}
+
+Gameplay::Gameplay(cage::Game& game, int w, int h, Mode mode) : 
 	cage::GameState(game),
 	BOARD_WIDTH(w),
 	BOARD_HEIGHT(h),
+	m_mode(mode),
 	m_vrMode(false),
 	m_spin(false),
 	skybox(std::filesystem::current_path().append("Assets/skybox"))
 {
-
 	m_level = 1;
 	m_score = 0;
 	m_levelCounter = 0;
@@ -20,6 +39,10 @@ Gameplay::Gameplay(cage::Game& game, int w, int h) :
 	totalTime = 0;
 	m_frameCount = 0;
 	m_fallTimer = 0.0;
+	m_shakeTimer = 0;
+	m_shaking = false;
+	m_shakeDuration = 0;
+	m_shakeOffset = { 0.f, 0.f, 0.f };
 
 	board = new char[BOARD_HEIGHT * BOARD_WIDTH];
 	for (int i = 0; i < BOARD_HEIGHT * BOARD_WIDTH; i++)
@@ -34,6 +57,7 @@ Gameplay::Gameplay(cage::Game& game, int w, int h) :
 
 	auto size = getGame().GetWindow().GetSize();
 	glViewport(0, 0, size.first, size.second);
+
 
 #pragma region VR
 	vr::EVRInitError eError = vr::VRInitError_None;
@@ -115,7 +139,7 @@ Gameplay::Gameplay(cage::Game& game, int w, int h) :
 	m_spriteProgram->Projection->ForwardToShader();
 	
 
-	CreateFrameBuffer(m_nRenderWidth, m_nRenderHeight, leftEyeDesc);
+	//CreateFrameBuffer(m_nRenderWidth, m_nRenderHeight, leftEyeDesc);
 
 	shrek.LoadModel("Assets/shrek.obj");
 
@@ -278,6 +302,42 @@ void Gameplay::ProcessEvents()
 	}
 }
 
+void Gameplay::networkPieceSync()
+{
+	using namespace cage::networking::packets;
+	if (m_mode == CLIENT)
+	{
+		PlayerPiecePos pos;
+		pos.x = currentPiece.x;
+		pos.y = currentPiece.y;
+		pos.orientation = currentPiece.orientation;
+		pos.shape = currentPiece.shape;
+		pos.playerID = m_playerID;
+		m_client->Send(&pos, sizeof(pos));
+	}
+	else if (m_mode == SERVER)
+	{
+		PlayerPiecePos pos;
+		pos.x = currentPiece.x;
+		pos.y = currentPiece.y;
+		pos.orientation = currentPiece.orientation;
+		pos.shape = currentPiece.shape;
+		pos.playerID = m_playerID;
+		m_server->SendAll(&pos, sizeof(pos));
+	}
+}
+
+void Gameplay::playerSync(cage::networking::packets::PlayerPiecePos& sync)
+{
+	int id = sync.playerID;
+	if (id == m_playerID)
+		return;
+	playerParts[id].x = sync.x;
+	playerParts[id].y = sync.y;
+	playerParts[id].orientation = sync.orientation;
+	playerParts[id].shape = sync.shape;
+}
+
 void Gameplay::gameOver()
 {
 	Mix_HaltChannel(2);
@@ -387,13 +447,71 @@ void Gameplay::logic()
 			nextPiece.shape = (std::rand() % 7) * 16;
 
 			//setBoardValOverPiece(currentPiece, 1);
+
+			shake(5.0, 0.3);
+
+			if (m_mode == CLIENT)
+			{
+				using namespace cage::networking::packets;
+				BoardSync sync;
+				char* compressed = new char[BOARD_WIDTH * BOARD_HEIGHT / 8];
+				compress(compressed);
+				SDL_memcpy(sync.board, compressed, BOARD_WIDTH * BOARD_HEIGHT / 8);
+				delete[] compressed;
+				m_client->Send(&sync, sizeof(sync));
+			}
+			else if (m_mode == SERVER)
+			{
+				using namespace cage::networking::packets;
+				BoardSync sync;
+				char* compressed = new char[BOARD_WIDTH * BOARD_HEIGHT / 8];
+				compress(compressed);
+				SDL_memcpy(sync.board, compressed, BOARD_WIDTH * BOARD_HEIGHT / 8);
+				delete[] compressed;
+				m_server->SendAll(&sync, sizeof(sync));
+			}
+
 		}
+	}
+
+	if (m_mode != OFFLINE)
+		playerParts[m_playerID] = currentPiece;
+}
+
+void Gameplay::compress(char* compressed)
+{
+	for (int i = 0; i < BOARD_WIDTH * BOARD_HEIGHT; i += 8)
+	{
+		compressed[i / 8] = 0;
+		compressed[i / 8] |= board[i + 0] << 7;
+		compressed[i / 8] |= board[i + 1] << 6;
+		compressed[i / 8] |= board[i + 2] << 5;
+		compressed[i / 8] |= board[i + 3] << 4;
+		compressed[i / 8] |= board[i + 4] << 3;
+		compressed[i / 8] |= board[i + 5] << 2;
+		compressed[i / 8] |= board[i + 6] << 1;
+		compressed[i / 8] |= board[i + 7] << 0;
+	}
+}
+
+void Gameplay::boardSync(cage::networking::packets::BoardSync& sync)
+{
+	char* compressed = sync.board;
+	for (int i = 0; i < BOARD_WIDTH * BOARD_HEIGHT; i++)
+	{
+		board[i] = ((compressed[i/8] << (i%8)) & 0x80) >> 7;
 	}
 }
 
 void Gameplay::Update(float delta)
 {
+	m_shakeTimer += delta;
 	logic();
+
+	if (m_mode == CLIENT)
+		m_client->Listen();
+	else if (m_mode == SERVER)
+		m_server->Listen();
 
 	totalTime += delta;
 	m_fallTimer += delta;
@@ -444,9 +562,9 @@ void Gameplay::Update(float delta)
 
 	// vr input and events
 
+	
 	if (m_vrMode)
 	{
-
 		// vr events
 		vr::VREvent_t event;
 		while (m_pHMD->PollNextEvent(&event, sizeof(event)))
@@ -529,7 +647,7 @@ void Gameplay::Update(float delta)
 			velocity = glm::vec4(velocity, 0.0) * hmdPose;
 			velocity.y = 0;
 		}
-	}
+	} 
 }
 
 void Gameplay::drawGrid()
@@ -540,6 +658,24 @@ void Gameplay::drawGrid()
 	grid->Draw(GL_LINES);
 }
 
+void Gameplay::shake(float strength, float duration)
+{
+	m_shakeDuration = duration;
+	m_shakeTimer = 0;
+	m_shakeStrength = strength;
+	m_shaking = true;
+}
+
+void Gameplay::applyShake()
+{
+	if (m_shaking)
+	{
+		int octaves = 4;
+		m_shakeOffset.x = Perlin::OctavePerlin(position.x, m_shakeTimer, octaves, 0.6);
+		m_shakeOffset.z = Perlin::OctavePerlin(position.z, m_shakeTimer, octaves, 0.6);
+	}
+}
+
 void Gameplay::drawScene(vr::EVREye eye)
 {
 	program->Use();
@@ -547,12 +683,14 @@ void Gameplay::drawScene(vr::EVREye eye)
 	glClearColor(0.3f, 0.5f, 0.2f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	applyShake();
+
 	if (!m_vrMode)
 	{
 		if (m_spin)
-			program->View->value = glm::lookAt(glm::vec3(0.f, 2.f, 20.f), { 0.f, 2.f, -1.f }, { 0.f, 1.f, 0.f }) * glm::rotate(glm::identity<glm::mat4>(), 0.5f * 6.28f * totalTime, glm::vec3(0.f, 1.f, 0.f));
+			program->View->value = glm::lookAt(glm::vec3(0.f, 2.f, 20.f) + m_shakeOffset, { 0.f, 2.f, -1.f }, { 0.f, 1.f, 0.f }) * glm::rotate(glm::identity<glm::mat4>(), 0.5f * 6.28f * totalTime, glm::vec3(0.f, 1.f, 0.f));
 		else
-			program->View->value = glm::lookAt(position, position + target, { 0.f, 1.f, 0.f });
+			program->View->value = glm::lookAt(position + m_shakeOffset, position + target + m_shakeOffset, { 0.f, 1.f, 0.f });
 		program->View->ForwardToShader();
 	}
 	else
@@ -588,26 +726,61 @@ void Gameplay::drawScene(vr::EVREye eye)
 	std::array<int, 16> box;
 	auto squares = getSquares(currentPiece);
 
-	for (int i = 0; i < 16; i++)
+	if (m_mode == OFFLINE)
 	{
-		box[i] = 0;
-
-		for (int j = 0; j < 4; j++)
+		for (int i = 0; i < 16; i++)
 		{
-			box[squares[j]] = 1;
+			box[i] = 0;
+
+			for (int j = 0; j < 4; j++)
+			{
+				box[squares[j]] = 1;
+			}
+
+			if (box[i] != 0)
+			{
+				int x = currentPiece.x + (i % 4);
+				int y = currentPiece.y + (i / 4);
+				program->Model->value = glm::translate(glm::identity<glm::mat4>(), { x - BOARD_WIDTH / 2, -(y - BOARD_HEIGHT / 2), 0.f });
+				program->Model->ForwardToShader();
+				shrek.Draw();
+			}
 		}
-
-		if (box[i] != 0)
+	}
+	else
+	{
+		for (int p = 0; p < m_numPlayers; p++)
 		{
-			int x = currentPiece.x + (i % 4);
-			int y = currentPiece.y + (i / 4);
-			program->Model->value = glm::translate(glm::identity<glm::mat4>(), { x - BOARD_WIDTH / 2, -(y - BOARD_HEIGHT / 2), 0.f });
-			program->Model->ForwardToShader();
-			shrek.Draw();
+			glm::vec4 tint = glm::vec4(Player(p).GetColor(), 0.5);
+
+			program->Tint->value = tint;
+			program->Tint->ForwardToShader();
+			squares = getSquares(playerParts[p]);
+
+			for (int i = 0; i < 16; i++)
+			{
+				box[i] = 0;
+
+				for (int j = 0; j < 4; j++)
+				{
+					box[squares[j]] = 1;
+				}
+
+				if (box[i] != 0)
+				{
+					int x = playerParts[p].x + (i % 4);
+					int y = playerParts[p].y + (i / 4);
+					program->Model->value = glm::translate(glm::identity<glm::mat4>(), { x - BOARD_WIDTH / 2, -(y - BOARD_HEIGHT / 2), 0.f });
+					program->Model->ForwardToShader();
+					shrek.Draw();
+				}
+			}
 		}
 	}
 
 	// draw the main game board
+	program->Tint->value = { 0.0, 0.0, 0.0, 0.0 };
+	program->Tint->ForwardToShader();
 
 	for (int y = 0; y < BOARD_HEIGHT; y++)
 	{
@@ -621,7 +794,6 @@ void Gameplay::drawScene(vr::EVREye eye)
 			}
 		}
 	}
-
 
 	// draw the next piece
 	squares = getSquares(nextPiece);
@@ -762,7 +934,8 @@ void Gameplay::Draw()
 
 		vr::VRCompositor()->PostPresentHandoff();
 	}
-	else
+	
+	//else
 	{
 		drawScene(vr::Eye_Left);
 	}

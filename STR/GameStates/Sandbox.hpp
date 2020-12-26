@@ -11,7 +11,7 @@
 #include "../CAGE/Graphics/Camera/Camera.hpp"
 #include "../CAGE/Graphics/UI/Button.hpp"
 #include "../CAGE/Graphics/UI/Text.hpp"
-#include "../../../CAGE/Core/GameState.hpp"
+#include "../../CAGE/Core/GameState.hpp"
 #include "../Perlin.hpp"
 
 

@@ -1,12 +1,13 @@
 #pragma once
 
+#include <utility>
 #include "Connection.hpp"
 
 namespace cage
 {
 	namespace networking
 	{
-		class ClientConnection : Connection
+		class ClientConnection : public Connection
 		{
 			Endpoint m_server, m_local;
 		public:
@@ -17,9 +18,9 @@ namespace cage
 				Send(&query, sizeof(packets::Query));
 			}
 
-			void Receive(UDPpacket* packet)
+			bool Receive(UDPpacket* packet)
 			{
-				m_local.Receive(packet);
+				return m_local.Receive(packet);
 			}
 			void Send(void* dataBuffer, size_t size)
 			{

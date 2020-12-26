@@ -23,6 +23,12 @@ namespace cage
 			Update();
 		}
 
+		void LayoutGroup::Remove(std::shared_ptr<UIElement> element)
+		{
+			UIElement::Remove(element);
+			m_layoutChildren.erase(std::remove(m_layoutChildren.begin(), m_layoutChildren.end(), element));
+		}
+
 		void LayoutGroup::AddAbsolute(std::shared_ptr<UIElement> element)
 		{
 			UIElement::Add(element);

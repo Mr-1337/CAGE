@@ -4,6 +4,7 @@
 #include <vector>
 #include <memory>
 #include <queue>
+#include <algorithm>
 #include <GLM/glm/glm.hpp>
 
 #include "../../IO/Events/EventListener.hpp"
@@ -68,7 +69,7 @@ namespace cage
 
 			virtual void LoadTexture(SDL_Surface* surface);
 
-			inline void SetActiveTexture(std::shared_ptr<Texture> texture)
+			virtual inline void SetActiveTexture(std::shared_ptr<Texture> texture)
 			{
 				if (texture)
 				{
@@ -124,6 +125,8 @@ namespace cage
 			// Adds a child to this UI element
 			virtual void Add(Child child);
 
+			virtual void Remove(Child child);
+
 			inline void SetParent(UIElement* parent)
 			{
 				m_parent = parent;
@@ -154,7 +157,10 @@ namespace cage
 		protected:
 			virtual void onTransform();
 
-
+			inline void setTextured(bool textured)
+			{
+				m_textured = textured;
+			}
 
 			std::shared_ptr<Texture> m_currentTexture;
 

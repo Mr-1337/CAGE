@@ -1,23 +1,20 @@
 #pragma once
 
-#include <vector>
 #include <iostream>
-#include <algorithm>
 #include "Connection.hpp"
 
 namespace cage
 {
 	namespace networking
 	{
-		class ServerConnection : Connection
+		class ServerConnection : public Connection
 		{
-			std::vector<Endpoint> m_clients;
-			Endpoint m_local;
+			Endpoint *m_local, m_remote;
 		public:
 			// Opens a server connection on the given port. Only should be used by servers.
-			ServerConnection(unsigned short port) : m_local(port)
+			ServerConnection(Endpoint* serverSocket, Endpoint&& remote) : m_local(serverSocket), m_remote(std::move(remote))
 			{
-				std::cout << "Server connection opened on port " << port << std::endl;
+				std::cout << "Server connection opened with " << m_remote.GetIPAsString() << std::endl;
 			}
 
 			~ServerConnection()
@@ -25,35 +22,19 @@ namespace cage
 				std::cout << "Server connection closed" << std::endl;
 			}
 
-			void AddClient(Endpoint client)
+			virtual bool Receive(UDPpacket* packet)
 			{
-				//if (std::find(m_clients.begin(), m_clients.end(), client) == m_clients.end())
-				{
-					m_clients.emplace_back(std::move(client));
-				}
-			}
-
-			virtual void Receive(UDPpacket* packet)
-			{
-				m_local.Receive(packet);
+				return m_local->Receive(packet);
 			}
 
 			virtual void Send(void* dataBuffer, size_t size)
 			{
-				for (auto& e : m_clients)
-				{
-					m_local.Send((char*)dataBuffer, size, e);
-				}
-			}
-
-			virtual void Send(void* dataBuffer, size_t size, size_t client)
-			{
-				m_local.Send((char*)dataBuffer, size, m_clients[client]);
+				m_local->Send((char*)dataBuffer, size, m_remote);
 			}
 
 			void Send(void* dataBuffer, size_t size, IPaddress ip)
 			{
-				m_local.Send((char*)dataBuffer, size, ip);
+				m_local->Send((char*)dataBuffer, size, ip);
 			}
 		};
 	}

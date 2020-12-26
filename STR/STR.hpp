@@ -17,5 +17,4 @@ public:
 
 	void Run() override;
 private:
-	bool m_running;
 };

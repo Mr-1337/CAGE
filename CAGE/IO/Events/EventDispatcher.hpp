@@ -22,7 +22,7 @@ namespace cage
 		// Removes a listener
 		void Unsubscribe(EventListener* listener)
 		{
-
+			m_listeners.erase(std::remove(m_listeners.begin(), m_listeners.end(), listener));
 		}
 
 		// Notify will send the event to all listeners interested in EventType

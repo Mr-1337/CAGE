@@ -2,12 +2,12 @@
 
 #include <GLM/glm/gtc/matrix_transform.hpp>
 
-#include "../../../CAGE/Core/GameState.hpp"
-#include "../../../CAGE/Graphics/UI/CheckBox.hpp"
-#include "../../../CAGE/Graphics/ShaderProgram/Generic3DShader.hpp"
-#include "../../../CAGE/Graphics/Camera/Camera.hpp"
+#include "../../CAGE/Core/GameState.hpp"
+#include "../../CAGE/Graphics/UI/CheckBox.hpp"
+#include "../../CAGE/Graphics/ShaderProgram/Generic3DShader.hpp"
+#include "../../CAGE/Graphics/Camera/Camera.hpp"
 
-#include "../../MenuButton.hpp"
+#include "../MenuButton.hpp"
 #include "../Track/Track.hpp"
 
 class Editor : public cage::GameState

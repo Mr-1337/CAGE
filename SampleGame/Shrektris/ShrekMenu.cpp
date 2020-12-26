@@ -25,6 +25,7 @@ ShrekMenu::ShrekMenu(cage::Game& game) : cage::GameState(game)
 	cage::ui::UIElement::shader = m_spriteShader;
 
 	//MenuButton::s_font = TTF_OpenFont("Assets/sans.ttf", 36);
+	MenuButton::s_font = new cage::Font("Assets/sans.ttf", 36);
 
 	Ref button1 = std::make_shared<MenuButton>("Play");
 	Ref button2 = std::make_shared<MenuButton>("Multiplayer");
@@ -33,7 +34,7 @@ ShrekMenu::ShrekMenu(cage::Game& game) : cage::GameState(game)
 
 	m_buttonGroup = std::make_shared<cage::ui::LayoutGroup>(new cage::ui::GridLayout({ 0.f, 50.f }, 1));
 
-	std::static_pointer_cast<MenuButton>(button1)->OnClick = [&, size]() { s_stateMachine->Push (new Gameplay(getGame(), 10, 20)); };
+	std::static_pointer_cast<MenuButton>(button1)->OnClick = [&, size]() { s_stateMachine->Push(new Gameplay(getGame(), 10, 20)); };
 	std::static_pointer_cast<MenuButton>(button2)->OnClick = [&, size]() { s_stateMachine->Push(new Lobby(getGame())); };
 	std::static_pointer_cast<MenuButton>(button3)->OnClick = [&, size]() { };
 	std::static_pointer_cast<MenuButton>(button4)->OnClick = [&, size]() { quit(); };

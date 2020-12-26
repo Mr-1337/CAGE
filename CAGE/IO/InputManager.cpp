@@ -5,7 +5,7 @@ namespace cage
 
 	void InputManager::Raise(SDL_Event& e)
 	{
-		m_dispatcher.Notify(Convert(e));
+		Raise(Convert(e));
 	}
 
 	void InputManager::Raise(Event& e)
@@ -95,5 +95,10 @@ namespace cage
 	void InputManager::Subscribe(EventListener* listener)
 	{
 		m_dispatcher.Subscribe(listener);
+	}
+
+	void InputManager::Unsubscribe(EventListener* listener)
+	{
+		m_dispatcher.Unsubscribe(listener);
 	}
 }
