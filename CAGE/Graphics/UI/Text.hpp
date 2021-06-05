@@ -1,6 +1,6 @@
 #pragma once
 
-#include <SDL2/SDL_ttf.h>
+#include "../Font/Font.hpp"
 #include "UIElement.hpp"
 
 namespace cage
@@ -10,12 +10,18 @@ namespace cage
 		class Text : public UIElement
 		{
 		public:
-			Text(TTF_Font* font);
-			void SetColor(SDL_Color color);
+			Text(const Font& font);
+			Text();
+			void SetColor(glm::vec4 color) override;
 			void SetText(const std::string& text);
+
+			inline std::string GetName() override
+			{
+				return "Text: " + m_text;
+			}
 		private:
 			std::string m_text;
-			TTF_Font* m_font;
+			const Font& m_font;
 			SDL_Color m_color;
 		};
 	}

@@ -32,9 +32,15 @@ namespace cage
 			glBindVertexArray(m_id);
 		}
 
+		static void UnbindAll()
+		{
+			glBindVertexArray(0);
+		}
+
 		~VertexArray()
 		{
 			glDeleteVertexArrays(1, &m_id);
+			UnbindAll();
 		}
 
 		inline unsigned int GetID() const { return m_id; }

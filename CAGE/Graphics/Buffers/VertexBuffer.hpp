@@ -1,5 +1,5 @@
 #pragma once
-#include <GLAD/glad/glad.h>
+#include <Glad/glad/glad.h>
 #include <vector>
 
 namespace cage
@@ -36,9 +36,18 @@ namespace cage
 			glBufferSubData(GL_ARRAY_BUFFER, 0, m_localData.size() * sizeof(VertexType), &m_localData[0]);
 		}
 
+		inline void UpdateRange(int startIndex, std::vector<VertexType>& data)
+		{
+			int length = data.size();
+			if (length == 0)
+				return;
+			glBufferSubData(GL_ARRAY_BUFFER, startIndex * sizeof(VertexType), length * sizeof(VertexType), &data[0]);
+		}
+
 		~VertexBuffer()
 		{
 			glDeleteBuffers(1, &m_id);
+			UnbindAll();
 		}
 
 		VertexType& operator[](int i)
@@ -49,6 +58,11 @@ namespace cage
 		inline size_t GetSize() const { return m_size; }
 
 		inline unsigned int GetID() const { return m_id; }
+
+		static void UnbindAll()
+		{
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+		}
 
 	private:
 		// OpenGL id or "name" for this vbo

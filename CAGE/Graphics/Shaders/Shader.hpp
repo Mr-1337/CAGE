@@ -11,7 +11,7 @@ namespace cage
 	{
 	public:
 
-		enum ShaderType
+		enum class ShaderType
 		{
 			VERTEX = GL_VERTEX_SHADER,
 			FRAGMENT = GL_FRAGMENT_SHADER
@@ -19,7 +19,8 @@ namespace cage
 
 		Shader(ShaderType type);
 		Shader(const Shader& other) = delete;
-		Shader(const Shader&& other) = delete;
+		Shader(Shader&& other);
+
 		~Shader();
 
 		void CompileFromFile(const std::string& path);
@@ -32,5 +33,9 @@ namespace cage
 
 		// The OpenGL id or "name" for this shader object
 		unsigned int m_id;
+
+		// Keeps track of if we own the data before freeing
+		bool m_ownsShader;
+
 	};
 }

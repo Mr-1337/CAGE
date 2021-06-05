@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <SDL2/SDL_image.h>
+#include <memory>
 
 #include "../VertexArrays/VertexArray.hpp"
 #include "../Textures/Texture.hpp"
@@ -17,7 +18,7 @@ namespace cage
 		std::string m_name;
 		VertexBuffer<VertexType> m_vbo;
 		VertexArray<VertexType> m_vao;
-		Texture* m_texture;
+		std::shared_ptr<Texture> m_texture;
 	public:
 
 		Mesh(const std::string& name, bool keepLocal) : m_name(name), m_vbo(keepLocal), m_vao(m_vbo), m_texture(nullptr)
@@ -32,12 +33,16 @@ namespace cage
 
 		~Mesh()
 		{
-
 		}
 
 		void LoadTexture(SDL_Surface* surface)
 		{
-			m_texture = new Texture(surface);
+			m_texture = std::make_shared<Texture>(surface);
+		}
+
+		void LoadTexture(std::shared_ptr<Texture> texture)
+		{
+			m_texture = texture;
 		}
 
 		void SetGeometry(const std::vector<VertexType>& geometry)
@@ -56,7 +61,7 @@ namespace cage
 			if (m_texture)
 				m_texture->Bind();
 			else
-				Texture::MissingTexture->Bind();
+				Texture::s_MissingTexture->Bind();
 			m_vao.Bind();
 			glDrawArrays(primitive, 0, m_vbo.GetSize());
 		}
@@ -66,7 +71,7 @@ namespace cage
 			if (m_texture)
 				m_texture->Bind();
 			else
-				Texture::MissingTexture->Bind();
+				Texture::s_MissingTexture->Bind();
 			m_vao.Bind();
 			glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
 		}

@@ -6,6 +6,7 @@
 
 namespace cage::uniforms
 {
+
 	template <class T>
 	class Uniform
 	{
@@ -15,11 +16,11 @@ namespace cage::uniforms
 		{
 			m_location = glGetUniformLocation(m_program, m_name.c_str());
 		}
-
-		inline Uniform<T>* operator=(T value)
+		
+		virtual Uniform<T>& operator=(T value)
 		{
 			this->value = value;
-			return this;
+			return *this;
 		}
 
 		virtual void ForwardToShader() = 0;
@@ -40,6 +41,15 @@ namespace cage::uniforms
 	{
 	public:
 		IntUniform(unsigned int program, const std::string& name);
+		void ForwardToShader() override;
+	};
+
+	// Bool
+
+	class BoolUniform : public Uniform<bool>
+	{
+	public:
+		BoolUniform(unsigned int program, const std::string& name);
 		void ForwardToShader() override;
 	};
 
@@ -76,6 +86,15 @@ namespace cage::uniforms
 	{
 	public:
 		Vec3Uniform(unsigned int program, const std::string& name);
+		void ForwardToShader() override;
+	};
+
+	// Vec4
+
+	class Vec4Uniform : public Uniform<glm::vec4>
+	{
+	public:
+		Vec4Uniform(unsigned int program, const std::string& name);
 		void ForwardToShader() override;
 	};
 }

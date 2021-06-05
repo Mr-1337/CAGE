@@ -8,7 +8,7 @@ namespace cage
 		cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
 		cameraUp = { 0.f, 1.f, 0.f };
 		cameraFront = glm::vec3(0.0f, 0.0f, 1.0f);
-		m_position = { 0.f };
+		m_position = { 0.f, 0.0, 0.0 };
 		yaw = 90;
 	}
 

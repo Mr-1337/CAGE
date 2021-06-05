@@ -1,0 +1,60 @@
+{
+  "actions": [
+    {
+      "name": "/actions/main/in/Move",
+      "requirement": "suggested",
+      "type": "vector2"
+    },
+    {
+      "name": "/actions/main/in/MoveBlockLeft",
+      "requirement": "suggested",
+      "type": "Boolean"
+    },
+    {
+      "name": "/actions/main/in/MoveBlockRight",
+      "requirement": "suggested",
+      "type": "Boolean"
+    },
+    {
+      "name": "/actions/main/in/MoveBlockDown",
+      "requirement": "suggested",
+      "type": "Boolean"
+    },
+    {
+      "name": "/actions/main/in/Rotate",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/main/in/LeftHand",
+      "requirement": "suggested",
+      "type": "pose"
+    },
+    {
+      "name": "/actions/main/in/RightHand",
+      "requirement": "suggested",
+      "type": "pose"
+    }
+  ],
+  "action_sets": [
+    {
+      "name": "/actions/main",
+      "usage": "leftright"
+    }
+  ],
+  "localization": [
+    {
+      "language_tag": "en_us",
+
+      "/actions/main": "Main Actions",
+
+      "/actions/main/in/Move": "Continuous Movement",
+      "/actions/main/in/MoveBlockLeft": "Move Block Left",
+      "/actions/main/in/MoveBlockRight": "Move Block Right",
+      "/actions/main/in/MoveBlockDown": "Move Block Down",
+      "/actions/main/in/Rotate": "Rotate Block",
+      "/actions/main/in/LeftHand": "Pose Left Hand",
+      "/actions/main/in/RightHand": "Pose Right Hand"
+    }
+
+  ]
+}

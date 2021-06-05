@@ -11,10 +11,12 @@ namespace cage
 	public:
 		StateMachine();
 		void ProcessEvents();
-		void Update(float delta);
+		void Update(float dt);
 		void Draw();
 
 		void Push(GameState* state);
+		void Pop();
+
 		bool Quit();
 	private:
 

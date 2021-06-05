@@ -1,0 +1,16 @@
+#tabs for the editor
+
+ui.tabs.tile
+Tiles
+
+ui.tabs.structure
+Structures
+
+ui.tabs.entity
+Entities
+
+ui.tabs.script
+Scripts
+
+ui.checkbox.grid
+Show Grid

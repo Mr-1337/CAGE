@@ -4,20 +4,23 @@
 namespace cage
 {
 
-	Texture* Texture::MissingTexture;
+	Texture* Texture::s_MissingTexture;
 
 	Texture::Texture(SDL_Surface* textureData, bool keepLocalCopy) : 
-		m_surface(textureData),
-		m_textureUnit(0)
+		m_textureUnit(0),
+		m_size(textureData->w, textureData->h),
+		m_surface(textureData)
 	{
 		glGenTextures(1, &m_id);
-		m_surface->refcount++;
 		Bind();
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 		uploadTexData(m_surface);
 
@@ -26,9 +29,6 @@ namespace cage
 
 	Texture::~Texture()
 	{
-		int count = --m_surface->refcount;
-		if (count == 1)
-			SDL_FreeSurface(m_surface);	
 		glDeleteTextures(1, &m_id);
 	}
 
