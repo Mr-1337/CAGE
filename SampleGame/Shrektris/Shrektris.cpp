@@ -1,12 +1,16 @@
 #include "Shrektris.hpp"
 #include "ShrekMenu.hpp"
 
-Shrektris::Shrektris(int argc, char** argv) : 
-	Game("Shrektris", argc, argv),
+Shrektris::Shrektris() : 
+	Game("Shrektris"),
 	m_running(true)
 {
 
-	std::string shrekStr = R"(
+}
+
+void Shrektris::Init()
+{
+    std::string shrekStr = R"(
 
                       _____
                    ,-'     `._
@@ -44,17 +48,18 @@ Shrektris::Shrektris(int argc, char** argv) :
 
 	)";
 
-	std::cout << std::endl << shrekStr << std::endl;
+
+    // Set this to true if you want to play in VR. The menus don't have VR interfaces yet :( so you're gonna need to use your mouse a bit, once gameplay loads you're set
+    vrMode = false;
+    std::cout << std::endl << shrekStr << std::endl;
 
     glEnable(GL_DEPTH_TEST);
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	cage::Texture::MissingTexture = new cage::Texture(IMG_Load("Assets/missing.png"));
     m_stateMachine.Push(new ShrekMenu(*this));
 }
-
 
 void Shrektris::Run()
 {

@@ -26,7 +26,7 @@ namespace cage
 		virtual ~Texture();
 		void Bind();
 
-		static Texture* MissingTexture;
+		static Texture* s_MissingTexture;
 
 	};
 }

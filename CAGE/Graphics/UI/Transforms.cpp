@@ -24,6 +24,8 @@ namespace cage::ui::transforms
 		case Interpolation::CUBIC:
 			return -2.0 * t * t * t + 3.0 * t * t;
 			break;
+		default:
+			return t;
 		}
 	}
 

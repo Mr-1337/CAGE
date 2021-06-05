@@ -1,5 +1,6 @@
 #include "World.hpp"
 #include "Scripting/ScriptManager.hpp"
+#include "Enemy.hpp"
 
 #include <GLM/glm/gtc/matrix_transform.hpp>
 #include <exception>
@@ -8,35 +9,42 @@ namespace ub
 {
 	World::World(std::pair<int, int> winSize) : 
 		m_worldMesh("World Mesh", true),
-		m_playerMesh("Player Mesh"),
-		m_uberMesh("Uber Mesh"),
 		m_gridMesh("Grid Mesh"),
 		m_cameraPos(0.f),
-		m_position(0.f),
 		m_zoom(1.0f),
 		m_winSize(winSize),
 		m_worldSize(16, 16),
 		m_drawGrid(false),
 		m_dirty(false),
-		m_hackBuffer(6, cage::Vertex3UV(0, 0, 0, 0, 0))
+		m_hackBuffer(6, cage::Vertex3UV(0, 0, 0, 0, 0)),
+		m_battle(nullptr),
+		m_control(true)
 	{
-
+		m_dialogue = std::make_shared<DialogueBox>();
+		m_root.Add(m_dialogue);
 		m_worldShader = std::make_shared<WorldShader>();
 
 		auto surface = IMG_Load("Assets/Textures/UBatlas.png");
 		m_worldMesh.LoadTexture(surface);
 		SDL_FreeSurface(surface);
 
-		m_playerMesh.LoadTexture(surface = IMG_Load("Assets/Textures/mr_placeholder.png"));
-		SDL_FreeSurface(surface);
-		m_uberMesh.LoadTexture(surface = IMG_Load("Assets/Textures/Uber.png"));
-		SDL_FreeSurface(surface);
+		m_player = new Player(this);
+		m_player->LoadTexture("mr_placeholder.png");
+		m_entities.push_back(m_player);
+
+		m_dev = new Character(this, "Dev");
+		m_dev->LoadTexture("Nuber.png");
+		m_entities.push_back(m_dev);
+
+		m_enemy = new Enemy(this);
+		m_enemy->LoadTexture("Uber.png");
+		m_entities.push_back(m_enemy);
 
 		m_scriptManager = new ScriptManager();
 		m_scriptManager->SetWorld(this);
 		m_worldShader->Use();
 
-
+		m_root.SetLocalMounting(cage::ui::MountPoint::TOP_LEFT);
 		SetWinSize(winSize);
 
 		//glClearColor(0.2, 0.0, 0.5, 0.0);
@@ -52,14 +60,19 @@ namespace ub
 		house.mesh->LoadTexture(tex);
 		house.w = tex->GetSize().first;
 		house.h = tex->GetSize().second;
-
-		
+		m_player->SetPosition({ 20.0, 20.0 });
 
 	}
 
 	void World::Zoom(int dy)
 	{
-		m_zoom *= 1.0 + 0.1 * (dy > 0) - 0.1 * (dy < 0);
+		if (m_control)
+		{
+			if (dy > 0)
+				m_zoom *= 1.1;
+			else
+				m_zoom /= 1.1;
+		}
 	}
 
 	World::~World()
@@ -84,7 +97,7 @@ namespace ub
 	{
 		m_scriptManager->Start();
 		m_cameraPos = { 0.f, 0.f };
-		m_position = { 0.f, 0.f };
+		m_player->SetPosition({ 0.f, 0.f });
 		m_pos2 = { 0.f, 0.f };
 		m_zoom = 1.0f;
 
@@ -97,6 +110,22 @@ namespace ub
 		m_tileData.clear();
 		m_tileData.resize(m_worldSize.first * m_worldSize.second);
 		GenWorld();
+	}
+
+	void World::StartBattle(Enemy* enemy)
+	{
+		m_worldShader->Use();
+		m_view = glm::identity<glm::mat4>();
+		m_worldShader->m_ViewProjection->value = m_projection * m_view;
+		m_worldShader->m_ViewProjection->ForwardToShader();
+		m_battle = std::make_unique<Battle>(m_player, m_enemy, m_worldShader);
+		m_battle->GetPanel()->Resize(m_root.GetSize());
+		m_root.Add(m_battle->GetPanel());
+	}
+
+	std::vector<Entity*> World::GetEntities()
+	{
+		return m_entities;
 	}
 
 	glm::ivec2 World::ToTileIndices(int x, int y)
@@ -251,6 +280,14 @@ namespace ub
 		m_winSize = winSize;
 		m_projection = glm::ortho(0.f, (float)winSize.first, (float)winSize.second, 0.f);
 		m_view = calcViewMatrix();
+
+		cage::ui::UIElement::shader->Use();
+		cage::ui::UIElement::shader->Projection->value = m_projection;
+		cage::ui::UIElement::shader->Projection->ForwardToShader();
+
+		m_root.Resize({ winSize.first, winSize.second });
+		if (InBattle())
+			m_battle->GetPanel()->Resize({ winSize.first, winSize.second });
 	}
 
 	void World::MoveEnt(unsigned int id, glm::vec2 position)
@@ -258,7 +295,7 @@ namespace ub
 		switch (id)
 		{
 		case 0:
-			m_position = position;
+			
 			break;
 		case 1:
 			m_pos2 = position;
@@ -268,139 +305,129 @@ namespace ub
 
 	void World::Update(float dt)
 	{
-		float speed = 256.f;
-		m_velocity = { 0.0, 0.0 };
+		if (InBattle())
+		{
+			m_battle->Update(dt);
+			if (m_battle->Complete())
+			{
+				m_root.Remove(m_battle->GetPanel());
+				m_battle = nullptr;
+			}
+		}
+		else
+		{
+			float speed = 256.f;
+			m_velocity = { 0.0, 0.0 };
 
-		auto keys = SDL_GetKeyboardState(NULL);
-		if (keys[SDL_SCANCODE_W])
-			m_velocity.y = -speed;
-		if (keys[SDL_SCANCODE_A])
-			m_velocity.x = -speed;
-		if (keys[SDL_SCANCODE_S])
-			m_velocity.y = speed;
-		if (keys[SDL_SCANCODE_D])
-			m_velocity.x = speed;
+			auto keys = SDL_GetKeyboardState(NULL);
+			if (m_control)
+			{
+				if (keys[SDL_SCANCODE_W])
+					m_velocity.y = -speed;
+				else if (keys[SDL_SCANCODE_A])
+					m_velocity.x = -speed;
+				else if (keys[SDL_SCANCODE_S])
+					m_velocity.y = speed;
+				else if (keys[SDL_SCANCODE_D])
+					m_velocity.x = speed;
 
-		const glm::vec2 playerOffset = glm::vec2(28.f, 48.f) * 0.5f;
-		const float moveTime = 1.0f / 0.2f;
-		m_cameraPos += (m_position + playerOffset - m_cameraPos) * moveTime * dt;
+				const glm::vec2 playerOffset = glm::vec2(28.f, 48.f) * 0.5f;
+				const float moveTime = 1.0f / 0.2f;
+				m_cameraPos += (m_player->GetPosition() + playerOffset - m_cameraPos) * moveTime * dt;
 
-		m_position += m_velocity * dt;
+				auto pos = m_player->GetPosition() + m_velocity * dt;
+				m_player->SetPosition(pos);
+				m_dev->SetPosition(m_pos2);
 
-		m_view = calcViewMatrix();
+				m_view = calcViewMatrix();
 
-		m_scriptManager->Update(dt);
+				for (auto e : m_entities)
+					e->Update(dt);
 
+				m_scriptManager->Update(dt);
+			}
+
+		}
+
+		m_root.Update(dt);
 	}
 
 	void World::Draw()
 	{
-		glEnable(GL_DEPTH_TEST);
-		m_worldShader->Use();
-		std::vector<cage::Vertex3UV> geometry;
-		geometry.reserve(6);
-
-		float playerDepth = (m_position.y + 48.f) / (m_worldSize.second * TILE_SIZE);
-
-		geometry.emplace_back(m_position.x + 0.f, m_position.y + 0.f,  playerDepth, 0.f, 0.f);
-		geometry.emplace_back(m_position.x + 28.f, m_position.y + 0.f, playerDepth, 0.f + 1, 0.f);
-		geometry.emplace_back(m_position.x + 0.f, m_position.y + 48.f, playerDepth, 0.f, 1);
-
-		geometry.emplace_back(m_position.x + 28.f, m_position.y + 0.f,  playerDepth, 0.f + 1, 0.f);
-		geometry.emplace_back(m_position.x + 0.f, m_position.y + 48.f,  playerDepth, 0.f, 1);
-		geometry.emplace_back(m_position.x + 28.f, m_position.y + 48.f, playerDepth, 1, 1);
-
-		m_playerMesh.GetBuffer().Fill(geometry);
-
-		geometry.clear();
-		geometry.reserve(6);
-
-		geometry.emplace_back(m_pos2.x + 0.f, m_pos2.y + 0.f, 0.f, 0.f, 0.f);
-		geometry.emplace_back(m_pos2.x + 28.f, m_pos2.y + 0.f, 0.f, 0.f + 1, 0.f);
-		geometry.emplace_back(m_pos2.x + 0.f, m_pos2.y + 48.f, 0.f, 0.f, 1);
-
-		geometry.emplace_back(m_pos2.x + 28.f, m_pos2.y + 0.f, 0.f, 0.f + 1, 0.f);
-		geometry.emplace_back(m_pos2.x + 0.f, m_pos2.y + 48.f, 0.f, 0.f, 1);
-		geometry.emplace_back(m_pos2.x + 28.f, m_pos2.y + 48.f, 0.f, 1, 1);
-
-		m_uberMesh.GetBuffer().Fill(geometry);
-
-		geometry.clear();
-		geometry.reserve(6);
-
-
-		float houseDepth = (float)(house.y + (float)house.h / TILE_SIZE) / m_worldSize.second;
-
-		geometry.emplace_back(house.x * TILE_SIZE, house.y * TILE_SIZE, houseDepth, 0.f, 0.f);
-		geometry.emplace_back(house.x * TILE_SIZE + house.w, house.y * TILE_SIZE, houseDepth, 0.f + 1, 0.f);
-		geometry.emplace_back(house.x * TILE_SIZE , house.y * TILE_SIZE + house.h, houseDepth, 0.f, 1);
-
-		geometry.emplace_back(house.x * TILE_SIZE + house.w, house.y * TILE_SIZE + 0.f, houseDepth, 0.f + 1, 0.f);
-		geometry.emplace_back(house.x * TILE_SIZE + 0.f, house.y * TILE_SIZE + house.h, houseDepth, 0.f, 1);
-		geometry.emplace_back(house.x * TILE_SIZE + house.w, house.y * TILE_SIZE + house.h, houseDepth, 1, 1);
-
-
-		house.mesh->GetBuffer().Fill(geometry);
-
-		m_worldShader->m_ViewProjection->value = m_projection * m_view;
-		m_worldShader->m_ViewProjection->ForwardToShader();
-
-		m_worldShader->m_Textured->value = true;
-		m_worldShader->m_Textured->ForwardToShader();
-		m_worldShader->m_Color->ForwardToShader();
-
-		m_worldMesh.Draw();
-		m_playerMesh.Draw();
-		m_uberMesh.Draw();
-		house.mesh->Draw();
-
-		for (auto& s : m_structureData)
+		if (InBattle())
 		{
-			s.mesh->Draw();
+			m_worldShader->Use();
+			m_worldShader->m_ViewProjection->value = m_projection;
+			m_worldShader->m_ViewProjection->ForwardToShader();
+			m_battle->Draw();
 		}
-
-		if (m_drawGrid)
+		else
 		{
-			m_worldShader->m_Textured->value = false;
-			m_worldShader->m_Color->value = { 1.0, 1.0, 1.0, 0.3 };
+			glEnable(GL_DEPTH_TEST);
+			m_worldShader->Use();
+			std::vector<cage::Vertex3UV> geometry;
+			geometry.reserve(6);
 
+			float houseDepth = (float)(house.y + (float)house.h / TILE_SIZE) / m_worldSize.second;
+
+			geometry.emplace_back(house.x * TILE_SIZE, house.y * TILE_SIZE, houseDepth, 0.f, 0.f);
+			geometry.emplace_back(house.x * TILE_SIZE + house.w, house.y * TILE_SIZE, houseDepth, 0.f + 1, 0.f);
+			geometry.emplace_back(house.x * TILE_SIZE, house.y * TILE_SIZE + house.h, houseDepth, 0.f, 1);
+
+			geometry.emplace_back(house.x * TILE_SIZE + house.w, house.y * TILE_SIZE + 0.f, houseDepth, 0.f + 1, 0.f);
+			geometry.emplace_back(house.x * TILE_SIZE + 0.f, house.y * TILE_SIZE + house.h, houseDepth, 0.f, 1);
+			geometry.emplace_back(house.x * TILE_SIZE + house.w, house.y * TILE_SIZE + house.h, houseDepth, 1, 1);
+
+			house.mesh->GetBuffer().Fill(geometry);
+
+			m_worldShader->m_ViewProjection->value = m_projection * m_view;
+			m_worldShader->m_ViewProjection->ForwardToShader();
+
+			m_worldShader->m_Textured->value = true;
 			m_worldShader->m_Textured->ForwardToShader();
 			m_worldShader->m_Color->ForwardToShader();
 
-			m_gridMesh.Draw(GL_LINES);
+			m_worldMesh.Draw();
+			house.mesh->Draw();
+
+			for (auto& s : m_structureData)
+			{
+				s.mesh->Draw();
+			}
+
+			for (auto e : m_entities)
+			{
+				e->Draw();
+			}
+
+			if (m_drawGrid)
+			{
+				m_worldShader->m_Textured->value = false;
+				m_worldShader->m_Color->value = { 1.0, 1.0, 1.0, 0.3 };
+
+				m_worldShader->m_Textured->ForwardToShader();
+				m_worldShader->m_Color->ForwardToShader();
+
+				m_gridMesh.Draw(GL_LINES);
+			}
 		}
 
+		// Draw the UI no matter what
+		glDisable(GL_DEPTH_TEST);
+		cage::ui::UIElement::shader->Use();
+		m_root.Draw();
 	}
 
-	void World::HandleEvents(SDL_Event e)
+	void World::HandleEvents(cage::Event&& e)
 	{
-		switch (e.type)
+		if (auto se = std::get_if<cage::ScrollEvent>(&e))
+			Zoom(se->amount);
+		else if (auto we = std::get_if<cage::WindowEvent>(&e))
 		{
-		case SDL_KEYDOWN:
-			switch (e.key.keysym.scancode)
-			{
-			case SDL_SCANCODE_RETURN:
-				//GenWorld();
-				break;
-			}
-			break;
-		case SDL_MOUSEWHEEL:
-			//if (e.wheel.y > 0)
-			//	m_zoom *= 1.0 + 0.1;
-			//else
-			//	m_zoom *= 1.0 - 0.1;
-			//m_zoom *= 1.0 - 0.1 * (((unsigned int)e.wheel.y & (1 << 31)) >> 31) + 0.1 * (1 - (((unsigned int)e.wheel.y & (1 << 31)) >> 31));
-			Zoom(e.wheel.y);
-			break;
-		case SDL_WINDOWEVENT:
-			if (e.window.event == SDL_WINDOWEVENT_RESIZED)
-			{
-				int w = e.window.data1;
-				int h = e.window.data2;
-				m_winSize = { w, h };
-				m_projection = glm::ortho(0.f, (float)w, (float)h, 0.f);
-			}
-			break;
+			SetWinSize({ we->data1, we->data2 });
 		}
+		m_player->ProcessInput(e);
+		if (InBattle())
+			m_battle->HandleEvents(e);
 	}
 }

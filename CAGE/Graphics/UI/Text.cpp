@@ -9,6 +9,11 @@ namespace cage
 
 		}
 
+		Text::Text() : Text(*s_DefaultFont)
+		{
+
+		}
+
 		void Text::SetText(const std::string& text)
 		{
 			m_text = text.empty() ? " " : text;
@@ -19,6 +24,7 @@ namespace cage
 		{
 			color *= 255.0;
 			m_color = { (Uint8)color.x, (Uint8)color.y, (Uint8)color.z, (Uint8)color.a };
+			SetText(m_text);
 		}
 	}
 }

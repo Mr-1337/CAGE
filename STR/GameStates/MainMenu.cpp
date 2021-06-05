@@ -10,8 +10,6 @@ MainMenu::MainMenu(cage::Game& game, std::pair<int, int> size) : cage::GameState
 {
 	glClearColor(0.3f, 0.3f, 0.2f, 1.f);
 
-	cage::Texture::MissingTexture = new cage::Texture(IMG_Load("Assets/missing.png"));
-
 	cage::Shader vertex(cage::Shader::ShaderType::VERTEX), fragment(cage::Shader::ShaderType::FRAGMENT);
 	vertex.CompileFromFile("Assets/sprite.vert");
 	fragment.CompileFromFile("Assets/sprite.frag");

@@ -43,11 +43,11 @@ add_custom_command(TARGET STR PRE_BUILD
                        ${CMAKE_SOURCE_DIR}/lib/Dlls $<TARGET_FILE_DIR:STR>)
 
 # SDL libraries
-set (SDL_LIBS SDL2/SDL2 SDL2/SDL2main SDL2/SDL2_mixer SDL2/SDL2_image SDL2/SDL2_ttf SDL2/SDL2_net)
+set (SDL_LIBS SDL2 SDL2main SDL2_mixer SDL2_image SDL2_ttf SDL2_net)
 
 # Steam libraries
 
-set (STEAM_LIBS Steam/phonon)
+set (STEAM_LIBS phonon)
 
 # link against CAGE, SDL and its extensions
 target_link_libraries (STR PUBLIC CAGE ${SDL_LIBS} ${STEAM_LIBS})

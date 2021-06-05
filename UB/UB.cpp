@@ -1,29 +1,28 @@
 #include "UB.hpp"
 #include <chrono>
 
-#include "GameStates/Gameplay.hpp"
 #include "GameStates/MainMenu.hpp"
+#include "Battle.hpp"
 
 namespace ub
 {
-	UndefinedBehavior::UndefinedBehavior(int argc, char** argv) : 
-		cage::Game("Undefined Behavior", argc, argv), 
+	UndefinedBehavior::UndefinedBehavior() : 
+		cage::Game("Undefined Behavior"), 
 		m_running(true)
+	{
+		
+	}
+
+	void UndefinedBehavior::Init()
 	{
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-		cage::Texture::MissingTexture = new cage::Texture(IMG_Load("Assets/Textures/missing.png"));
 		m_window->SetIcon("Assets/Textures/icon.png");
-		
 
+		Battle::s_Game = this;
 		auto size = m_window->GetSize();
 		m_stateMachine.Push(new MainMenu(*this));
-	}
-
-	void UndefinedBehavior::handleCMDArgs(int argc, char** argv)
-	{
-
 	}
 
 	UndefinedBehavior::~UndefinedBehavior()

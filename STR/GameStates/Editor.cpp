@@ -25,8 +25,6 @@ Editor::Editor(cage::Game& game, std::pair<int, int> size) : cage::GameState(gam
 
 		std::cout << size.first << ", " << size.second << std::endl;
 
-		cage::Texture::MissingTexture = new cage::Texture(IMG_Load("Assets/missing.png"));
-
 		m_genericShader->Use();
 
 		m_genericShader->Projection->value = glm::perspective(glm::quarter_pi<float>(), (float)size.first / size.second, 0.1f, 500.f);

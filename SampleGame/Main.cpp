@@ -8,17 +8,34 @@
 #include <iostream>
 #include <SDL2/SDL.h>
 #include "Shrektris/Shrektris.hpp"
-
-template<typename T>
-void PlayGame(int argc, char** argv)
-{
-	T game(argc, argv);
-	game.Run();
-}
+#include "../CAGE/CAGE.hpp"
 
 int main(int argc, char** argv)
 {
-	PlayGame<Shrektris>(argc, argv);
+	
+	char input;
+	bool vrMode;
+
+	std::cout << "Do you want to play in VR mode? [y/n]" << std::endl;
+
+	do
+	{
+		std::cin >> input;
+		switch (input)
+		{
+		case 'n':
+			vrMode = false;
+			break;
+		case 'y':
+			vrMode = true;
+			break;
+		default:
+			std::cout << "Invalid input" << std::endl;
+		}
+
+	} while (input != 'n' && input != 'y');
+
+	cage::PlayGame<Shrektris>(argc, argv);
 	std::cout << "It's not ogre, it's never ogre" << std::endl;
 
 	return 0;

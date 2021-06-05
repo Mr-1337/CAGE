@@ -13,6 +13,12 @@ namespace ub
 		World::Tile GetSelection();
 
 		bool HandleEvent(cage::Event& e) override;
+
+		inline std::string GetName() override
+		{
+			return "Tile Panel";
+		}
+
 	private:
 
 		class TileButton : public cage::ui::Button

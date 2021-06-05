@@ -1,5 +1,7 @@
 #pragma once
 
+#include <random>
+
 #include "Window.hpp"
 #include "StateMachine.hpp"
 #include "../IO/Assets/TextureManager.hpp"
@@ -13,8 +15,13 @@ namespace cage
 	class Game
 	{
 	public:
-		Game(const char* title, int argc, char** argv);
+		Game(const char* title);
 		~Game();
+
+		void EngineInit();
+
+		virtual void HandleCMDArgs(int argc, char** argv);
+		virtual void Init() = 0;
 
 		// Runs the main game loop
 		virtual void Run() = 0;
@@ -25,11 +32,12 @@ namespace cage
 		Language& GetLanguage();
 		audio::PlaybackEngine& GetPlaybackEngine();
 
+		std::mt19937& GetRNG();
 
 	protected:
 		std::unique_ptr<Window> m_window;
 
-		virtual void handleCMDArgs(int argc, char** argv) = 0;
+
 		// A finite state machine, facilitates switching between potentially vastly different application states
 		StateMachine m_stateMachine;
 		TextureManager m_textureManager;
@@ -39,9 +47,16 @@ namespace cage
 		audio::PlaybackEngine m_playbackEngine;
 
 	private:
+
 		// Loads each SDL library, throws an exception if any fail
 		void initSDL();
+
+		void initGL();
+
 		void unloadSDL();
+
+		std::string m_title;
+		std::mt19937 m_rng;
 
 	};
 }

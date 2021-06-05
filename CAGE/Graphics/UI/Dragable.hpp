@@ -1,6 +1,7 @@
+#pragma once
+
 #include "Clickable.hpp"
 
-#pragma once
 
 namespace cage
 {

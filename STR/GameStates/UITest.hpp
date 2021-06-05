@@ -8,6 +8,8 @@
 #include "../CAGE/Graphics/UI/Text.hpp"
 #include "../CAGE/IO/Networking/Endpoint.hpp"
 
+#include <Graphics/UI/DebugVisualizer.hpp>
+
 #pragma once
 
 class UITest : public cage::GameState
@@ -28,6 +30,7 @@ private:
 	std::shared_ptr<cage::ui::Button> b1, b2, b3, b4;
 	std::shared_ptr<cage::ui::Text> message;
 	std::shared_ptr<cage::ui::CheckBox> c1, c2, c3;
+	std::shared_ptr<cage::ui::DebugVisualizer> m_debug;
 
 	Mix_Chunk *s1, *s2, *s3, *s4;
 };

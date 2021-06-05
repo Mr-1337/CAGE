@@ -61,7 +61,7 @@ namespace cage
 			if (m_texture)
 				m_texture->Bind();
 			else
-				Texture::MissingTexture->Bind();
+				Texture::s_MissingTexture->Bind();
 			m_vao.Bind();
 			glDrawArrays(primitive, 0, m_vbo.GetSize());
 		}
@@ -71,7 +71,7 @@ namespace cage
 			if (m_texture)
 				m_texture->Bind();
 			else
-				Texture::MissingTexture->Bind();
+				Texture::s_MissingTexture->Bind();
 			m_vao.Bind();
 			glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
 		}

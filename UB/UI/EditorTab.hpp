@@ -20,5 +20,10 @@ namespace ub
 			Add(text);
 			SetColor({ 0.5, 0.5, 0.5, 1.0 });
 		}
+
+		std::string GetName() override
+		{
+			return "Editor Tab";
+		}
 	};
 }

@@ -8,14 +8,14 @@ namespace cage
 		Raise(Convert(e));
 	}
 
-	void InputManager::Raise(Event& e)
+	void InputManager::Raise(Event&& e)
 	{
 		m_dispatcher.Notify(e);
 	}
 
 	Event InputManager::Convert(SDL_Event& e)
 	{
-		Event event = KeyDownEvent(65);
+		Event event = KeyDownEvent(65, false);
 
 		// click, motion, down, up, wheel
 		switch (e.type)
@@ -52,10 +52,18 @@ namespace cage
 			break;
 		}
 		case SDL_KEYDOWN:
-			event.emplace<KeyDownEvent>(e.key.keysym.sym);
+			event.emplace<KeyDownEvent>(e.key.keysym.sym, e.key.repeat);
 			break;
 		case SDL_KEYUP:
 			break;
+		case SDL_WINDOWEVENT:
+		{
+			if (e.window.event == SDL_WINDOWEVENT_RESIZED)
+			{
+				event.emplace<WindowEvent>(WindowEvent::Type::RESIZE, e.window.data1, e.window.data2);
+			}
+			break;
+		}
 		}
 
 		return event;

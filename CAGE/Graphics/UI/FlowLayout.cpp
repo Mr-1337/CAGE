@@ -23,6 +23,13 @@ namespace cage
 
 		}
 
+
+		std::string FlowLayout::GetName()
+		{
+			return "Flow";
+		}
+
+
 		void FlowLayout::Update()
 		{
 			if (m_orientation == Orientation::HORIZONTAL)
@@ -47,7 +54,7 @@ namespace cage
 			}
 			else
 			{
-				glm::vec2 pos = { 0.f, 0.f };
+				glm::vec2 pos = { 0.f, m_padding.y };
 
 				float maxWidth = 0.f;
 

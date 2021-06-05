@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../CAGE/Core/GameState.hpp"
 #include "../World.hpp"
 

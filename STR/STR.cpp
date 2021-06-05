@@ -5,15 +5,9 @@
 #include "STR.hpp"
 #include "Perlin.hpp"
 
-STR::STR(int argc, char** argv) : 
-	Game("ShrekTech Racing", argc, argv)
-{
-	auto size = m_window->GetSize();
-	glViewport(0, 0, size.first, size.second);
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	
+STR::STR() : 
+	Game("ShrekTech Racing")
+{	
 	//glClearColor(0.8f, 0.5f, 0.1f, 1.0f);
 
 
@@ -24,7 +18,16 @@ STR::~STR()
 
 }
 
-void STR::handleCMDArgs(int argc, char** argv)
+void STR::Init()
+{
+	auto size = m_window->GetSize();
+	glViewport(0, 0, size.first, size.second);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+}
+
+void STR::HandleCMDArgs(int argc, char** argv)
 {
 
 }

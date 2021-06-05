@@ -9,8 +9,11 @@ project ("CAGE"
 		LANGUAGES C CXX
 		)
 
-include_directories ("include")
-link_directories ("lib")
+include_directories ("include" "CAGE")
+link_directories ("lib" "lib/SDL2" "lib/Steam")
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Include sub-projects.
 add_subdirectory ("CAGE")

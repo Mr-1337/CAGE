@@ -46,7 +46,7 @@ namespace cage
 		CheckBox::CheckBox(TextureManager& texManager, const std::string& label, const Font& font)
 			: LayoutGroup(new FlowLayout()), m_label(label)
 		{
-			SetVisible(false);
+			//SetVisible(false);
 
 			auto text = std::make_shared<Text>(font);
 			text->SetText(label);

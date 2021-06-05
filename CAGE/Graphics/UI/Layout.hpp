@@ -1,6 +1,7 @@
 #pragma once
 
 #include <GLM/glm/glm.hpp>
+#include <string>
 
 namespace cage
 {
@@ -20,6 +21,8 @@ namespace cage
 				m_container = container;
 			}
 			virtual void Update() = 0;
+
+			virtual std::string GetName() = 0;
 		protected:
 			LayoutGroup* m_container;
 		private:

@@ -4,6 +4,7 @@
 #include <memory>
 #include <array>
 #include "../../CAGE/IO/Networking/ServerConnection.hpp"
+
 class Lobby;
 class Gameplay;
 

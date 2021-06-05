@@ -87,13 +87,21 @@ set(SRC_FILES
 	"Graphics/ShaderProgram/SkyboxShader.hpp" 
 	"Graphics/UI/ScrollPanel.hpp" 
 	"Graphics/UI/Dragable.hpp"
+	"Graphics/UI/Clickable.hpp"
 	"Graphics/UI/TextField.hpp" 
 	"IO/Networking/Connection.hpp" 
 	"IO/Networking/ClientConnection.hpp" 
 	"IO/Networking/ServerConnection.hpp" 
 	"IO/Networking/Packets.hpp" 
 	"Graphics/UI/Transforms.hpp" 
-	"Graphics/UI/Transforms.cpp" )
+	"Graphics/UI/Transforms.cpp" 
+	"Graphics/UI/DebugVisualizer.hpp" 
+	"Graphics/UI/DebugVisualizer.cpp" "Graphics/UI/ListLayout.hpp" "Graphics/UI/ListLayout.cpp" "IO/Events/WindowEvents.hpp" "Util/Timer.hpp" "Util/Timer.cpp")
+
+set (CMAKE_CXX_EXTENSIONS OFF)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Add source to this project's library.
 add_library (CAGE STATIC ${SRC_FILES})

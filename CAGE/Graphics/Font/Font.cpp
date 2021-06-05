@@ -15,7 +15,6 @@ namespace cage
 	std::shared_ptr<cage::Texture> Font::Render(const std::string& text, SDL_Color color) const
 	{
 		return std::make_shared<cage::Texture>(TTF_RenderUTF8_Blended(m_font, text.c_str(), color));
-
 	}
 
 

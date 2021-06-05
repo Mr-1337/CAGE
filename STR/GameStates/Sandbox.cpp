@@ -105,7 +105,6 @@ Sandbox::Sandbox(cage::Game& game, std::pair<int, int> size) :
 	camera->SetProjection(glm::perspective(glm::quarter_pi<float>(), (float)size.first / size.second, 0.1f, 5000.f));
 	camera->SetPosition({ 0.f, 1.f, 0.f });
 
-	cage::Texture::MissingTexture = new cage::Texture(IMG_Load("Assets/missing.png"));
 	m_speedometer = std::make_shared<cage::ui::UIElement>();
 	m_speedometer->LoadTexture(IMG_Load("Assets/speed.png"));
 

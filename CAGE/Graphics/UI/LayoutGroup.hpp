@@ -15,11 +15,13 @@ namespace cage
 			void Add(Child element) override;
 			void Remove(Child element) override;
 			void AddAbsolute(Child element);
-			void Update();
+			virtual void Update();
 			void Compress();
 
+			std::string GetName() override;
+
 			std::vector<Child> GetLayoutChildren();
-		private:
+		protected:
 			Layout* m_layout;
 			std::vector<Child> m_layoutChildren;
 		};

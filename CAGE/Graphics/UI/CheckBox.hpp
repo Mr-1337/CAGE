@@ -18,6 +18,11 @@ namespace cage
 
 				bool Checked();
 
+				inline std::string GetName() override
+				{
+					return "Checkbox Button";
+				}
+
 			private:
 
 				bool m_selected;
@@ -35,6 +40,11 @@ namespace cage
 			bool Checked();
 
 			bool HandleEvent(Event& e) override;
+
+			inline std::string GetName() override
+			{
+				return "Checkbox";
+			}
 
 		private:
 			std::shared_ptr<CheckBoxButton> m_button;

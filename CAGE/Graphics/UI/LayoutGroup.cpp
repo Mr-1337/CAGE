@@ -11,6 +11,11 @@ namespace cage
 			m_layout->SetContainer(this);
 		}
 
+		std::string LayoutGroup::GetName()
+		{
+			return "Layout Group (" + m_layout->GetName() + ")";
+		}
+
 		LayoutGroup::~LayoutGroup()
 		{
 			delete m_layout;

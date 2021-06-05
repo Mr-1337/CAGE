@@ -14,7 +14,11 @@ namespace ub
 
 		void SetWorld(World* world);
 		void Start();
+		void Enqueue(ScriptAction* action);
 		void Update(float dt);
+
+		inline bool Empty() { return m_actionQueue.empty(); }
+
 	private:
 		std::queue<ScriptAction*> m_actionQueue;
 		World* m_world;

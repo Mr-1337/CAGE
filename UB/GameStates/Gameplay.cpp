@@ -14,7 +14,7 @@ namespace ub
 
 	Gameplay::~Gameplay()
 	{
-		std::cout << "\n\n\n\nDeleting the world\n\n\n\n";
+		std::cout << "Deleting the world\n";
 		delete m_world;
 	}
 
@@ -23,7 +23,7 @@ namespace ub
 		SDL_Event e;
 		while (SDL_PollEvent(&e))
 		{
-			m_world->HandleEvents(e);
+			m_world->HandleEvents(m_input.Convert(e));
 			switch (e.type)
 			{
 			case SDL_QUIT:
@@ -39,7 +39,7 @@ namespace ub
 				}
 				break;
 			case SDL_KEYDOWN:
-				if (e.key.keysym.sym == SDLK_RETURN)
+				if (e.key.keysym.sym == SDLK_ESCAPE)
 				{
 					quit();
 				}

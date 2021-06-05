@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../../CAGE/Core/GameState.hpp"
 #include "../../CAGE/Graphics/UI/UIElement.hpp"
 #include "../../CAGE/Graphics/UI/Button.hpp"
@@ -6,6 +8,7 @@
 #include "../UI/TilePanel.hpp"
 #include "../UI/StructurePanel.hpp"
 #include "../UI/ScriptPanel.hpp"
+#include <Graphics/UI/DebugVisualizer.hpp>
 
 
 namespace ub
@@ -30,8 +33,11 @@ namespace ub
 		std::shared_ptr<cage::ui::LayoutGroup> m_tabBar, m_bottomPanel, m_rightPanel;
 		std::shared_ptr<cage::ui::Button> m_play, m_pause, m_stop, m_hand, m_file, m_pencil;
 		std::shared_ptr<TilePanel> m_tilePanel;
-		std::shared_ptr<cage::ui::UIElement> m_tileHighlight;
+		std::shared_ptr<cage::ui::UIElement> m_tileHighlight, m_gameRoot;
+		std::shared_ptr<cage::ui::DebugVisualizer> m_debugVisualizer;
 		std::shared_ptr<cage::ui::CheckBox> m_gridToggle;
+
+		cage::Font m_font;
 
 		class Tool
 		{

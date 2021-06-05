@@ -1,7 +1,5 @@
 #pragma once
 
-#include <SDL2/SDL_mixer.h>
-#include <GLM/glm/glm.hpp>
 #include "Sound.hpp"
 
 namespace cage

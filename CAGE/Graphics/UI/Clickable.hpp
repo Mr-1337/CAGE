@@ -17,6 +17,8 @@ namespace cage
 
 			bool HandleEvent(Event& e) override
 			{
+				if (UIElement::HandleEvent(e))
+					return true;
 				if (Hoverable::HandleEvent(e))
 					return true;
 				if (auto ce = std::get_if<MouseClickEvent>(&e))

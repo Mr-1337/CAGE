@@ -17,6 +17,11 @@ namespace cage
 				m_clickStart = false;
 			}
 
+			inline std::string GetName() override
+			{
+				return "Button";
+			}
+
 			std::function<void(void)> OnClick;
 
 		protected:

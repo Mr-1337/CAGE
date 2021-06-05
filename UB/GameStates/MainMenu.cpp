@@ -1,10 +1,7 @@
 #include <SDL2/SDL_image.h>
 #include <GLM/glm/gtc/matrix_transform.hpp>
-#include "../CAGE/Core/StateMachine.hpp"
 #include "../CAGE/Core/Platform.hpp"
 #include "../CAGE/Core/Game.hpp"
-#include "../CAGE/Graphics/UI/GridLayout.hpp"
-#include "../CAGE/Graphics/UI/TextField.hpp"
 #include "MainMenu.hpp"
 #include "Gameplay.hpp"
 #include "Editor.hpp"
@@ -36,15 +33,13 @@ namespace ub
 		m_shader->Projection->ForwardToShader();
 
 		cage::ui::UIElement::shader = m_shader;
+		Entity::s_Game = &getGame();
+		DialogueBox::s_Font = new cage::Font("Assets/Fonts/consola.ttf", 20);
+		DialogueBox::s_AudioEngine = &getGame().GetPlaybackEngine();
 
 		m_selector = std::make_shared<cage::ui::UIElement>();
 
-		m_root.SetLocalMounting(cage::ui::MountPoint::CENTER);
-		m_root.Resize({ (float)winSize.first, (float)winSize.second });
-		m_root.MoveTo({ (float)winSize.first / 2, (float)winSize.second / 2 });
-
-		
-		std::cout << cage::platform::GetUsername() << std::endl;
+		m_root.SetLocalMounting(cage::ui::MountPoint::TOP_LEFT);
 
 		auto& playbackEngine = getGame().GetPlaybackEngine();
 		auto& soundManager = getGame().GetSoundManager();
@@ -73,7 +68,6 @@ namespace ub
 				auto texture = m_font.Render(names[i], color);
 				m_buttons[i] = std::make_shared<cage::ui::Button>(texture, std::nullopt, std::nullopt);
 				buttonGroup->Add(m_buttons[i]);
-				m_input.Subscribe(m_buttons[i].get());
 				m_buttons[i]->OnClick = callbacks[i];
 				m_buttons[i]->OnHover = [i, this]() { updateSelector(i); };
 			}
@@ -82,11 +76,8 @@ namespace ub
 			m_selector->SetActiveTexture(m_font.Render(">", color));
 			m_selector->SetParentMounting(cage::ui::MountPoint::TOP_LEFT);
 			m_selector->SetLocalMounting(cage::ui::MountPoint::CENTER_RIGHT);
+			m_input.Subscribe(&m_root);
 
-
-			auto tf = std::make_shared<cage::ui::TextField>(m_font);
-			m_root.Add(tf);
-			m_input.Subscribe(tf.get());
 		}
 
 
@@ -94,7 +85,8 @@ namespace ub
 		glViewport(0, 0, winSize.first, winSize.second);
 
 		updateSelector(0);
-
+		//m_debug = std::make_shared<cage::ui::DebugVisualizer>(&m_root);
+		//m_root.Add(m_debug);
 	}
 
 	MainMenu::~MainMenu()
@@ -112,7 +104,6 @@ namespace ub
 		glViewport(0, 0, size.first, size.second);
 
 		m_root.Resize({ (float)size.first, (float)size.second });
-		m_root.MoveTo({ (float)size.first / 2, (float)size.second / 2 });
 
 		cage::ui::UIElement::shader = m_shader;
 
@@ -141,7 +132,6 @@ namespace ub
 					auto size = std::make_pair(event.window.data1, event.window.data2);
 					glViewport(0, 0, size.first, size.second);
 					m_root.Resize({ (float)size.first, (float)size.second });
-					m_root.MoveTo({ (float)size.first / 2, (float)size.second / 2 });
 
 					m_shader->Projection->value = glm::ortho(0.f, (float)size.first, (float)size.second, 0.f);
 					m_shader->Projection->ForwardToShader();

@@ -1,10 +1,12 @@
+#pragma once
+
 #include "UIElement.hpp"
 #include "LayoutGroup.hpp"
 #include "FlowLayout.hpp"
 #include "Button.hpp"
 #include "Dragable.hpp"
+#include "Transforms.hpp"
 
-#pragma once
 
 namespace cage
 {
@@ -13,6 +15,7 @@ namespace cage
 		class ScrollPanel : public LayoutGroup
 		{
 
+			// The content of the panel
 			class ContentPane : public UIElement
 			{
 			public:
@@ -23,8 +26,14 @@ namespace cage
 					child->SetParentMounting(MountPoint::TOP);
 					UIElement::Add(child);
 				}
+
+				std::string GetName() override
+				{
+					return "Scroll Content Pane";
+				}
 			};
 
+			// The entire scroll bar, not just the nested box
 			class ScrollBar : public Clickable
 			{
 			public:
@@ -44,12 +53,15 @@ namespace cage
 						dst.y = std::min(dst.y, GetSize().y - m_bar->GetSize().y);
 						dst.y = std::max(dst.y, 0.f);
 
+						m_targetPos = dst;
 						m_bar->MoveTo(dst);
 					};
 
 					Add(m_bar);
+					m_targetPos = m_bar->GetPosition();
 				}
 				std::shared_ptr<Dragable> m_bar;
+				glm::vec2 m_targetPos;
 
 				bool HandleEvent(Event& e) override
 				{
@@ -58,6 +70,11 @@ namespace cage
 					if (Clickable::HandleEvent(e))
 						return true;
 					return false;
+				}
+
+				std::string GetName() override
+				{
+					return "Scrollbar";
 				}
 
 			private:
@@ -75,7 +92,8 @@ namespace cage
 						mouse.y = std::min(mouse.y, GetSize().y - m_bar->GetSize().y);
 						mouse.y = std::max(mouse.y, 0.f);
 
-						m_bar->MoveTo({ mouse.x, mouse.y });
+						m_targetPos = mouse;
+						m_bar->ScheduleTransform(std::make_unique<transforms::MoveTo>(m_targetPos, 0, 0.2, transforms::Interpolation::CUBIC));
 						return true;
 					}
 					return false;
@@ -90,6 +108,11 @@ namespace cage
 		public:
 
 			const int k_width = 20;
+
+			std::string GetName() override
+			{
+				return "Scroll Panel";
+			}
 
 			ScrollPanel(glm::vec2 size) : 
 				LayoutGroup(new FlowLayout()),
@@ -149,11 +172,13 @@ namespace cage
 					{
 						int scroll = se->amount;
 
-						glm::vec2 newPos = m_bar->GetPosition() - glm::vec2{ 0.0f, 50.0f * scroll };
+						glm::vec2 newPos = m_scrollBar->m_targetPos - glm::vec2{ 0.0f, 50.0f * scroll };
 						newPos.y = std::min(newPos.y, m_scrollPanelHeight - m_bar->GetSize().y);
 						newPos.y = std::max(0.f, newPos.y);
 
-						m_bar->MoveTo(newPos);
+						m_scrollBar->m_targetPos = newPos;
+						m_bar->HaltCurrentTransform();
+						m_bar->ScheduleTransform(std::make_unique<transforms::MoveTo>(newPos, 0, 0.2, transforms::Interpolation::CUBIC));
 						updateContentPos();
 
 						return true;
@@ -172,19 +197,22 @@ namespace cage
 			void onTransform() override
 			{
 				m_scrollPanelHeight = GetScaledSize().y;
+				//m_contentPane->Resize(GetSize());
+				//m_scrollBar->Resize({ k_width, GetSize().y });;
 			}
 
 		private:
 
 			void updateContentPos()
 			{
-				m_scrollProgress = m_bar->GetPosition().y / (m_scrollPanelHeight - m_bar->GetSize().y);
+				m_scrollProgress = m_scrollBar->m_targetPos.y / (m_scrollPanelHeight - m_bar->GetSize().y);
 				if (std::isnan(m_scrollProgress))
 					m_scrollProgress = 0.0;
 				glm::vec2 pos = { 0.f, -m_content->GetScaledSize().y + m_scrollPanelHeight };
 				pos *= m_scrollProgress;
 
-				m_content->MoveTo(pos);
+				m_content->HaltCurrentTransform();
+				m_content->ScheduleTransform(std::make_unique<transforms::MoveTo>(pos, 0, 0.2, transforms::Interpolation::CUBIC));
 			}
 
 			std::shared_ptr<ScrollBar> m_scrollBar;

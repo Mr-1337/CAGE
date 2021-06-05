@@ -43,11 +43,13 @@
 class Shrektris : public cage::Game
 {
 public:
-	Shrektris(int argc, char** argv);
+	Shrektris();
+	void HandleCMDArgs(int argc, char** argv) override { std::cout << "SHREK TECH\n\n\n\n"; }
+	void Init() override;
 	void Run() override;
+	bool vrMode;
 private:
 
-	void handleCMDArgs(int argc, char** argv) override {}
 
 
 	bool m_running;

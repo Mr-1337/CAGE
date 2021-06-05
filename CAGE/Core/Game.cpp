@@ -8,6 +8,7 @@
 
 #include "Game.hpp"
 #include "Platform.hpp"
+#include "Graphics/UI/UIElement.hpp"
 
 static void GLAPIENTRY
 MessageCallback(GLenum source,
@@ -72,53 +73,50 @@ MessageCallback(GLenum source,
 
 namespace cage
 {
-	Game::Game(const char* title, int argc, char** argv) :
-		m_language("en-US")
+	Game::Game(const char* title) :
+		m_language("en-US"),
+		m_title(title),
+		m_rng(1337)
 	{
-		try
-		{
+		
+	}
 
-			//handleCMDArgs(argc, argv);
+	void Game::HandleCMDArgs(int argc, char** argv)
+	{
 
-			std::vector<std::string> names;
-			names = {
-				"Considerably Average Game Engine",
-				"Consistently Awful Game Engine",
-				"Categorically Atrocious Game Engine",
-				"Choose Another Game Engine",
-				"Confusingly Atypical Game Engine",
-				"Contentious Architecture Game Engine",
-				"Conceptually Abysmal Game Engine",
-				"Cordially Advertised Game Engine",
-				"Completely Antithetical Game Engine",
-				"Criminal Authored Game Engine",
-				"Consistently Avoided Game Engine",
-				"Crimes Against Game Engines",
-				"Creatively Aimless Game Engine",
-				"Conventionally Astray Game Engine",
-				"Clumsily Adapted Game Engine",
-				"Computer Antagonizing Game Engine",
-				"Carelessly Authored Game Engine"
-			};
+	}
 
-			initSDL();
+	void Game::EngineInit()
+	{
 
-			m_window = std::make_unique<Window>(title, 1024, 720);
-			gladLoadGLLoader(SDL_GL_GetProcAddress);
+		std::vector<std::string> names;
+		names = {
+			"Considerably Average Game Engine",
+			"Consistently Awful Game Engine",
+			"Categorically Atrocious Game Engine",
+			"Choose Another Game Engine",
+			"Confusingly Atypical Game Engine",
+			"Contentious Architecture Game Engine",
+			"Conceptually Abysmal Game Engine",
+			"Cordially Advertised Game Engine",
+			"Completely Antithetical Game Engine",
+			"Criminal Authored Game Engine",
+			"Consistently Avoided Game Engine",
+			"Crimes Against Game Engines",
+			"Creatively Aimless Game Engine",
+			"Conventionally Astray Game Engine",
+			"Clumsily Adapted Game Engine",
+			"Computer Antagonizing Game Engine",
+			"Carelessly Authored Game Engine"
+		};
 
-			printf("Vendor:   %s\n", glGetString(GL_VENDOR));
-			printf("Renderer: %s\n", glGetString(GL_RENDERER));
-			printf("Version:  %s\n", glGetString(GL_VERSION));
-			glEnable(GL_DEBUG_OUTPUT);
-			glDebugMessageCallback(MessageCallback, 0);
+		initSDL();
+		m_window = std::make_unique<Window>(m_title.c_str(), 1024, 720);
+		initGL();
 
-			platform::Init();
-
-		}
-		catch (const std::exception& e)
-		{
-			std::cout << e.what() << std::endl;
-		}
+		platform::Init();
+		cage::Texture::s_MissingTexture = new cage::Texture(IMG_Load("Assets/Textures/missing.png"));
+		cage::ui::UIElement::s_DefaultFont = new cage::Font("Assets/Fonts/consola.ttf", 18);
 	}
 
 	Game::~Game()
@@ -149,6 +147,22 @@ namespace cage
 	audio::PlaybackEngine& Game::GetPlaybackEngine()
 	{
 		return m_playbackEngine;
+	}
+
+	std::mt19937& Game::GetRNG()
+	{
+		return m_rng;
+	}
+
+	void Game::initGL()
+	{
+		gladLoadGLLoader(SDL_GL_GetProcAddress);
+
+		printf("Vendor:   %s\n", glGetString(GL_VENDOR));
+		printf("Renderer: %s\n", glGetString(GL_RENDERER));
+		printf("Version:  %s\n", glGetString(GL_VERSION));
+		glEnable(GL_DEBUG_OUTPUT);
+		glDebugMessageCallback(MessageCallback, 0);
 	}
 
 	void Game::initSDL()

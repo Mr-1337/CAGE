@@ -26,11 +26,6 @@ UITest::UITest(cage::Game& game, std::pair<int, int> size) : cage::GameState(gam
 
 	cage::ui::UIElement::shader = m_spriteShader;
 
-	//b1 = std::make_shared<cage::ui::Button>(std::make_shared<cage::Texture>(IMG_Load("Assets/simon.png")), std::make_shared<cage::Texture>(IMG_Load("Assets/simon2.png")), std::make_shared<cage::Texture>(IMG_Load("Assets/ms.png")));
-	//b2 = std::make_shared<cage::ui::Button>(std::make_shared<cage::Texture>(IMG_Load("Assets/simon.png")), std::make_shared<cage::Texture>(IMG_Load("Assets/simon2.png")), std::make_shared<cage::Texture>(IMG_Load("Assets/ms.png")));
-	//b3 = std::make_shared<cage::ui::Button>(std::make_shared<cage::Texture>(IMG_Load("Assets/simon.png")), std::make_shared<cage::Texture>(IMG_Load("Assets/simon2.png")), std::make_shared<cage::Texture>(IMG_Load("Assets/ms.png")));
-	//b4 = std::make_shared<cage::ui::Button>(std::make_shared<cage::Texture>(IMG_Load("Assets/simon.png")), std::make_shared<cage::Texture>(IMG_Load("Assets/simon2.png")), std::make_shared<cage::Texture>(IMG_Load("Assets/ms.png")));
-
 	b1 = std::make_shared<MenuButton>("1");
 	b2 = std::make_shared<MenuButton>("2");
 	b3 = std::make_shared<MenuButton>("3");
@@ -43,7 +38,7 @@ UITest::UITest(cage::Game& game, std::pair<int, int> size) : cage::GameState(gam
 	c3 = std::make_shared<cage::ui::CheckBox>(getGame().GetTextureManager(), "Frog", font);
 
 	message = std::make_shared<cage::ui::Text>(font);
-	message->SetColor({ 0, 0, 1.0, 1.0 });
+	message->SetColor({ 0, 0, 1.0, 0.9 });
 	message->SetText("Still waiting...");
 
 	//b4->MoveTo({ 300, 300 });
@@ -92,9 +87,12 @@ UITest::UITest(cage::Game& game, std::pair<int, int> size) : cage::GameState(gam
 	b3->OnClick = [this]() { Mix_PlayChannel(1, s3, 0); };
 	b4->OnClick = [this]() { Mix_PlayChannel(1, s4, 0); };
 
+
 	m_root.Resize({ size.first, size.second });
 	m_root.MoveTo({ size.first / 2, size.second / 2 });
 
+	m_debug = std::make_shared<cage::ui::DebugVisualizer>(&m_root);
+	m_root.Add(m_debug);
 }
 
 void UITest::ProcessEvents()
@@ -132,7 +130,9 @@ void UITest::ProcessEvents()
 			}
 			break;
 		default:
-			m_input.Raise(e);
+			//m_input.Raise(e);
+			auto ev = m_input.Convert(e);
+			m_root.HandleEvent(ev);
 		}
 	}
 }
@@ -173,6 +173,7 @@ void UITest::Update(float dt)
 	}
 
 	message->MoveTo(total);
+	m_root.Update(dt);
 
 }
 

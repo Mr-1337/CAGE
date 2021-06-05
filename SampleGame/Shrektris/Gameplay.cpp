@@ -4,6 +4,7 @@
 #include "../CAGE/Core/StateMachine.hpp"
 #include "../CAGE/Core/Game.hpp"
 #include "../Perlin.hpp"
+#include "Shrektris.hpp"
 
 Gameplay::Gameplay(cage::Game& game, cage::networking::packets::GameStart start, std::unique_ptr<Client> client) : Gameplay(game, start.boardW, start.boardH, CLIENT)
 {
@@ -28,7 +29,7 @@ Gameplay::Gameplay(cage::Game& game, int w, int h, Mode mode) :
 	BOARD_WIDTH(w),
 	BOARD_HEIGHT(h),
 	m_mode(mode),
-	m_vrMode(false),
+	m_vrMode(((Shrektris&)game).vrMode),
 	m_spin(false),
 	skybox(std::filesystem::current_path().append("Assets/skybox"))
 {
@@ -254,7 +255,7 @@ void Gameplay::ProcessEvents()
 			}
 			else if (e.key.keysym.scancode == SDL_SCANCODE_G && e.key.repeat == false)
 			{
-				memset(board, 0, sizeof(board));
+				memset(board, 0, sizeof(char) * BOARD_WIDTH * BOARD_HEIGHT);
 			}
 			else if (e.key.keysym.scancode == SDL_SCANCODE_A)
 			{
@@ -390,7 +391,7 @@ void Gameplay::logic()
 			//Clear any rows we should
 
 			int breakTotal = 0;
-			for (size_t i = BOARD_HEIGHT - 1; i > 0; i--)
+			for (int i = BOARD_HEIGHT - 1; i > 0; i--)
 			{
 
 				int yesCount = 0;
@@ -558,8 +559,6 @@ void Gameplay::Update(float delta)
 		}
 	}
 
-	position += velocity * delta;
-
 	// vr input and events
 
 	
@@ -647,7 +646,9 @@ void Gameplay::Update(float delta)
 			velocity = glm::vec4(velocity, 0.0) * hmdPose;
 			velocity.y = 0;
 		}
-	} 
+	}
+
+	position += velocity * delta;
 }
 
 void Gameplay::drawGrid()

@@ -30,16 +30,17 @@ namespace ub
 		m_actionQueue = std::queue<ScriptAction*>();
 		m_actionQueue.push(new StartAction(m_world));
 
-		m_actionQueue.push(new EntMoveAction(m_world, { 0.f, 0.f }, { 300.f, 300.f }, 3.0f));
-		m_actionQueue.push(new EntMoveAction(m_world, { 300.f, 300.f }, { 0.f, 600.f }, 3.0f));
-		m_actionQueue.push(new EntMoveAction(m_world, { 0.f, 600.f }, { -300.f, 300.f }, 3.0f));
-		m_actionQueue.push(new EntMoveAction(m_world, { -300.f, 300.f }, { 0.f, 0.f }, 3.0f));
-		m_actionQueue.push(new SoundAction(m_world, "mouth.wav"));
+		m_actionQueue.push(new EntMoveAction(m_world, { 0.f, 0.f }, { 300.f, 300.f }, 1.0f));
+		m_actionQueue.push(new EntMoveAction(m_world, { 300.f, 300.f }, { 0.f, 600.f }, 1.0f));
+		m_actionQueue.push(new EntMoveAction(m_world, { 0.f, 600.f }, { -300.f, 300.f }, 1.0f));
+		m_actionQueue.push(new EntMoveAction(m_world, { -300.f, 300.f }, { 0.f, 0.f }, 1.0f));
+	}
 
-		m_actionQueue.push(new EntMoveAction(m_world, { 0.f, 0.f }, { 30.f, 30.f }, 30.0f));
-		m_actionQueue.push(new EntMoveAction(m_world, { 30.f, 30.f }, { 0.f, 60.f }, 30.0f));
-		m_actionQueue.push(new EntMoveAction(m_world, { 0.f, 60.f }, { -30.f, 30.f }, 30.0f));
-		m_actionQueue.push(new EntMoveAction(m_world, { -30.f, 30.f }, { 0.f, 0.f }, 30.0f));
+	void ScriptManager::Enqueue(ScriptAction* action)
+	{
+		if (m_actionQueue.empty())
+			m_actionQueue.push(new StartAction(m_world));
+		m_actionQueue.push(action);
 	}
 
 	void ScriptManager::Update(float dt)

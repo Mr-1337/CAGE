@@ -10,6 +10,11 @@ namespace cage
 		{
 		}
 
+		std::string GridLayout::GetName()
+		{
+			return "Grid";
+		}
+
 		void GridLayout::Update()
 		{
 			glm::vec2 maxSize = { 0.f, 0.f };

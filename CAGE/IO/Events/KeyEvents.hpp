@@ -8,7 +8,8 @@ namespace cage
 	{
 	public:
 		const int keyCode;
-		KeyDownEvent(int keyCode) : keyCode(keyCode)
+		bool repeat;
+		KeyDownEvent(int keyCode, bool repeat) : keyCode(keyCode), repeat(repeat)
 		{
 
 		}

@@ -1,10 +1,11 @@
 #include <iostream>
 #include "STR.hpp"
 
+#include <CAGE.hpp>
+
 int main(int argc, char** argv)
 {
-	STR game(argc, argv);
-	game.Run();
+	cage::PlayGame<STR>(argc, argv);
 	std::cout << "It's not ogre, it's never ogre" << std::endl;
 
 	return 0;

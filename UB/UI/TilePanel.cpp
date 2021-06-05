@@ -21,7 +21,7 @@ namespace ub
 		m_selectionHighlight->SetColor({ 0.0f, 1.f, 0.f, 0.5f });
 
 		m_tileAtlas = IMG_Load("Assets/Textures/UBatlas.png");
-		for (std::uint8_t i = 0; i < static_cast<std::uint8_t>(128); i++)
+		for (std::uint8_t i = 0; i < static_cast<std::uint8_t>(48); i++)
 		{
 			makeTileButton(static_cast<World::Tile>(i % 0x2f));
 		}

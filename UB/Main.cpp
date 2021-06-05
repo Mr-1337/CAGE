@@ -1,13 +1,11 @@
 // This is where the madness starts
 
-
 #include "UB.hpp"
 
 // Entry Point
 int main(int argc, char** argv)
 {
-    ub::UndefinedBehavior game(argc, argv);
-    game.Run();
+    cage::PlayGame<ub::UndefinedBehavior>(argc, argv);
 
     // The Return
 	return 0;

@@ -11,6 +11,7 @@
 #include "../ShaderProgram/SpriteShader.hpp"
 #include "../Textures/Texture.hpp"
 #include "Transforms.hpp"
+#include "../Font/Font.hpp"
 
 namespace cage
 {
@@ -30,10 +31,19 @@ namespace cage
 			BOTTOM_RIGHT
 		};
 
+		enum class Axis : unsigned int
+		{
+			NONE = 0,
+			HORIZONTAL = 1,
+			VERTICAL = 2,
+			BOTH = HORIZONTAL | VERTICAL
+		};
+
 		/*
 		 * A CAGE UIElement is the base of all elements in the UI Scene Graph
 		 * They can either be directly visible or simply represent aggregates of children UIElements
 		 */
+
 
 		class UIElement : public cage::EventListener
 		{
@@ -44,15 +54,18 @@ namespace cage
 
 			MountPoint m_localMount;
 			MountPoint m_parentMount;
+			
+			Axis m_relativeSizeAxes;
+			Axis m_relativePositionAxes;
 
 			UIElement* m_parent;
 			std::vector<Child> m_children;
 
 			glm::mat4 m_totalTransform;
 
-			glm::vec2 m_position;
+			glm::vec2 m_position, m_relativePosition;
 			// Size is the actual dimensions of the raw, untransformed UIElement which does not impact children, Scale is a scale transform that affects children 
-			glm::vec2 m_scale, m_size, m_mountOffset, m_parentMountOffset;
+			glm::vec2 m_scale, m_size, m_relativeSize, m_mountOffset, m_parentMountOffset;
 
 			// The color to render this quad if it is a non textured element
 			glm::vec4 m_color;
@@ -69,6 +82,14 @@ namespace cage
 
 			virtual void LoadTexture(SDL_Surface* surface);
 
+			inline virtual std::string GetName()
+			{
+				if (m_parent == nullptr)
+					return "Root";
+				else
+					return "Unspecified";
+			}
+
 			virtual inline void SetActiveTexture(std::shared_ptr<Texture> texture)
 			{
 				if (texture)
@@ -84,9 +105,19 @@ namespace cage
 				m_color = color;
 			}
 
+			inline bool IsVisible()
+			{
+				return m_visible;
+			}
+
 			inline virtual bool HandleEvent(Event& e)
 			{
-				return false;
+				if (!m_visible)
+					return false;
+				bool handled = false;
+				for (auto c : m_children)
+					handled = c->HandleEvent(e);
+				return handled;
 			}
 
 			virtual void Update(float deltaTime);
@@ -98,6 +129,17 @@ namespace cage
 
 			// Sets what part of the parent element the origin should be placed at
 			inline void SetParentMounting(MountPoint mounting) { m_parentMount = mounting; recalcTransform(); }
+
+			// Sets along which axes this element should be sized relative to its parent (for example with axes set to horizontal and the size set to 0.5, the element would be half the width of the parent)
+			inline void SetRelativeSizeAxes(Axis axes) { m_relativeSizeAxes = axes; }
+
+			// Sets along which axes this element should be positioned relative to its parent (for example with axes set to horizontal and position set to 0.5, this element would be positioned in the center of the parent horizontally)
+			inline void SetRelativePositionAxes(Axis axes) { m_relativePositionAxes = axes; }
+
+			inline MountPoint GetLocalMounting() { return m_localMount; }
+			inline MountPoint GetParentMounting() { return m_parentMount; }
+
+			inline glm::vec2 GetParentMountOffset() { return m_parentMountOffset; }
 
 			// Transform manipulators and accessors
 
@@ -112,13 +154,22 @@ namespace cage
 			inline void Rotate(float angle) { m_rotation += angle; recalcTransform(); }
 			inline void SetRotation(float angle) { m_rotation = angle; recalcTransform(); }
 			inline void SetScale(float scaleFactor) { m_scale = { scaleFactor, scaleFactor }; recalcTransform(); }
+			inline void SetScale(glm::vec2 scale) { m_scale = scale; recalcTransform(); }
 			inline void SetVisible(bool visible) { m_visible = visible; }
 			inline void SetMasking(bool masking) { m_masking = masking; }
 
 			void ScheduleTransform(std::unique_ptr<transforms::Transform> transform);
+			bool HaltCurrentTransform();
 			
 			inline glm::mat4 GetTransform() const { return m_totalTransform; }
-			inline void SetTransform(const glm::mat4&& transform) { m_totalTransform = transform; }
+			inline void SetTransform(const glm::mat4&& transform) 
+			{ 
+				m_totalTransform = transform;
+				for (auto c : m_children)
+				{
+					c->recalcTransform();
+				}
+			}
 
 			std::vector<Child>& GetChildren();
 
@@ -137,12 +188,16 @@ namespace cage
 			virtual ~UIElement() = default;
 
 			static std::shared_ptr<SpriteShader> shader;
+			static Font* s_DefaultFont;
 			
 
 		private:
 
 			static void initSharedData();
 			static bool init;
+
+			bool isHorizontal(Axis axes);
+			bool isVertical(Axis axes);
 
 			bool m_textured;
 			bool m_visible;

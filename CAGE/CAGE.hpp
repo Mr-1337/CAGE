@@ -11,6 +11,9 @@ namespace cage
 	void PlayGame(int argc, char** argv)
 	{
 		T game;
+		game.HandleCMDArgs(argc, argv);
+		game.EngineInit();
+		game.Init();
 		game.Run();
 	}
 }

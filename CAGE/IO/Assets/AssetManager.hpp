@@ -29,17 +29,19 @@ namespace cage
 		{
 			if (m_assetMap.find(name) == m_assetMap.end())
 			{
-				std::cout << k_name << " asset map did not contain resource " << name << ", attempting to load from disk" << std::endl;
+				std::cout << k_name << " asset map did not contain resource " << name << ", attempting to load from disk: ";
 				std::filesystem::path path = k_gameAssetDirectory / getAssetSubdirectory() / name;
 				try
 				{
 					if (!std::filesystem::exists(path))
 						throw std::runtime_error("File " + path.string() + " doesn't exist :(");
-					m_assetMap[name] = loadAssetFromFile(k_gameAssetDirectory / getAssetSubdirectory() / name);
+					m_assetMap[name] = loadAssetFromFile(path);
+					std::cout << "Success!" << std::endl;
 				}
 				catch(std::exception& e)
 				{
 					m_assetMap[name] = nullptr;
+					std::cout << "Failure!" << std::endl;
 					std::cout << e.what() << std::endl;
 				}
 			}

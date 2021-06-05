@@ -1,9 +1,13 @@
 #pragma once
 
+#include <utility>
 #include "WorldShader.hpp"
 #include "../CAGE/Graphics/Models/Mesh.hpp"
 #include "Structure.hpp"
-
+#include "Character.hpp"
+#include "Entity.hpp"
+#include "Player.hpp"
+#include "Battle.hpp"
 
 namespace ub
 {
@@ -18,12 +22,28 @@ namespace ub
 		void Update(float dt);
 		void Draw();
 		void GenWorld();
-		void HandleEvents(SDL_Event e);
+		void HandleEvents(cage::Event&& e);
+
+		std::vector<Entity*> GetEntities();
+
+		auto GetDialogueBox() { return m_dialogue; }
+
+		inline Player* GetPlayer() { return m_player; }
+		inline ScriptManager* GetScriptManager() { return m_scriptManager; }
+
 		void MoveEnt(unsigned int id, glm::vec2 position);
+
 		void SetWinSize(std::pair<int, int> winSize);
+		inline void SetControl(bool control) { m_control = control; }
+
 		void Resize(std::pair<int, int> worldSize);
 		void Move(glm::vec2 position);
 		void Zoom(int dy);
+
+		void StartBattle(Enemy* enemy);
+		inline bool InBattle() { return m_battle != nullptr; }
+
+		inline std::pair<int, int> GetSize() { return m_worldSize; }
 		
 		inline glm::vec2 GetCameraPos() 
 		{ 
@@ -34,7 +54,6 @@ namespace ub
 		inline glm::mat4 GetViewMatrix() { return m_view; }
 		inline float GetZoom() { return m_zoom; }
 		inline void SetGrid(bool grid) { m_drawGrid = grid; }
-
 
 		void Reload();
 
@@ -65,19 +84,28 @@ namespace ub
 		glm::mat4 calcViewMatrix();
 
 		std::shared_ptr<ub::WorldShader> m_worldShader;
-		cage::Mesh<cage::Vertex3UV> m_worldMesh, m_playerMesh, m_uberMesh, m_gridMesh;
+
+		cage::ui::UIElement m_root;
+		std::shared_ptr<DialogueBox> m_dialogue;
+
+		cage::Mesh<cage::Vertex3UV> m_worldMesh, m_gridMesh;
 
 		glm::mat4 m_projection, m_view;
-		glm::vec2 m_cameraPos, m_position, m_pos2, m_velocity;
+		glm::vec2 m_cameraPos, m_pos2, m_velocity;
 		float m_zoom; 
-		bool m_drawGrid, m_dirty;
+		bool m_drawGrid, m_dirty, m_control;
 
 		ScriptManager* m_scriptManager;
+		std::unique_ptr<Battle> m_battle;
 
 		Structure house;
 
+		Player* m_player;
+		Character* m_dev;
+		Enemy* m_enemy;
 		std::vector<Tile> m_tileData;
 		std::vector<Structure> m_structureData;
+		std::vector<Entity*> m_entities;
 		std::vector<cage::Vertex3UV> m_hackBuffer;
 
 		std::pair<int, int> m_winSize, m_worldSize;

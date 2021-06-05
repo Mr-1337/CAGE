@@ -12,6 +12,8 @@ namespace cage
 		public:
 			GridLayout(glm::vec2 padding, int cols);
 			void Update() override;
+
+			std::string GetName() override;
 		};
 	}
 }

@@ -4,7 +4,7 @@
 namespace cage
 {
 
-	Texture* Texture::MissingTexture;
+	Texture* Texture::s_MissingTexture;
 
 	Texture::Texture(SDL_Surface* textureData, bool keepLocalCopy) : 
 		m_textureUnit(0),

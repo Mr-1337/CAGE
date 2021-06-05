@@ -1,6 +1,7 @@
 #pragma once
 
 #include "UIElement.hpp"
+
 #include <optional>
 #include <functional>
 
@@ -12,8 +13,8 @@ namespace cage
 		{
 		public:
 			Hoverable(std::optional<std::shared_ptr<Texture>> idleTexture, std::optional<std::shared_ptr<Texture>> hoverTexture) : 
-				m_hovering(false),
-				m_idleTexture(idleTexture), m_hoverTexture(hoverTexture)
+				m_idleTexture(idleTexture), m_hoverTexture(hoverTexture),
+				m_hovering(false)
 			{
 				m_lastX = 0;
 				m_lastY = 0;

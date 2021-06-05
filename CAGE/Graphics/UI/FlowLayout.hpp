@@ -22,6 +22,10 @@ namespace cage
 			FlowLayout(glm::vec2 padding, bool leftJustify = false);
 			FlowLayout();
 			void Update() override;
+
+
+			std::string GetName() override;
+
 		private:
 			Orientation m_orientation;
 		};

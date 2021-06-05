@@ -8,8 +8,6 @@ ShrekMenu::ShrekMenu(cage::Game& game) : cage::GameState(game)
 {
 	glClearColor(0.3f, 0.5f, 0.2f, 0.0f);
 
-	cage::Texture::MissingTexture = new cage::Texture(IMG_Load("Assets/missing.png"));
-
 	cage::Shader vertex(cage::Shader::ShaderType::VERTEX), fragment(cage::Shader::ShaderType::FRAGMENT);
 	vertex.CompileFromFile("Assets/sprite.vert");
 	fragment.CompileFromFile("Assets/sprite.frag");

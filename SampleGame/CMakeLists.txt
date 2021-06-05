@@ -16,10 +16,16 @@ set(SRC_FILES
 	"Shrektris/Player.hpp" 
 	"Shrektris/Server.hpp" 
 	"Shrektris/Client.hpp" 
-	"MenuButton.cpp" "Shrektris/Server.cpp" "Shrektris/Client.cpp" "Perlin.hpp" "Perlin.cpp")
+	"MenuButton.cpp" 
+	"Shrektris/Server.cpp" 
+	"Shrektris/Client.cpp" 
+	"Perlin.hpp" 
+	"Perlin.cpp")
 
-set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_EXTENSIONS OFF)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable (SampleGame ${SRC_FILES})
 
@@ -36,11 +42,10 @@ add_custom_command(TARGET SampleGame PRE_BUILD
                        ${CMAKE_SOURCE_DIR}/lib/Dlls $<TARGET_FILE_DIR:SampleGame>)
 
 # SDL libraries
-set (SDL_LIBS SDL2/SDL2 SDL2/SDL2main SDL2/SDL2_mixer SDL2/SDL2_image SDL2/SDL2_ttf SDL2/SDL2_net)
+set (SDL_LIBS SDL2 SDL2main SDL2_mixer SDL2_image SDL2_ttf SDL2_net)
 
 # Steam libraries
-
-set (STEAM_LIBS Steam/openvr_api)
+set (STEAM_LIBS openvr_api)
 
 # link against CAGE, SDL and its extensions
 target_link_libraries (SampleGame PUBLIC CAGE ${SDL_LIBS} ${STEAM_LIBS})

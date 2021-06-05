@@ -2,6 +2,7 @@
 
 cmake_minimum_required (VERSION 3.10)
 
+
 set (SRC_FILES
     "Main.cpp"
     "UB.hpp"
@@ -37,10 +38,17 @@ set (SRC_FILES
     "UI/RightPanel.hpp" 
     "UI/EditorPanel.hpp"
     "Structure.cpp"
-    "Structure.hpp")
+    "Structure.hpp"
+    "Character.cpp"
+    "Character.hpp" 
+    "UI/DialogueBox.hpp" 
+    "UI/DialogueBox.cpp" "Entity.hpp" "Entity.cpp" "Player.hpp" "Player.cpp" "Scripting/StartBattleAction.cpp" "Scripting/StartBattleAction.hpp" "Battle.hpp" "Battle.cpp" "Enemy.hpp" "Enemy.cpp" "UI/ProgressBar.hpp" "UI/BattleMenu.hpp" "UI/BattleMenu.cpp")
+    
 
-set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_EXTENSIONS OFF)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable (UB ${SRC_FILES})
 
@@ -58,7 +66,7 @@ add_custom_command(TARGET UB PRE_BUILD
                        ${CMAKE_SOURCE_DIR}/lib/Dlls $<TARGET_FILE_DIR:UB>)
 
 # SDL libraries
-set (SDL_LIBS SDL2/SDL2 SDL2/SDL2main SDL2/SDL2_mixer SDL2/SDL2_image SDL2/SDL2_ttf SDL2/SDL2_net)
+set (SDL_LIBS SDL2 SDL2main SDL2_mixer SDL2_image SDL2_ttf SDL2_net)
 
 # Steam libraries
 set (STEAM_LIBS Steam/phonon Steam/openvr_api)
