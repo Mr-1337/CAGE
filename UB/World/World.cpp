@@ -201,7 +201,7 @@ namespace ub
 		std::vector<cage::Vertex3UV> geometry;
 		geometry.reserve(m_tilemap.GetSize().first * m_tilemap.GetSize().second * 6);
 
-		auto makeLine = [&geometry, this](int x1, int x2, int y1, int y2) -> void
+		auto makeLine = [&geometry, this, TILE_SIZE](int x1, int x2, int y1, int y2) -> void
 		{
 			geometry.emplace_back(static_cast<float>(TILE_SIZE) * glm::vec3{ x1, y1, 0.01 }, glm::vec2{ 0.f, 0.f });
 			geometry.emplace_back(static_cast<float>(TILE_SIZE) * glm::vec3{ x2, y2, 0.01 }, glm::vec2{ 0.f, 0.f });
