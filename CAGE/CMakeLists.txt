@@ -105,12 +105,13 @@ set(SRC_FILES
 	"Util/Timer.hpp" 
 	"Util/Timer.cpp" 
 	"Graphics/Scene/Node.hpp"
-	 "Graphics/Scene/Node.cpp" 
-	 "Graphics/Buffers/IndexBuffer.hpp" 
-	 "Graphics/Animation/Bone.hpp"
-	 "Graphics/Animation/Animation.hpp"
+	"Graphics/Scene/Node.cpp" 
+	"Graphics/Buffers/IndexBuffer.hpp" 
+	"Graphics/Animation/Bone.hpp"
+	"Graphics/Animation/Animation.hpp"
 
-	  "Graphics/Animation/Animation.cpp")
+	"Graphics/Animation/Animation.cpp"
+	"Graphics/UI/DebugVisualizer.cpp" "Graphics/UI/ListLayout.hpp" "Graphics/UI/ListLayout.cpp" "IO/Events/WindowEvents.hpp" "Util/Timer.hpp" "Util/Timer.cpp" "Graphics/Textures/TextureArray.hpp" "Graphics/Textures/TextureArray.cpp")
 
 set (CMAKE_CXX_EXTENSIONS OFF)
 

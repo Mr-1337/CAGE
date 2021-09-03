@@ -4,7 +4,7 @@
 #include "../../CAGE/Graphics/UI/UIElement.hpp"
 #include "../../CAGE/Graphics/UI/Button.hpp"
 #include "../../CAGE/Graphics/UI/CheckBox.hpp"
-#include "../World.hpp"
+#include "../World/World.hpp"
 #include "../UI/TilePanel.hpp"
 #include "../UI/StructurePanel.hpp"
 #include "../UI/ScriptPanel.hpp"
@@ -30,7 +30,7 @@ namespace ub
 	private:
 
 		cage::ui::UIElement m_root;
-		std::shared_ptr<cage::ui::LayoutGroup> m_tabBar, m_bottomPanel, m_rightPanel;
+		std::shared_ptr<cage::ui::LayoutGroup> m_tabBar, m_bottomPanel, m_rightPanel, m_saveDialogue;
 		std::shared_ptr<cage::ui::Button> m_play, m_pause, m_stop, m_hand, m_file, m_pencil;
 		std::shared_ptr<TilePanel> m_tilePanel;
 		std::shared_ptr<cage::ui::UIElement> m_tileHighlight, m_gameRoot;
@@ -84,8 +84,8 @@ namespace ub
 					m_radius = std::max(m_radius, 0);
 					//m_editor->m_tileHighlight->Resize(glm::vec2{ 2 * m_radius + 1, 2 * m_radius + 1 } *static_cast<float>(World::TILE_SIZE));
 
-					m_editor->m_tileHighlight->Resize((float)World::TILE_SIZE * glm::vec2{ (float)2 * m_radius + 1 });
-					m_editor->m_tileHighlight->SetTransform(m_world->GetViewMatrix() * glm::translate(glm::identity<glm::mat4>(), (float)World::TILE_SIZE * glm::vec3{ m_indices, 0 } + glm::vec3{ cage::ui::UIElement::GetMountOffset(cage::ui::MountPoint::TOP_LEFT, glm::vec2{World::TILE_SIZE}, { 1.f, 1.f }), 0.f }));
+					m_editor->m_tileHighlight->Resize((float)Tilemap::TILE_SIZE * glm::vec2{ (float)2 * m_radius + 1 });
+					m_editor->m_tileHighlight->SetTransform(m_world->GetViewMatrix() * glm::translate(glm::identity<glm::mat4>(), (float)Tilemap::TILE_SIZE * glm::vec3{ m_indices, 0 } + glm::vec3{ cage::ui::UIElement::GetMountOffset(cage::ui::MountPoint::TOP_LEFT, glm::vec2{Tilemap::TILE_SIZE}, { 1.f, 1.f }), 0.f }));
 
 				}
 				else if (auto ce = std::get_if<cage::MouseClickEvent>(&e))
@@ -101,8 +101,8 @@ namespace ub
 					m_editor->m_tileHighlight->SetVisible(inViewport({ me->x, me->y }));
 
 					m_indices = m_world->ToTileIndices(me->x, me->y);
-					m_editor->m_tileHighlight->Resize((float)World::TILE_SIZE * glm::vec2{ (float)2 * m_radius + 1 });
-					m_editor->m_tileHighlight->SetTransform(m_world->GetViewMatrix() * glm::translate(glm::identity<glm::mat4>(), (float)World::TILE_SIZE * glm::vec3{ m_indices, 0 } + glm::vec3{ cage::ui::UIElement::GetMountOffset(cage::ui::MountPoint::TOP_LEFT, glm::vec2{World::TILE_SIZE}, { 1.f, 1.f }), 0.f }));
+					m_editor->m_tileHighlight->Resize((float)Tilemap::TILE_SIZE * glm::vec2{ (float)2 * m_radius + 1 });
+					m_editor->m_tileHighlight->SetTransform(m_world->GetViewMatrix() * glm::translate(glm::identity<glm::mat4>(), (float)Tilemap::TILE_SIZE * glm::vec3{ m_indices, 0 } + glm::vec3{ cage::ui::UIElement::GetMountOffset(cage::ui::MountPoint::TOP_LEFT, glm::vec2{Tilemap::TILE_SIZE}, { 1.f, 1.f }), 0.f }));
 				}
 
 				//->m_tileHighlight->SetScale({ m_world->GetZoom() });
@@ -144,6 +144,8 @@ namespace ub
 		Tool* m_currentTool;
 
 		glm::ivec2 m_gameViewport;
+
+		void toggleSaveUI();
 
 		bool m_playback;
 

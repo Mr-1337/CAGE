@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include "../World.hpp"
+#include "../World/World.hpp"
 #include "../../CAGE/Graphics/UI/ScrollPanel.hpp"
 
 namespace ub

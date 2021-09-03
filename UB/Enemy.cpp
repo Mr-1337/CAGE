@@ -1,5 +1,5 @@
 #include "Enemy.hpp"
-#include "World.hpp"
+#include "World/World.hpp"
 #include "Scripting/ScriptManager.hpp"
 #include "Scripting/StartBattleAction.hpp"
 

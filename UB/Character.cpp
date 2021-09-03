@@ -1,12 +1,11 @@
 #include "Character.hpp"
-#include "World.hpp"
+#include "World/World.hpp"
 #include <filesystem>
 
 namespace ub
 {
 	Character::Character(World* world, std::string name) :
-		Entity(world),
-		m_name(name),
+		Entity(world, name),
 		m_dialogueBox(world->GetDialogueBox()),
 		m_hp(10),
 		m_maxHP(10),
@@ -25,7 +24,7 @@ namespace ub
 		loadExpression("shrek");
 		loadExpression("dwight");
 
-		std::filesystem::path file = std::filesystem::path("Characters") / m_name / "speak.ogg";
+		std::filesystem::path file = std::filesystem::path("Characters") / GetName() / "speak.ogg";
 		m_voice = s_Game->GetSoundManager().Get(file.string());
 	}
 
@@ -96,12 +95,12 @@ namespace ub
 	void Character::Say(const std::string& message, const std::string& expression)
 	{
 		m_dialogueBox->SetVisible(true);
-		m_dialogueBox->Say(message, m_expressions[expression], m_voice, m_name);
+		m_dialogueBox->Say(message, m_expressions[expression], m_voice, GetName());
 	}
 
 	void Character::loadExpression(std::string filename)
 	{
-		std::filesystem::path file = std::filesystem::path("Characters") / m_name / filename.append(".png");
+		std::filesystem::path file = std::filesystem::path("Characters") / GetName() / filename.append(".png");
 		filename = filename.substr(0, filename.length() - 4);
 		
 		m_expressions[filename] = s_Game->GetTextureManager().Get(file.string());

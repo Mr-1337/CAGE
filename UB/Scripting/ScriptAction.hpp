@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../World.hpp"
+#include "../World/World.hpp"
 
 namespace ub
 {

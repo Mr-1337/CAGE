@@ -6,24 +6,24 @@ namespace ub
 	TilePanel::TilePanel(World* world) : 
 		EditorPanel({ 200.f, 400.f }, world, "Tiles"),
 		m_tileAtlas(nullptr),
-		m_selection(World::Tile::INVALID)
+		m_selection(Tilemap::Tile::INVALID)
 	{
 
 		m_content = std::make_shared<cage::ui::LayoutGroup>(new cage::ui::GridLayout({ 10.f, 10.f }, 4));
 
-		m_hoverHighlight->Resize({ World::TILE_SIZE, World::TILE_SIZE });
+		m_hoverHighlight->Resize({ Tilemap::TILE_SIZE, Tilemap::TILE_SIZE });
 		m_hoverHighlight->Scale({ 1.2f });
 		m_hoverHighlight->SetColor({ 1.0f, 0.f, 0.f, 0.5f });
 		m_hoverHighlight->SetVisible(false);
 
-		m_selectionHighlight->Resize({ World::TILE_SIZE, World::TILE_SIZE });
+		m_selectionHighlight->Resize({ Tilemap::TILE_SIZE, Tilemap::TILE_SIZE });
 		m_selectionHighlight->Scale({ 1.2f });
 		m_selectionHighlight->SetColor({ 0.0f, 1.f, 0.f, 0.5f });
 
 		m_tileAtlas = IMG_Load("Assets/Textures/UBatlas.png");
 		for (std::uint8_t i = 0; i < static_cast<std::uint8_t>(48); i++)
 		{
-			makeTileButton(static_cast<World::Tile>(i % 0x2f));
+			makeTileButton(static_cast<Tilemap::Tile>(i % 0x2f));
 		}
 		m_content->AddAbsolute(m_hoverHighlight);
 		m_content->AddAbsolute(m_selectionHighlight);
@@ -45,26 +45,26 @@ namespace ub
 		return false;
 	}
 
-	World::Tile TilePanel::GetSelection()
+	Tilemap::Tile TilePanel::GetSelection()
 	{
 		return m_selection;
 	}
 
-	void TilePanel::makeTileButton(World::Tile type)
+	void TilePanel::makeTileButton(Tilemap::Tile type)
 	{
 		std::uint8_t asInt = static_cast<int>(type);
 		int x, y;
 		SDL_Rect src, dst;
 		SDL_Surface* surface;
 		
-		surface = SDL_CreateRGBSurface(0, World::TILE_SIZE, World::TILE_SIZE, 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
-		x = World::TILE_SIZE * (asInt % 16);
-		y = World::TILE_SIZE * (asInt / 16);
+		surface = SDL_CreateRGBSurface(0, Tilemap::TILE_SIZE, Tilemap::TILE_SIZE, 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
+		x = Tilemap::TILE_SIZE * (asInt % 16);
+		y = Tilemap::TILE_SIZE * (asInt / 16);
 
 		src.x = x;
 		src.y = y;
-		src.w = World::TILE_SIZE;
-		src.h = World::TILE_SIZE;
+		src.w = Tilemap::TILE_SIZE;
+		src.h = Tilemap::TILE_SIZE;
 
 		SDL_BlitSurface(m_tileAtlas, &src, surface, nullptr);
 

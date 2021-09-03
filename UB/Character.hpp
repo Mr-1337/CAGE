@@ -37,7 +37,6 @@ namespace ub
 		bool m_dead;
 		void loadExpression(std::string filename);
 		std::map<std::string, std::shared_ptr<cage::Texture>> m_expressions;
-		std::string m_name;
 		std::shared_ptr<cage::audio::Sound> m_voice;
 		std::shared_ptr<DialogueBox> m_dialogueBox;
 

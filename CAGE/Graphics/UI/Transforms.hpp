@@ -12,7 +12,8 @@ namespace cage
 			enum class Interpolation
 			{
 				LINEAR,
-				CUBIC
+				CUBIC,
+				BOUNCE_BACK
 			};
 
 			class Transform
@@ -62,6 +63,15 @@ namespace cage
 				glm::vec2 m_start, m_dst;
 			public:
 				Move(glm::vec2 displacement, float startTime, float endTime, Interpolation interpolation);
+				void Init() override;
+				void Apply() override;
+			};
+
+			class FadeTo : public Transform
+			{
+				glm::vec4 m_start, m_end;
+			public:
+				FadeTo(glm::vec4 endColor, float startTime, float endTime);
 				void Init() override;
 				void Apply() override;
 			};

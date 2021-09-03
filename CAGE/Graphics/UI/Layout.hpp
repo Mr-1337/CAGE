@@ -16,11 +16,15 @@ namespace cage
 		class Layout
 		{
 		public:
+
+			virtual ~Layout() {};
+
 			void SetContainer(LayoutGroup* container)
 			{
 				m_container = container;
 			}
 			virtual void Update() = 0;
+			
 
 			virtual std::string GetName() = 0;
 		protected:

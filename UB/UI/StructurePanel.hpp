@@ -1,7 +1,7 @@
 #pragma once
 
 #include "EditorTab.hpp"
-#include "../World.hpp"
+#include "../World/World.hpp"
 
 namespace ub
 {

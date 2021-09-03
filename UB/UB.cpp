@@ -7,7 +7,7 @@
 namespace ub
 {
 	UndefinedBehavior::UndefinedBehavior() : 
-		cage::Game("Undefined Behavior"), 
+		cage::Game("UB"), 
 		m_running(true)
 	{
 		

@@ -11,10 +11,10 @@ namespace cage
 	namespace uniforms
 	{
 
-		template <class T>
-		class Uniform
-		{
-		public:
+	template <typename T>
+	class Uniform
+	{
+	public:
 
 			inline Uniform(unsigned int program, const std::string& name) : m_location(-1), m_program(program), m_name(name)
 			{

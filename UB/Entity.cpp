@@ -1,16 +1,16 @@
 #include "Entity.hpp"
-#include "World.hpp"
+#include "World/World.hpp"
 
 namespace ub
 {
 
 	cage::Game* Entity::s_Game = nullptr;
 
-	Entity::Entity(World* world) : m_world(world), m_mesh("Entity"), m_collisionEnabled(true), m_interacting(false)
+	Entity::Entity(World* world, const std::string& name) : m_world(world), m_mesh("Entity"), m_collisionEnabled(true), m_interacting(false), m_name(name)
 	{
 		m_size = { 16.0, 16.0 };
 		m_position = { world->GetSize().first / 2, world->GetSize().second / 2 };
-		m_position *= world->TILE_SIZE;
+		m_position *= Tilemap::TILE_SIZE;
 	}
 
 	bool Entity::interacting()
@@ -82,7 +82,7 @@ namespace ub
 		std::vector<cage::Vertex3UV> geometry;
 		geometry.reserve(6);
 
-		float depth = (m_position.y + m_size.y) / (m_world->GetSize().second * m_world->TILE_SIZE);
+		float depth = (m_position.y + m_size.y) / (m_world->GetSize().second * Tilemap::TILE_SIZE);
 
 		depth = glm::min(depth, 1.0f);
 

@@ -1,8 +1,10 @@
 #include <GLM/glm/gtc/matrix_transform.hpp>
+#include <Graphics/UI/TextField.hpp>
 #include "../../CAGE/Core/Game.hpp"
 #include "Editor.hpp"
 #include "../CAGE/Graphics/UI/FlowLayout.hpp"
 #include "../CAGE/Graphics/UI/GridLayout.hpp"
+#include "../World/WorldSerializer.hpp"
 
 namespace ub
 {
@@ -11,9 +13,9 @@ namespace ub
 		m_playback(false),
 		m_currentTool(nullptr),
 		m_world(std::make_unique<World>(std::pair{ 16, 16 })),
-		m_font("Assets/Fonts/consola.ttf", 16)
+		m_font("Assets/Fonts/consola.ttf", 18)
 	{
-		auto size = getGame().GetWindow().GetSize();
+		const auto size = getGame().GetWindow().GetSize();
 
 		auto& lang = getGame().GetLanguage();
 		lang.LoadFile("editor.lang");
@@ -83,22 +85,30 @@ namespace ub
 		selHigh->SetVisible(true);
 		selHigh->SetColor({ 0, 0.5, 0, 0.5 });
 
-		auto select = [this, selHigh](std::shared_ptr<cage::ui::UIElement> button, Tool* tool)
+		auto select = [this, selHigh](std::shared_ptr<cage::ui::UIElement> button)
 		{
 			glm::vec2 pos = button->GetPosition();
 			pos += cage::ui::UIElement::GetMountOffset(cage::ui::MountPoint::CENTER_LEFT, button->GetSize(), button->GetScale());
-			selHigh->MoveTo(pos);
+			selHigh->MoveTo(pos);	
+		};
+
+		auto selectTool = [this, select](std::shared_ptr<cage::ui::UIElement> button, Tool* tool)
+		{
+			select(button);
+			if (!m_currentTool)
+				m_saveDialogue->SetVisible(false);
 			m_currentTool = tool;
 		};
 
-		m_hand->OnClick = [this, select]()	  { select(m_hand, m_handTool.get()); };
-		m_pencil->OnClick = [this, select]() { select(m_pencil, m_pencilTool.get()); };
+		m_hand->OnClick = [this, selectTool]()	  { selectTool(m_hand, m_handTool.get()); };
+		m_pencil->OnClick = [this, selectTool]() { selectTool(m_pencil, m_pencilTool.get()); };
+		m_file->OnClick = [this, select]() { toggleSaveUI(); select(m_file); m_currentTool = nullptr; };
 
 		toolBar->Add(m_pencil);
 		toolBar->Add(m_hand);
 		toolBar->Add(m_file);
 		toolBar->Add(m_gridToggle);
-		select(m_hand, m_handTool.get());
+		selectTool(m_hand, m_handTool.get());
 		toolBar->AddAbsolute(selHigh);
 
 		m_play->OnClick = [this, toolBar]() ->void
@@ -148,6 +158,108 @@ namespace ub
 
 		pbBar->SetColor(fgColor);
 		toolBar->SetColor(fgColor);
+		
+		{
+			using namespace cage::ui;
+			m_saveDialogue = std::make_shared<LayoutGroup>(new FlowLayout({}, FlowLayout::Orientation::VERTICAL, false));
+			m_saveDialogue->SetColor(bgColor);
+
+			auto sdTopbar = std::make_shared<LayoutGroup>(new FlowLayout());
+			//auto sdTopbar = std::make_shared<UIElement>();
+			sdTopbar->SetColor(fgColor);
+			sdTopbar->SetRelativeSizeAxes(Axis::HORIZONTAL);
+			sdTopbar->Resize({ 1.0f, 80.f });
+
+			auto text = std::make_shared<Text>(m_font);
+			text->SetText("Save / Load World");
+			auto textBG = std::make_shared<UIElement>();
+			textBG->SetRelativeSizeAxes(Axis::BOTH);
+			textBG->Add(text);
+			textBG->Resize({ 0.75f, 1.0f });
+
+			auto closeButton = std::make_shared<Button>(std::nullopt, std::nullopt, std::nullopt);
+			closeButton->SetColor({ 0.7, 0.2, 0.2, 1.0 });
+			closeButton->SetRelativeSizeAxes(Axis::BOTH);
+
+			closeButton->Resize({ 0.25f, 1.0f });
+
+			closeButton->OnClick = [this]() { toggleSaveUI(); };
+			closeButton->OnHover = [closeButton]() { closeButton->HaltAllTransforms(); closeButton->ScheduleTransform(std::make_unique<transforms::FadeTo>(glm::vec4{ 0.8, 0.3, 0.3, 1.0 }, 0.f, 0.1f)); };
+			closeButton->OnUnHover = [closeButton]() { closeButton->HaltAllTransforms(); closeButton->ScheduleTransform(std::make_unique<transforms::FadeTo>(glm::vec4{ 0.7, 0.2, 0.2, 1.0 }, 0.f, 0.1f)); };
+
+			auto line = std::make_shared<UIElement>();
+			line->SetColor({ 1.0, 1.0, 1.0, 1.0 });
+			line->Resize({ 20.0, 2.0 });
+			line->Rotate(glm::radians(45.f));
+
+			closeButton->Add(line);
+
+			line = std::make_shared<UIElement>();
+			line->SetColor({ 1.0, 1.0, 1.0, 1.0 });
+			line->Resize({ 20.0, 2.0 });
+			line->Rotate(glm::radians(-45.f));
+
+			closeButton->Add(line);
+
+			sdTopbar->Add(textBG);
+			sdTopbar->Add(closeButton);
+			m_saveDialogue->Add(sdTopbar);
+
+
+			auto filenameRow = std::make_shared<LayoutGroup>(new FlowLayout());
+			auto filenameField = std::make_shared<TextField>(m_font, 40);
+			text = std::make_shared<Text>(m_font);
+			text->SetColor({ 1.0, 1.0, 1.0, 1.0 });
+			text->SetText("File Name: ");
+			filenameRow->Add(text);
+			filenameRow->Add(filenameField);
+			m_saveDialogue->Add(filenameRow);
+
+			auto buttonBar = std::make_shared<LayoutGroup>(new FlowLayout());
+			buttonBar->SetRelativeSizeAxes(Axis::HORIZONTAL);
+			buttonBar->Resize({ 1.0, 80.0f });
+
+			auto saveButton = std::make_shared<Button>(std::nullopt, std::nullopt, std::nullopt);
+			saveButton->SetColor({ 0.7, 0.2, 0.2, 1.0 });
+			saveButton->SetRelativeSizeAxes(Axis::BOTH);
+			saveButton->Resize({ 0.5, 1.0 });
+
+			saveButton->OnClick = [this, filenameField]() {
+				WorldSerializer serializer(*m_world);
+				serializer.SaveToFile(filenameField->GetText());
+			};
+
+			auto loadButton = std::make_shared<Button>(std::nullopt, std::nullopt, std::nullopt);
+			loadButton->SetColor({ 0.2, 0.7, 0.2, 1.0 });
+			loadButton->SetRelativeSizeAxes(Axis::BOTH);
+			loadButton->Resize({ 0.5, 1.0 });
+
+			loadButton->OnClick = [this, filenameField]() {
+				WorldSerializer serializer(*m_world);
+				serializer.LoadFromFile(filenameField->GetText());
+			};
+
+			text = std::make_shared<cage::ui::Text>(m_font);
+			text->SetColor({ 1.0, 1.0, 1.0, 1.0 });
+			text->SetText("Save");
+			saveButton->Add(text);
+
+			text = std::make_shared<cage::ui::Text>(m_font);
+			text->SetColor({ 1.0, 1.0, 1.0, 1.0 });
+			text->SetText("Load");
+			loadButton->Add(text);
+
+			buttonBar->Add(saveButton);
+			buttonBar->Add(loadButton);
+
+			m_saveDialogue->Add(buttonBar);
+			buttonBar->Update();
+			sdTopbar->Update();
+
+			m_root.Add(m_saveDialogue);
+			m_saveDialogue->SetVisible(false);
+			//m_saveDialogue->SetRelativePositionAxes(Axis::BOTH);
+		}
 
 		std::ifstream file;
 		file.open("Assets/Worlds/shrek.txt");
@@ -158,14 +270,14 @@ namespace ub
 			{
 				std::string s;
 				file >> s;
-				m_world->PaintTileRaw(j, i, (World::Tile)std::stoi(s));
+				m_world->PaintTileRaw(j, i, (Tilemap::Tile)std::stoi(s));
 			}
 		}
 
 		m_tileHighlight = std::make_shared<cage::ui::UIElement>();
 		m_tileHighlight->SetParentMounting(cage::ui::MountPoint::TOP_LEFT);
 		m_tileHighlight->SetLocalMounting(cage::ui::MountPoint::TOP_LEFT);
-		m_tileHighlight->Resize({ World::TILE_SIZE, World::TILE_SIZE });
+		m_tileHighlight->Resize({ Tilemap::TILE_SIZE, Tilemap::TILE_SIZE });
 		m_tileHighlight->SetColor({ 1.0, 1.0, 1.0, 0.3 });
 
 		m_root.Add(m_tileHighlight);
@@ -206,7 +318,7 @@ namespace ub
 		while (SDL_PollEvent(&event))
 		{
 			m_input.Raise(event);
-			if (!m_playback)
+			if (!m_playback && m_currentTool)
 				m_currentTool->Use(m_input.Convert(event));
 
 			m_world->HandleEvents(m_input.Convert(event));
@@ -289,5 +401,10 @@ namespace ub
 		cage::ui::UIElement::shader->Projection->ForwardToShader();
 		glDisable(GL_DEPTH_TEST);
 		m_root.Draw();
+	}
+
+	void Editor::toggleSaveUI()
+	{
+		m_saveDialogue->SetVisible(!m_saveDialogue->IsVisible());
 	}
 }

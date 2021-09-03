@@ -2,7 +2,7 @@
 
 #include "../../CAGE/Graphics/UI/Button.hpp"
 #include "EditorPanel.hpp"
-#include "../World.hpp"
+#include "../World/World.hpp"
 
 namespace ub
 {
@@ -10,7 +10,7 @@ namespace ub
 	{
 	public:
 		TilePanel(World* world);
-		World::Tile GetSelection();
+		Tilemap::Tile GetSelection();
 
 		bool HandleEvent(cage::Event& e) override;
 
@@ -24,7 +24,7 @@ namespace ub
 		class TileButton : public cage::ui::Button
 		{
 		public:
-			TileButton(World::Tile tile, std::optional<std::shared_ptr<cage::Texture>> idle) : cage::ui::Button(idle, std::nullopt, std::nullopt)
+			TileButton(Tilemap::Tile tile, std::optional<std::shared_ptr<cage::Texture>> idle) : cage::ui::Button(idle, std::nullopt, std::nullopt)
 			{
 			}
 		private:
@@ -32,9 +32,9 @@ namespace ub
 		};
 
 		SDL_Surface* m_tileAtlas;
-		World::Tile m_selection;
+		Tilemap::Tile m_selection;
 
-		void makeTileButton(World::Tile type);
+		void makeTileButton(Tilemap::Tile type);
 
 	};
 }

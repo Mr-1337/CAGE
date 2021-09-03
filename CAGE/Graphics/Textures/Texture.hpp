@@ -14,8 +14,8 @@ namespace cage
 		std::pair <int, int> m_size;
 		SDL_Surface* m_surface;
 
-		void uploadTexData(SDL_Surface* surface);
 		GLenum getGLPixelFormat(SDL_PixelFormat* sdlFormat);
+		void uploadTexData(SDL_Surface* surface);
 
 	public:
 		// Contructs a texture from the given SDL_Surface. If the texture does not keep a local copy of the surface, it will be automatically freed upon construction

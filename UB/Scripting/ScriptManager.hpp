@@ -2,7 +2,7 @@
 #include <queue>
 
 #include "ScriptAction.hpp"
-#include "../World.hpp"
+#include "../World/World.hpp"
 
 namespace ub
 {

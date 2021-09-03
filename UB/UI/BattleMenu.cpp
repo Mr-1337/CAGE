@@ -36,6 +36,9 @@ namespace ub
 		m_enterSound = m_game.GetSoundManager().Get("XPError.ogg");
 		
 		updateSelector();
+
+		SetRelativeSizeAxes(cage::ui::Axis::VERTICAL);
+		Resize({ GetSize().x, 1.0 });
 	}
 
 	void BattleMenu::updateSelector()

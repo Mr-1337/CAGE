@@ -3,6 +3,7 @@
 #include <utility>
 #include <array>
 #include <GLM/glm/gtc/matrix_transform.hpp>
+#include <cstring>
 #include <OpenVR/openvr.h>
 #include <SDL2/SDL_mixer.h>
 

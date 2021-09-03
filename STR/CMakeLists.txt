@@ -40,7 +40,7 @@ add_custom_command(TARGET STR PRE_BUILD
 
 add_custom_command(TARGET STR PRE_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy_directory
-                       ${CMAKE_SOURCE_DIR}/lib/Dlls $<TARGET_FILE_DIR:STR>)
+                       ${CMAKE_SOURCE_DIR}/lib/DLLs $<TARGET_FILE_DIR:STR>)
 
 # SDL libraries
 set (SDL_LIBS SDL2 SDL2main SDL2_mixer SDL2_image SDL2_ttf SDL2_net)

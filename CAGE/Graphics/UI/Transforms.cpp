@@ -24,6 +24,15 @@ namespace cage::ui::transforms
 		case Interpolation::CUBIC:
 			return -2.0 * t * t * t + 3.0 * t * t;
 			break;
+		case Interpolation::BOUNCE_BACK:
+		{
+			const float c1 = 1.70158;
+			const float c2 = 1.525 * c1;
+			return t < 0.5f
+				? (std::pow(2.f * t, 2.f) * ((c2 + 1.f) * 2.f * t - c2)) / 2.f
+				: (std::pow(2.f * t - 2.f, 2.f) * ((c2 + 1.f) * (t * 2.f - 2.f) + c2) + 2.f) / 2.f;
+			break;
+		}
 		default:
 			return t;
 		}
@@ -67,6 +76,25 @@ namespace cage::ui::transforms
 			float t = Interpolate();
 			glm::vec2 pos = m_start * (1 - t) + (m_dst) * t;
 			m_element->MoveTo(pos);
+		}
+	}
+
+	FadeTo::FadeTo(glm::vec4 endColor, float startTime, float endTime) : Transform(startTime, endTime, Interpolation::LINEAR), m_end(endColor)
+	{
+
+	}
+
+	void FadeTo::Init()
+	{
+		m_start = m_element->GetColor();
+	}
+
+	void FadeTo::Apply()
+	{
+		if (!Complete())
+		{
+			float t = Interpolate();
+			m_element->SetColor(glm::mix(m_start, m_end, t));
 		}
 	}
 }

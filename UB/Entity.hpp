@@ -18,6 +18,7 @@ namespace ub
 		bool m_interacting;
 		glm::vec2 m_size;
 		glm::vec2 m_position;
+		const std::string m_name;
 	protected:
 		World* getWorld();
 
@@ -31,7 +32,7 @@ namespace ub
 
 		static cage::Game* s_Game;
 
-		Entity(World* world);
+		Entity(World* world, const std::string& name);
 		void LoadTexture(const std::string& name);
 
 		virtual void Update(float dt);
@@ -42,6 +43,7 @@ namespace ub
 
 		inline glm::vec2 GetPosition() { return m_position; }
 		inline glm::vec2 GetSize() { return m_size; }
+		inline std::string GetName() { return m_name; }
 
 		inline void EnableCollision() { m_collisionEnabled = true; }
 		inline void DisableCollision() { m_collisionEnabled = false; }
@@ -52,7 +54,6 @@ namespace ub
 
 	private:
 		void resolveCollision(Entity* other);
-
 	};
 
 }

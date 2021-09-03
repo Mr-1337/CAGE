@@ -7,9 +7,15 @@ set (SRC_FILES
     "Main.cpp"
     "UB.hpp"
     "UB.cpp"
-    "WorldShader.hpp"
-    "World.hpp"
-    "World.cpp"
+    "World/WorldShader.hpp"
+    "World/World.hpp"
+    "World/World.cpp"
+    "World/WorldSerializer.hpp" 
+    "World/WorldSerializer.cpp"
+    "World/Structure.cpp"
+    "World/Structure.hpp"
+    "World/Room.hpp"
+    "World/Tilemap.hpp"
     "Scripting/ScriptManager.hpp"
     "Scripting/ScriptManager.cpp"
     "Scripting/ScriptAction.hpp"
@@ -37,8 +43,6 @@ set (SRC_FILES
     "UI/ScriptPanel.cpp"
     "UI/RightPanel.hpp" 
     "UI/EditorPanel.hpp"
-    "Structure.cpp"
-    "Structure.hpp"
     "Character.cpp"
     "Character.hpp" 
     "UI/DialogueBox.hpp" 
@@ -54,9 +58,9 @@ set (SRC_FILES
     "Enemy.hpp" 
     "Enemy.cpp" 
     "UI/ProgressBar.hpp" 
-    "UI/BattleMenu.hpp"
-    "UI/BattleMenu.cpp")
-    
+    "UI/BattleMenu.hpp" 
+    "UI/BattleMenu.cpp"
+     "World/Tilemap.cpp")
 
 set (CMAKE_CXX_EXTENSIONS OFF)
 
@@ -76,7 +80,7 @@ add_custom_command(TARGET UB PRE_BUILD
 
 add_custom_command(TARGET UB PRE_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy_directory
-                       ${CMAKE_SOURCE_DIR}/lib/Dlls $<TARGET_FILE_DIR:UB>)
+                       ${CMAKE_SOURCE_DIR}/lib/DLLs $<TARGET_FILE_DIR:UB>)
 
 # SDL libraries
 set (SDL_LIBS SDL2 SDL2main SDL2_mixer SDL2_image SDL2_ttf SDL2_net)

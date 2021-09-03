@@ -37,8 +37,9 @@ namespace ub
 
 		m_actionMenu = std::make_shared<BattleMenu>(*this, *s_Game);
 		m_actionMenu->SetRelativePositionAxes(cage::ui::Axis::VERTICAL);
+		m_actionMenu->SetRelativeSizeAxes(cage::ui::Axis::VERTICAL);
 		m_actionMenu->MoveTo({ 300, 0.5 });
-		m_actionMenu->SetParentMounting(cage::ui::MountPoint::CENTER_LEFT);
+		m_actionMenu->SetParentMounting(cage::ui::MountPoint::TOP_LEFT);
 
 		m_battleUI->Add(m_bottomBar);
 		m_bottomBar->Add(m_actionMenu);
@@ -58,7 +59,7 @@ namespace ub
 		/*
 		std::map<int, int> hist;
 
-		for (int i = 0; i < 500000; i++)
+		for (int i = 0; i < 10000; i++)
 		{
 			hist[static_cast<int>(std::round(m_rng(s_Game->GetRNG())))]++;
 		}
@@ -73,7 +74,9 @@ namespace ub
 
 		std::uniform_int_distribution<int> rngesus(1, 422);
 		std::cout << rngesus(s_Game->GetRNG()) << std::endl;
+		
 		*/
+
 	}
 
 	void Battle::Update(float dt)

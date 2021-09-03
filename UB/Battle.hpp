@@ -5,7 +5,7 @@
 #include "Player.hpp"
 #include "Enemy.hpp"
 
-#include "WorldShader.hpp"
+#include "World/WorldShader.hpp"
 #include "UI/ProgressBar.hpp"
 
 namespace ub

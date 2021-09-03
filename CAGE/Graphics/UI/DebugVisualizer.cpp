@@ -59,6 +59,7 @@ namespace cage
 
 			m_highlight->Add(m_cross);
 			m_highlight->Add(m_axes);
+			m_highlight->IgnoreMasking(true);
 
 			m_content->AddAbsolute(m_highlight);
 			Add(m_content);

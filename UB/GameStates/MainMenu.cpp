@@ -71,6 +71,7 @@ namespace ub
 				m_buttons[i]->OnClick = callbacks[i];
 				m_buttons[i]->OnHover = [i, this]() { updateSelector(i); };
 			}
+
 			m_root.Add(buttonGroup);
 			buttonGroup->AddAbsolute(m_selector);
 			m_selector->SetActiveTexture(m_font.Render(">", color));
@@ -85,6 +86,7 @@ namespace ub
 		glViewport(0, 0, winSize.first, winSize.second);
 
 		updateSelector(0);
+
 		//m_debug = std::make_shared<cage::ui::DebugVisualizer>(&m_root);
 		//m_root.Add(m_debug);
 	}

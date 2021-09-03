@@ -4,7 +4,6 @@
 
 #include <GLM/glm/gtc/matrix_transform.hpp>
 
-
 namespace cage
 {
 	namespace ui
@@ -29,6 +28,17 @@ namespace cage
 			return static_cast<unsigned int>(lhs) | static_cast<unsigned int>(rhs);
 		}
 
+		bool IsHorizontal(Axis axes)
+		{
+			return (axes & Axis::HORIZONTAL) != 0;
+		}
+
+		bool IsVertical(Axis axes)
+		{
+			return (axes & Axis::VERTICAL) != 0;
+		}
+
+
 		void UIElement::initSharedData()
 		{
 			sharedVBO = new VertexBuffer<Vertex2>();
@@ -52,7 +62,7 @@ namespace cage
 
 		}
 
-		UIElement::UIElement(bool textured) : m_textured(textured), m_visible(true), m_masking(false)
+		UIElement::UIElement(bool textured) : m_textured(textured), m_visible(true), m_masking(false), m_ignoreMasking(false)
 		{
 			if (!UIElement::init)
 				UIElement::initSharedData();
@@ -73,16 +83,6 @@ namespace cage
 			m_relativePositionAxes = Axis::NONE;
 
 			m_parent = nullptr;
-		}
-
-		bool UIElement::isHorizontal(Axis axes)
-		{
-			return (axes & Axis::HORIZONTAL) != 0;
-		}
-
-		bool UIElement::isVertical(Axis axes)
-		{
-			return (axes & Axis::VERTICAL) != 0;
 		}
 
 		void UIElement::LoadTexture(SDL_Surface* surface)
@@ -127,8 +127,8 @@ namespace cage
 
 		void UIElement::Resize(glm::vec2 size)
 		{
-			bool horiz = isHorizontal(m_relativeSizeAxes);
-			bool vert = isVertical(m_relativeSizeAxes);
+			bool horiz = IsHorizontal(m_relativeSizeAxes);
+			bool vert = IsVertical(m_relativeSizeAxes);
 
 			m_relativeSize.x = size.x * horiz;
 			m_relativeSize.y = size.y * vert;
@@ -143,8 +143,8 @@ namespace cage
 
 		void UIElement::MoveTo(glm::vec2 newPosition)
 		{
-			bool horiz = isHorizontal(m_relativeSizeAxes);
-			bool vert = isVertical(m_relativeSizeAxes);
+			bool horiz = IsHorizontal(m_relativePositionAxes);
+			bool vert = IsVertical(m_relativePositionAxes);
 
 			m_relativePosition.x = newPosition.x * horiz;
 			m_relativePosition.y = newPosition.y * vert;
@@ -189,13 +189,13 @@ namespace cage
 		{
 			if (m_parent != nullptr)
 			{
-				if (isHorizontal(m_relativeSizeAxes))
+				if (IsHorizontal(m_relativeSizeAxes))
 					m_size.x = m_parent->GetSize().x * m_relativeSize.x;
-				if (isVertical(m_relativeSizeAxes))
+				if (IsVertical(m_relativeSizeAxes))
 					m_size.y = m_parent->GetSize().y * m_relativeSize.y;
-				if (isHorizontal(m_relativePositionAxes))
+				if (IsHorizontal(m_relativePositionAxes))
 					m_position.x = m_parent->GetSize().x * m_relativePosition.x;
-				if (isVertical(m_relativePositionAxes))
+				if (IsVertical(m_relativePositionAxes))
 					m_position.y = m_parent->GetSize().y * m_relativePosition.y;
 			}
 
@@ -233,6 +233,11 @@ namespace cage
 			if (!m_transformQueue.empty())
 				m_transformQueue.pop();
 			return !m_transformQueue.empty();
+		}
+
+		void UIElement::HaltAllTransforms()
+		{
+			while (HaltCurrentTransform());
 		}
 
 		void UIElement::Add(Child child)
@@ -277,6 +282,8 @@ namespace cage
 				sharedVAO->Bind();
 				if (m_visible)
 				{
+					if (m_ignoreMasking)
+						glDisable(GL_STENCIL_TEST);
 					shader->SpriteSize->value = m_size;
 					shader->SpriteSize->ForwardToShader();
 					shader->Model->value = m_totalTransform;

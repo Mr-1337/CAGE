@@ -44,6 +44,9 @@ namespace cage
 		 * They can either be directly visible or simply represent aggregates of children UIElements
 		 */
 
+		bool IsHorizontal(Axis axes);
+		bool IsVertical(Axis axes);
+
 
 		class UIElement : public cage::EventListener
 		{
@@ -79,6 +82,8 @@ namespace cage
 			UIElement(bool textured);
 			UIElement(UIElement& other) = delete;
 			UIElement(UIElement&& other) = delete;
+			
+			virtual ~UIElement() = default;
 
 			virtual void LoadTexture(SDL_Surface* surface);
 
@@ -100,6 +105,8 @@ namespace cage
 				}
 			}
 
+			inline glm::vec4 GetColor() const { return m_color; }
+
 			virtual void SetColor(glm::vec4 color)
 			{
 				m_color = color;
@@ -116,7 +123,7 @@ namespace cage
 					return false;
 				bool handled = false;
 				for (auto c : m_children)
-					handled = c->HandleEvent(e);
+					handled |= c->HandleEvent(e);
 				return handled;
 			}
 
@@ -132,6 +139,7 @@ namespace cage
 
 			// Sets along which axes this element should be sized relative to its parent (for example with axes set to horizontal and the size set to 0.5, the element would be half the width of the parent)
 			inline void SetRelativeSizeAxes(Axis axes) { m_relativeSizeAxes = axes; }
+			inline Axis GetRelativeSizeAxes() { return m_relativeSizeAxes; }
 
 			// Sets along which axes this element should be positioned relative to its parent (for example with axes set to horizontal and position set to 0.5, this element would be positioned in the center of the parent horizontally)
 			inline void SetRelativePositionAxes(Axis axes) { m_relativePositionAxes = axes; }
@@ -157,9 +165,11 @@ namespace cage
 			inline void SetScale(glm::vec2 scale) { m_scale = scale; recalcTransform(); }
 			inline void SetVisible(bool visible) { m_visible = visible; }
 			inline void SetMasking(bool masking) { m_masking = masking; }
+			inline void IgnoreMasking(bool ignores) { m_ignoreMasking = ignores; }
 
 			void ScheduleTransform(std::unique_ptr<transforms::Transform> transform);
 			bool HaltCurrentTransform();
+			void HaltAllTransforms();
 			
 			inline glm::mat4 GetTransform() const { return m_totalTransform; }
 			inline void SetTransform(const glm::mat4&& transform) 
@@ -185,7 +195,6 @@ namespace cage
 
 			static glm::vec2 GetMountOffset(MountPoint mounting, glm::vec2 size, glm::vec2 scale);
 
-			virtual ~UIElement() = default;
 
 			static std::shared_ptr<SpriteShader> shader;
 			static Font* s_DefaultFont;
@@ -196,12 +205,10 @@ namespace cage
 			static void initSharedData();
 			static bool init;
 
-			bool isHorizontal(Axis axes);
-			bool isVertical(Axis axes);
-
 			bool m_textured;
 			bool m_visible;
 			bool m_masking;
+			bool m_ignoreMasking;
 
 			void recalcTransform();
 			void drawChildren();
