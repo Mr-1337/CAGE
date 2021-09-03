@@ -40,6 +40,8 @@ set(SRC_FILES
 	"Graphics/Buffers/FrameBuffer.cpp"
 	"Graphics/Textures/Texture.hpp"
 	"Graphics/Textures/Texture.cpp"
+	"Graphics/Textures/TextureArray.hpp"
+	"Graphics/Textures/TextureArray.cpp"
 	"Graphics/Uniforms/Uniforms.hpp"
 	"Graphics/Uniforms/Uniforms.cpp"
 	"Graphics/ShaderProgram/ShaderProgram.hpp"
@@ -96,7 +98,19 @@ set(SRC_FILES
 	"Graphics/UI/Transforms.hpp" 
 	"Graphics/UI/Transforms.cpp" 
 	"Graphics/UI/DebugVisualizer.hpp" 
-	"Graphics/UI/DebugVisualizer.cpp" "Graphics/UI/ListLayout.hpp" "Graphics/UI/ListLayout.cpp" "IO/Events/WindowEvents.hpp" "Util/Timer.hpp" "Util/Timer.cpp")
+	"Graphics/UI/DebugVisualizer.cpp" 
+	"Graphics/UI/ListLayout.hpp" 
+	"Graphics/UI/ListLayout.cpp" 
+	"IO/Events/WindowEvents.hpp" 
+	"Util/Timer.hpp" 
+	"Util/Timer.cpp" 
+	"Graphics/Scene/Node.hpp"
+	 "Graphics/Scene/Node.cpp" 
+	 "Graphics/Buffers/IndexBuffer.hpp" 
+	 "Graphics/Animation/Bone.hpp"
+	 "Graphics/Animation/Animation.hpp"
+
+	  "Graphics/Animation/Animation.cpp")
 
 set (CMAKE_CXX_EXTENSIONS OFF)
 

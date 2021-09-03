@@ -5,6 +5,7 @@
 #include "../CAGE/Core/Game.hpp"
 #include "../Perlin.hpp"
 #include "Shrektris.hpp"
+#include <Core/Window.hpp>
 
 Gameplay::Gameplay(cage::Game& game, cage::networking::packets::GameStart start, std::unique_ptr<Client> client) : Gameplay(game, start.boardW, start.boardH, CLIENT)
 {
@@ -31,7 +32,10 @@ Gameplay::Gameplay(cage::Game& game, int w, int h, Mode mode) :
 	m_mode(mode),
 	m_vrMode(((Shrektris&)game).vrMode),
 	m_spin(false),
-	skybox(std::filesystem::current_path().append("Assets/skybox"))
+	skybox(std::filesystem::current_path().append("Assets/skybox")),
+	//m_w2(*new cage::Window("2", 200, 200)),
+	//m_w3(*new cage::Window("3", 200, 200)),
+	m_window(getGame().GetWindow())
 {
 	m_level = 1;
 	m_score = 0;
@@ -45,6 +49,8 @@ Gameplay::Gameplay(cage::Game& game, int w, int h, Mode mode) :
 	m_shakeDuration = 0;
 	m_shakeOffset = { 0.f, 0.f, 0.f };
 
+	m_context = m_window.GetGLContext();
+	m_window.MakeContextCurrent(m_context);
 	board = new char[BOARD_HEIGHT * BOARD_WIDTH];
 	for (int i = 0; i < BOARD_HEIGHT * BOARD_WIDTH; i++)
 		board[i] = 0;
@@ -58,6 +64,8 @@ Gameplay::Gameplay(cage::Game& game, int w, int h, Mode mode) :
 
 	auto size = getGame().GetWindow().GetSize();
 	glViewport(0, 0, size.first, size.second);
+
+	m_context = m_window.GetGLContext();
 
 
 #pragma region VR
@@ -117,10 +125,10 @@ Gameplay::Gameplay(cage::Game& game, int w, int h, Mode mode) :
 	cage::Shader vertexShader(cage::Shader::ShaderType::VERTEX);
 	cage::Shader fragShader(cage::Shader::ShaderType::FRAGMENT);
 
-	vertexShader.CompileFromFile("Assets/generic3D.vert");
-	fragShader.CompileFromFile("Assets/generic3D.frag");
+	vertexShader.CompileFromFile("Assets/Shaders/generic3D.vert");
+	fragShader.CompileFromFile("Assets/Shaders/generic3D.frag");
 
-	program = std::make_unique<cage::Generic3DShader>(vertexShader, fragShader);
+	program = std::make_shared<cage::Generic3DShader>(vertexShader, fragShader);
 	program->Use();
 	program->Projection->value = glm::perspective(glm::quarter_pi<float>(), (float)m_nRenderWidth / (float)m_nRenderHeight, m_near, m_far);
 	program->Projection->ForwardToShader();
@@ -140,13 +148,15 @@ Gameplay::Gameplay(cage::Game& game, int w, int h, Mode mode) :
 	m_spriteProgram->Projection->ForwardToShader();
 	
 
-	//CreateFrameBuffer(m_nRenderWidth, m_nRenderHeight, leftEyeDesc);
+	CreateFrameBuffer(m_nRenderWidth, m_nRenderHeight, leftEyeDesc);
 
 	shrek.LoadModel("Assets/shrek.obj");
+	newShrek = cage::LoadModelFromFile("Assets/shrek.glb");
+	//newShrek2 = cage::LoadModelFromFile("Assets/shrek-norig.glb");
 
 	populateGrid();
 
-	m_font = new cage::Font("Assets/sans.ttf", 32);
+	m_font = new cage::Font("Assets/Fonts/sans.ttf", 32);
 
 	std::srand(std::time(nullptr));
 
@@ -165,7 +175,13 @@ Gameplay::Gameplay(cage::Game& game, int w, int h, Mode mode) :
 	levels[2] = Mix_LoadWAV("Assets/level3.ogg");
 	levels[3] = Mix_LoadWAV("Assets/level4.ogg");
 
-	Mix_PlayChannel(2, music, -1);
+	sfx[0] = Mix_LoadWAV("Assets/Sounds/thud.ogg");
+	sfx[1] = Mix_LoadWAV("Assets/Sounds/movelr.ogg");
+	sfx[2] = Mix_LoadWAV("Assets/Sounds/movefail.ogg");
+	sfx[3] = Mix_LoadWAV("Assets/Sounds/rotcw.ogg");
+	sfx[4] = Mix_LoadWAV("Assets/Sounds/rotccw.ogg");
+
+	//Mix_PlayChannel(2, music, -1);
 
 	currentPiece.shape = 0;
 	currentPiece.y = 1;
@@ -184,6 +200,33 @@ Gameplay::Gameplay(cage::Game& game, int w, int h, Mode mode) :
 	m_rightPanel->SetParentMounting(cage::ui::MountPoint::CENTER_RIGHT);
 	m_rightPanel->SetLocalMounting(cage::ui::MountPoint::CENTER_RIGHT);
 
+	m_dab = std::make_shared<MenuButton>("Play");
+	m_dab->Scale(0.5);
+	m_dab->OnClick = [this]()
+	{
+		newShrek->Play();
+		std::cout << "Start the dab" << std::endl;
+	};
+
+	m_dab2 = std::make_shared<MenuButton>("Cycle");
+	m_dab2->Scale(0.5);
+	m_dab2->OnClick = [this]()
+	{
+		newShrek->CycleAnimation();
+	};
+
+	m_rightPanel->Add(m_dab);
+	m_rightPanel->Add(m_dab2);
+
+	auto stop = std::make_shared<MenuButton>("Stop");
+	stop->Scale(0.5);
+	stop->OnClick = [this]()
+	{
+		newShrek->Stop();
+	};
+
+	m_rightPanel->Add(stop);
+
 	m_rootNode.Resize(glm::vec2{ m_nRenderWidth, m_nRenderHeight });
 	m_rootNode.SetLocalMounting(cage::ui::MountPoint::TOP_LEFT);
 
@@ -200,7 +243,7 @@ Gameplay::Gameplay(cage::Game& game, int w, int h, Mode mode) :
 
 void Gameplay::populateGrid()
 {
-	auto buffer = grid->GetBuffer();
+	auto& buffer = grid->GetBuffer();
 
 	std::vector<cage::Vertex3UVNormal> verts;
 
@@ -228,8 +271,11 @@ void Gameplay::ProcessEvents()
 {
 	SDL_Event e;
 
+
 	while (SDL_PollEvent(&e))
 	{
+		auto res = m_input.Convert(e);
+		m_rootNode.HandleEvent(res);
 		if (e.type == SDL_QUIT)
 			quit();
 		if (e.type == SDL_KEYDOWN)
@@ -348,6 +394,7 @@ void Gameplay::gameOver()
 	quit();
 }
 
+
 void Gameplay::logic()
 {
 	visualizer = currentPiece;
@@ -440,6 +487,8 @@ void Gameplay::logic()
 				scoreText->SetText(std::string("Score: ").append(std::to_string(m_score)));
 			}
 
+			shake(0.8, 0.2);
+			Mix_PlayChannel(-1, sfx[0], 0);
 			// make a new piece
 			nextPiece.x = BOARD_WIDTH / 2;
 			nextPiece.y = 0;
@@ -449,7 +498,6 @@ void Gameplay::logic()
 
 			//setBoardValOverPiece(currentPiece, 1);
 
-			shake(5.0, 0.3);
 
 			if (m_mode == CLIENT)
 			{
@@ -507,6 +555,8 @@ void Gameplay::boardSync(cage::networking::packets::BoardSync& sync)
 void Gameplay::Update(float delta)
 {
 	m_shakeTimer += delta;
+	if (m_shakeTimer > m_shakeDuration)
+		m_shaking = false;
 	logic();
 
 	if (m_mode == CLIENT)
@@ -649,6 +699,7 @@ void Gameplay::Update(float delta)
 	}
 
 	position += velocity * delta;
+	newShrek->Update(delta);
 }
 
 void Gameplay::drawGrid()
@@ -672,8 +723,8 @@ void Gameplay::applyShake()
 	if (m_shaking)
 	{
 		int octaves = 4;
-		// m_shakeOffset.x = Perlin::OctavePerlin(position.x, m_shakeTimer, octaves, 0.6);
-		// m_shakeOffset.z = Perlin::OctavePerlin(position.z, m_shakeTimer, octaves, 0.6);
+		m_shakeOffset.x = Perlin::OctavePerlin(position.x, m_shakeTimer, octaves, 0.6);
+		m_shakeOffset.z = Perlin::OctavePerlin(position.z, m_shakeTimer, octaves, 0.6);
 	}
 }
 
@@ -842,6 +893,17 @@ void Gameplay::drawScene(vr::EVREye eye)
 		}
 	}
 
+	program->Tint->value = { 0.0, 0.0, 0.0, 0.0 };
+	program->Tint->ForwardToShader();
+
+	//program->Model->value = glm::identity<glm::mat4>();
+	//program->Model->ForwardToShader();
+	//shrek.Draw();
+
+	//newShrek->m_TransformNode->m_LocalTransform = glm::rotate(glm::identity<glm::mat4>(), totalTime, glm::vec3(0, 1, 0));
+	newShrek->Draw(program);
+	//newShrek2->Draw(program);
+
 	// draw my hands
 
 	if (m_vrMode)
@@ -936,7 +998,47 @@ void Gameplay::Draw()
 		vr::VRCompositor()->PostPresentHandoff();
 	}
 	
-	//else
+	/*
+	m_w2.SetPosition(1000 + 200 * sin(totalTime), 1000 + 200 * cos(totalTime));
+	m_w3.SetSize(400 + 200 * sin(totalTime), 400 + 200 * cos(totalTime));
+
+
+	glBindFramebuffer(GL_FRAMEBUFFER, leftEyeDesc.m_nRenderFramebufferId);
+	glViewport(0, 0, 2560, 1440);
+	drawScene(vr::Eye_Left);
+
+	auto size = m_window.GetSize();
+	auto pos = m_window.GetPosition();
+
+	const int WIDTH = 2560;
+	const int HEIGHT = 1440;
+
+	auto interp = GL_LINEAR;
+
+	m_window.MakeContextCurrent(m_context);
+	glViewport(0, 0, size.first, size.second);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBlitFramebuffer(pos.first, HEIGHT - (pos.second + size.second), pos.first + size.first, HEIGHT-pos.second, 0, 0, size.first, size.second, GL_COLOR_BUFFER_BIT, interp);
+	m_window.SwapBuffers();
+
+	size = m_w2.GetSize();
+	pos = m_w2.GetPosition();
+
+	m_w2.MakeContextCurrent(m_context);
+	glViewport(0, 0, size.first, size.second);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBlitFramebuffer(pos.first, HEIGHT - (pos.second + size.second), pos.first + size.first, HEIGHT - pos.second, 0, 0, size.first, size.second, GL_COLOR_BUFFER_BIT, interp);
+	m_w2.SwapBuffers();
+
+	size = m_w3.GetSize();
+	pos = m_w3.GetPosition();
+
+	m_w3.MakeContextCurrent(m_context);
+	glViewport(0, 0, size.first, size.second);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBlitFramebuffer(pos.first, HEIGHT - (pos.second + size.second), pos.first + size.first, HEIGHT - pos.second, 0, 0, size.first, size.second, GL_COLOR_BUFFER_BIT, interp);
+	m_w3.SwapBuffers();
+	*/
 	{
 		drawScene(vr::Eye_Left);
 	}

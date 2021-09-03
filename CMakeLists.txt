@@ -10,7 +10,7 @@ project ("CAGE"
 		)
 
 include_directories ("include" "CAGE")
-link_directories ("lib" "lib/SDL2" "lib/Steam")
+link_directories ("lib" "lib/SDL2" "lib/Steam" "lib/assimp")
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -20,10 +20,13 @@ add_subdirectory ("CAGE")
 target_compile_features("CAGE" PRIVATE cxx_std_17)
 
 add_subdirectory ("SampleGame")
-target_compile_features("SampleGame" PRIVATE cxx_std_17)
+target_compile_features("Shrektris" PRIVATE cxx_std_17)
 
 add_subdirectory ("STR")
 target_compile_features("STR" PRIVATE cxx_std_17)
 
 add_subdirectory ("UB")
 target_compile_features("UB" PRIVATE cxx_std_17)
+
+add_subdirectory ("V2")
+target_compile_features("V2" PRIVATE cxx_std_17)

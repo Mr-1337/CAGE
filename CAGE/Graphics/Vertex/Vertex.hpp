@@ -142,15 +142,22 @@ namespace cage
 	struct Vertex3UVNormal
 	{
 
-		Vertex3UVNormal(const glm::vec3& position, const glm::vec2& uv, const glm::vec3& normal) : position(position), uv(uv), normal(normal) {};
-		Vertex3UVNormal(const Vertex3UVNormal& other) : position(other.position), uv(other.uv), normal(other.normal)
+		Vertex3UVNormal(const glm::vec3& position, const glm::vec2& uv, const glm::vec3& normal) : position(position), uv(uv), normal(normal) 
+		{
+			boneIDs = { -1, -1, -1, -1 };
+			weights = { 0, 0, 0, 0 };
+		};
+
+		Vertex3UVNormal(const glm::vec3& position, const glm::vec2& uv, const glm::vec3& normal, const glm::ivec4& boneIDs, const glm::vec4& weights) : position(position), uv(uv), normal(normal), boneIDs(boneIDs), weights(weights)
 		{
 
-		}
+		};
 
 		glm::vec3 position;
 		glm::vec2 uv;
 		glm::vec3 normal;
+		glm::vec4 boneIDs;
+		glm::vec4 weights;
 	};
 
 	template<>
@@ -161,6 +168,8 @@ namespace cage
 		layout.emplace_back(3, VertexAttribute::Type::FLOAT, false, offsetof(Vertex3UVNormal, position));
 		layout.emplace_back(2, VertexAttribute::Type::FLOAT, false, offsetof(Vertex3UVNormal, uv));
 		layout.emplace_back(3, VertexAttribute::Type::FLOAT, false, offsetof(Vertex3UVNormal, normal));
+		layout.emplace_back(4, VertexAttribute::Type::FLOAT, false, offsetof(Vertex3UVNormal, boneIDs));
+		layout.emplace_back(4, VertexAttribute::Type::FLOAT, false, offsetof(Vertex3UVNormal, weights));
 
 		return layout;
 	}

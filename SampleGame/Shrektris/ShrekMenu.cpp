@@ -9,8 +9,8 @@ ShrekMenu::ShrekMenu(cage::Game& game) : cage::GameState(game)
 	glClearColor(0.3f, 0.5f, 0.2f, 0.0f);
 
 	cage::Shader vertex(cage::Shader::ShaderType::VERTEX), fragment(cage::Shader::ShaderType::FRAGMENT);
-	vertex.CompileFromFile("Assets/sprite.vert");
-	fragment.CompileFromFile("Assets/sprite.frag");
+	vertex.CompileFromFile("Assets/Shaders/sprite.vert");
+	fragment.CompileFromFile("Assets/Shaders/sprite.frag");
 	m_spriteShader = std::make_shared<cage::SpriteShader>(vertex, fragment);
 
 	auto size = getGame().GetWindow().GetSize();
@@ -23,7 +23,7 @@ ShrekMenu::ShrekMenu(cage::Game& game) : cage::GameState(game)
 	cage::ui::UIElement::shader = m_spriteShader;
 
 	//MenuButton::s_font = TTF_OpenFont("Assets/sans.ttf", 36);
-	MenuButton::s_font = new cage::Font("Assets/sans.ttf", 36);
+	MenuButton::s_font = new cage::Font("Assets/Fonts/sans.ttf", 36);
 
 	Ref button1 = std::make_shared<MenuButton>("Play");
 	Ref button2 = std::make_shared<MenuButton>("Multiplayer");

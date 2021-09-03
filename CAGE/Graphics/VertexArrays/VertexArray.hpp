@@ -1,5 +1,6 @@
 #pragma once
 #include "../Buffers/VertexBuffer.hpp"
+#include "../Buffers/IndexBuffer.hpp"
 #include "../Vertex/Vertex.hpp"
 
 namespace cage
@@ -26,6 +27,8 @@ namespace cage
 				glEnableVertexAttribArray(i);
 			}
 		}
+
+		VertexArray(const VertexArray<VertexType>& other) = delete;
 
 		inline void Bind()
 		{

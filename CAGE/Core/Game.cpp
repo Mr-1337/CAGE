@@ -156,7 +156,7 @@ namespace cage
 
 	void Game::initGL()
 	{
-		gladLoadGLLoader(SDL_GL_GetProcAddress);
+		//gladLoadGLLoader(SDL_GL_GetProcAddress);
 
 		printf("Vendor:   %s\n", glGetString(GL_VENDOR));
 		printf("Renderer: %s\n", glGetString(GL_RENDERER));

@@ -17,8 +17,5 @@ namespace ub
 
 	private:
 		bool m_running;
-		cage::StateMachine m_stateMachine;
-
-
 	};
 }

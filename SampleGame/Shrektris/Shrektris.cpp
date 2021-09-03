@@ -8,6 +8,11 @@ Shrektris::Shrektris() :
 
 }
 
+Shrektris::~Shrektris()
+{
+
+}
+
 void Shrektris::Init()
 {
     std::string shrekStr = R"(
@@ -53,11 +58,14 @@ void Shrektris::Init()
     vrMode = false;
     std::cout << std::endl << shrekStr << std::endl;
 
+
     glEnable(GL_DEPTH_TEST);
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    m_window->SetIcon("Assets/Textures/icon.png");
+    
     m_stateMachine.Push(new ShrekMenu(*this));
 }
 

@@ -15,6 +15,8 @@ namespace cage
 			glCreateBuffers(1, &m_id);
 		}
 
+		VertexBuffer(const VertexBuffer& other) = delete;
+
 		inline void Bind()
 		{
 			glBindBuffer(GL_ARRAY_BUFFER, m_id);

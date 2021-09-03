@@ -1,5 +1,4 @@
 #include "Uniforms.hpp"
-#include <GLM/glm/gtc/type_ptr.hpp>
 
 namespace cage::uniforms
 {
@@ -42,7 +41,7 @@ namespace cage::uniforms
 	FloatUniform::FloatUniform(unsigned int program, const std::string& name)
 		: Uniform<float>(program, name)
 	{
-
+		value = 0.0f;
 	}
 
 	void FloatUniform::ForwardToShader()
@@ -109,4 +108,5 @@ namespace cage::uniforms
 	{
 		glUniform4fv(m_location, 1, glm::value_ptr(value));
 	}
+
 }

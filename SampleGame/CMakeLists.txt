@@ -27,25 +27,25 @@ set (CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_executable (SampleGame ${SRC_FILES})
+add_executable (Shrektris ${SRC_FILES})
 
 if (MSVC)
-    target_compile_options(SampleGame PUBLIC "/permissive-")
+    target_compile_options(Shrektris PUBLIC "/permissive-")
 endif()
 
-add_custom_command(TARGET SampleGame PRE_BUILD
+add_custom_command(TARGET Shrektris PRE_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy_directory
-                       ${CMAKE_SOURCE_DIR}/SampleGame/Assets $<TARGET_FILE_DIR:SampleGame>/Assets)
+                       ${CMAKE_SOURCE_DIR}/SampleGame/Assets $<TARGET_FILE_DIR:Shrektris>/Assets)
 
-add_custom_command(TARGET SampleGame PRE_BUILD
+add_custom_command(TARGET Shrektris PRE_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy_directory
-                       ${CMAKE_SOURCE_DIR}/lib/Dlls $<TARGET_FILE_DIR:SampleGame>)
+                       ${CMAKE_SOURCE_DIR}/lib/Dlls $<TARGET_FILE_DIR:Shrektris>)
 
 # SDL libraries
 set (SDL_LIBS SDL2 SDL2main SDL2_mixer SDL2_image SDL2_ttf SDL2_net)
 
 # Steam libraries
-set (STEAM_LIBS openvr_api)
+set (STEAM_LIBS phonon openvr_api)
 
 # link against CAGE, SDL and its extensions
-target_link_libraries (SampleGame PUBLIC CAGE ${SDL_LIBS} ${STEAM_LIBS})
+target_link_libraries (Shrektris PUBLIC CAGE ${SDL_LIBS} ${STEAM_LIBS} assimp-vc142-mt)

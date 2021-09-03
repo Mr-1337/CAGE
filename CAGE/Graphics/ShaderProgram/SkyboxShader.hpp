@@ -17,7 +17,7 @@ namespace cage
 			Projection = new uniforms::Mat4Uniform(GetID(), "u_projection");
 		}
 
-		SkyboxShader() : SkyboxShader(loadShaderFromFile("Assets/skybox.vert"), loadShaderFromFile("Assets/skybox.frag"))
+		SkyboxShader() : SkyboxShader(loadShaderFromFile("Assets/Shaders/skybox.vert"), loadShaderFromFile("Assets/Shaders/skybox.frag"))
 		{
 
 		}

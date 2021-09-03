@@ -23,6 +23,11 @@
 #include "Client.hpp"
 #include "Server.hpp"
 
+namespace cage
+{
+	class Window;
+}
+
 class Gameplay : public cage::GameState
 {
 	using Ref = std::shared_ptr<cage::ui::UIElement>;
@@ -56,6 +61,11 @@ private:
 
 	std::unique_ptr<Client> m_client;
 	std::unique_ptr<Server> m_server;
+
+	//cage::Window &m_w2, &m_w3;
+	cage::Window &m_window;
+
+	SDL_GLContext m_context;
 
 	void boardSync(cage::networking::packets::BoardSync& sync);
 	void playerSync(cage::networking::packets::PlayerPiecePos& sync);
@@ -176,6 +186,7 @@ private:
 		{
 			t.x -= dx;
 			//setBoardValOverPiece(t, 1);
+			Mix_PlayChannel(-1, sfx[2], 0);
 			return false;
 		}
 
@@ -201,19 +212,22 @@ private:
 			t.orientation %= 4;
 
 			//setBoardValOverPiece(t, 1);
+			Mix_PlayChannel(-1, sfx[2], 0);
 			return false;
 		}
 
 		// place new piece onto the board
 		//setBoardValOverPiece(t, 1);
+		Mix_PlayChannel(-1, sfx[3], 0);
 		networkPieceSync();
+
 		return true;
 
 	};
 
 	
 
-#pragma region VR Shit
+#pragma region VR
 	vr::IVRSystem* m_pHMD;
 
 	glm::mat4 projLeft, projRight, eyePosLeft, eyePosRight, hmdPose;
@@ -395,16 +409,19 @@ private:
 	Tetromino playerParts[8];
 	Mix_Chunk* music, * layers1, * layers2, * layers3, * bigLayers, * donkey;
 	Mix_Chunk* levels[4];
+	Mix_Chunk* sfx[5];
 	cage::ui::UIElement m_rootNode;
 	std::shared_ptr<cage::ui::Text> scoreText, levelText;
 	std::shared_ptr<cage::ui::LayoutGroup> m_rightPanel;
+	std::shared_ptr<cage::ui::Button> m_dab, m_dab2;
 	cage::Font* m_font;
 	unsigned int m_score, m_level, m_levelCounter;
 	glm::vec4 fontColor = { 12 / 255.f, 160 / 255.f, 18 / 255.f, 1.0 };
 	cage::Model shrek;
+	cage::Model* newShrek, *newShrek2;
 	cage::Skybox skybox;
 	cage::Mesh<cage::Vertex3UVNormal>* grid;
-	std::unique_ptr<cage::Generic3DShader> program;
+	std::shared_ptr<cage::Generic3DShader> program;
 	std::unique_ptr<cage::SkyboxShader> skyProgram;
 	std::shared_ptr<cage::SpriteShader> m_spriteProgram;
 
