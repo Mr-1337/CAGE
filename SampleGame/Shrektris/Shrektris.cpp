@@ -3,7 +3,8 @@
 
 Shrektris::Shrektris() : 
 	Game("Shrektris"),
-	m_running(true)
+	m_running(true),
+    m_vrMode(false)
 {
 
 }
@@ -11,6 +12,23 @@ Shrektris::Shrektris() :
 Shrektris::~Shrektris()
 {
 
+}
+
+void Shrektris::HandleCMDArgs(int argc, char** argv)
+{
+    if (argc > 1)
+    {
+        std::string arg = argv[1];
+        if (arg == "-vr")
+        {
+            std::cout << "launching in vr mode" << std::endl;
+            m_vrMode = true;
+        }
+        else
+        {
+            std::cout << "Unrecognized argument " << arg << std::endl;
+        }
+    }
 }
 
 void Shrektris::Init()
@@ -53,9 +71,6 @@ void Shrektris::Init()
 
 	)";
 
-
-    // Set this to true if you want to play in VR. The menus don't have VR interfaces yet :( so you're gonna need to use your mouse a bit, once gameplay loads you're set
-    vrMode = false;
     std::cout << std::endl << shrekStr << std::endl;
 
 

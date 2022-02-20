@@ -23,7 +23,7 @@ namespace cage
 		const MouseButton button;
 
 		inline MouseClickEvent(int x, int y, MouseButton button, bool release) :
-			x(x), y(y), button(button), wasRelease(release)
+			x(x), y(y), wasRelease(release), button(button)
 		{
 
 		}

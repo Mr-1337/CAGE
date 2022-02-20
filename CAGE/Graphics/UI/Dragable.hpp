@@ -38,16 +38,8 @@ namespace cage
 				return false;
 			}
 
-		private:
-
-			bool m_dragging;
-
-			void onTransform() override
-			{
-
-			}
-
-			bool onClick(int x, int y) override
+		protected:
+			virtual bool onClick(int x, int y) override
 			{
 				if (hovering())
 				{
@@ -55,6 +47,15 @@ namespace cage
 					return true;
 				}
 				return false;
+			}
+
+		private:
+
+			bool m_dragging;
+
+			void onTransform() override
+			{
+
 			}
 
 			bool onRelease() override

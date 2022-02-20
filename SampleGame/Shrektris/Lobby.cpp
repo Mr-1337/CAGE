@@ -4,7 +4,7 @@
 #include "../../CAGE/Graphics/UI/GridLayout.hpp"
 #include "Gameplay.hpp"
 
-Lobby::Lobby(cage::Game& game) : cage::GameState(game), m_font("Assets/sans.ttf", 32)
+Lobby::Lobby(cage::Game& game) : cage::GameState(game), m_font("Assets/Fonts/sans.ttf", 32)
 {
 	std::shared_ptr<MenuButton> host = std::make_shared<MenuButton>("Host");
 	std::shared_ptr<MenuButton> join = std::make_shared<MenuButton>("Join");

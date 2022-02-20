@@ -111,7 +111,15 @@ set(SRC_FILES
 	"Graphics/Animation/Animation.hpp"
 
 	"Graphics/Animation/Animation.cpp"
-	"Graphics/UI/DebugVisualizer.cpp" "Graphics/UI/ListLayout.hpp" "Graphics/UI/ListLayout.cpp" "IO/Events/WindowEvents.hpp" "Util/Timer.hpp" "Util/Timer.cpp" "Graphics/Textures/TextureArray.hpp" "Graphics/Textures/TextureArray.cpp")
+	"Graphics/UI/DebugVisualizer.cpp" 
+	"Graphics/UI/ListLayout.hpp" 
+	"Graphics/UI/ListLayout.cpp" 
+	"IO/Events/WindowEvents.hpp" 
+	"Util/Timer.hpp" 
+	"Util/Timer.cpp" 
+	"Graphics/Textures/TextureArray.hpp" 
+	"Graphics/Textures/TextureArray.cpp"
+	"Graphics/UI/ScrollField.hpp")
 
 set (CMAKE_CXX_EXTENSIONS OFF)
 

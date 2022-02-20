@@ -7,6 +7,7 @@ namespace ub
 	// Class containing the tile data and mesh and provides facilities for sampling a tile
 	class Tilemap
 	{
+		friend class WorldSerializer;
 	public:
 
 		const static int TILE_SIZE = 32;

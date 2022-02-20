@@ -15,6 +15,8 @@ namespace ub
 
 	class World
 	{
+		friend class WorldSerializer;
+
 	public:
 		World(std::pair<int, int> winSize);
 		~World();

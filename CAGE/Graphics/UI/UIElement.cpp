@@ -282,8 +282,8 @@ namespace cage
 				sharedVAO->Bind();
 				if (m_visible)
 				{
-					if (m_ignoreMasking)
-						glDisable(GL_STENCIL_TEST);
+					//if (m_ignoreMasking)
+						//glDisable(GL_STENCIL_TEST);
 					shader->SpriteSize->value = m_size;
 					shader->SpriteSize->ForwardToShader();
 					shader->Model->value = m_totalTransform;

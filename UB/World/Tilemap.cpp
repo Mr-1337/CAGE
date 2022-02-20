@@ -10,7 +10,7 @@ namespace ub
 		SDL_FreeSurface(surface);
 
 		m_tileData.resize(m_width * m_height);
-		std::for_each(std::begin(m_tileData), std::end(m_tileData), [](auto& t) { t = Tile::LAVA; });
+		//std::for_each(std::begin(m_tileData), std::end(m_tileData), [](auto& t) { t = Tile::LAVA; });
 
 		buildMesh();
 	}
@@ -61,8 +61,9 @@ namespace ub
 	{
 		int index = (y * m_width + x) * 6;
 		std::vector<cage::Vertex3UV> geometry;
-		geometry.reserve(30);
+		geometry.reserve(6);
 		makeTile(geometry, x, y, static_cast<unsigned char>(operator()(x, y)));
+		m_mesh.GetBuffer().Bind();
 		m_mesh.GetBuffer().UpdateRange(index, geometry);
 	}
 

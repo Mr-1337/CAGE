@@ -270,11 +270,11 @@ namespace ub
 			{
 				if (keys[SDL_SCANCODE_W])
 					m_velocity.y = -speed;
-				else if (keys[SDL_SCANCODE_A])
+				if (keys[SDL_SCANCODE_A])
 					m_velocity.x = -speed;
-				else if (keys[SDL_SCANCODE_S])
+				if (keys[SDL_SCANCODE_S])
 					m_velocity.y = speed;
-				else if (keys[SDL_SCANCODE_D])
+				if (keys[SDL_SCANCODE_D])
 					m_velocity.x = speed;
 
 				const glm::vec2 playerOffset = glm::vec2(28.f, 48.f) * 0.5f;
@@ -301,63 +301,69 @@ namespace ub
 	void World::Draw()
 	{
 		const int TILE_SIZE = Tilemap::TILE_SIZE;
-		if (InBattle())
+		
+		glEnable(GL_DEPTH_TEST);
+		m_worldShader->Use();
+		std::vector<cage::Vertex3UV> geometry;
+		geometry.reserve(6);
+
+		float houseDepth = (float)(house.y + (float)house.h / TILE_SIZE) / m_tilemap.GetSize().second;
+
+		geometry.emplace_back(house.x * TILE_SIZE, house.y * TILE_SIZE, houseDepth, 0.f, 0.f);
+		geometry.emplace_back(house.x * TILE_SIZE + house.w, house.y * TILE_SIZE, houseDepth, 0.f + 1, 0.f);
+		geometry.emplace_back(house.x * TILE_SIZE, house.y * TILE_SIZE + house.h, houseDepth, 0.f, 1);
+
+		geometry.emplace_back(house.x * TILE_SIZE + house.w, house.y * TILE_SIZE + 0.f, houseDepth, 0.f + 1, 0.f);
+		geometry.emplace_back(house.x * TILE_SIZE + 0.f, house.y * TILE_SIZE + house.h, houseDepth, 0.f, 1);
+		geometry.emplace_back(house.x * TILE_SIZE + house.w, house.y * TILE_SIZE + house.h, houseDepth, 1, 1);
+
+		house.mesh->GetBuffer().Fill(geometry);
+
+		m_worldShader->m_ViewProjection->value = m_projection * m_view;
+		m_worldShader->m_ViewProjection->ForwardToShader();
+
+		m_worldShader->m_Textured->value = true;
+		m_worldShader->m_Textured->ForwardToShader();
+		m_worldShader->m_Color->ForwardToShader();
+
+		m_tilemap.Draw();
+		house.mesh->Draw();
+
+		for (auto& s : m_structureData)
 		{
-			m_worldShader->Use();
-			m_worldShader->m_ViewProjection->value = m_projection;
-			m_worldShader->m_ViewProjection->ForwardToShader();
-			m_battle->Draw();
-		}
-		else
-		{
-			glEnable(GL_DEPTH_TEST);
-			m_worldShader->Use();
-			std::vector<cage::Vertex3UV> geometry;
-			geometry.reserve(6);
-
-			float houseDepth = (float)(house.y + (float)house.h / TILE_SIZE) / m_tilemap.GetSize().second;
-
-			geometry.emplace_back(house.x * TILE_SIZE, house.y * TILE_SIZE, houseDepth, 0.f, 0.f);
-			geometry.emplace_back(house.x * TILE_SIZE + house.w, house.y * TILE_SIZE, houseDepth, 0.f + 1, 0.f);
-			geometry.emplace_back(house.x * TILE_SIZE, house.y * TILE_SIZE + house.h, houseDepth, 0.f, 1);
-
-			geometry.emplace_back(house.x * TILE_SIZE + house.w, house.y * TILE_SIZE + 0.f, houseDepth, 0.f + 1, 0.f);
-			geometry.emplace_back(house.x * TILE_SIZE + 0.f, house.y * TILE_SIZE + house.h, houseDepth, 0.f, 1);
-			geometry.emplace_back(house.x * TILE_SIZE + house.w, house.y * TILE_SIZE + house.h, houseDepth, 1, 1);
-
-			house.mesh->GetBuffer().Fill(geometry);
-
+			auto mat = glm::identity<glm::mat4>();
+			//mat[1][0] = -m_cameraShear.x;
+			m_worldShader->m_Model->value = mat;
+			m_worldShader->m_Model->ForwardToShader();
 			m_worldShader->m_ViewProjection->value = m_projection * m_view;
 			m_worldShader->m_ViewProjection->ForwardToShader();
+			s.mesh->Draw();
+		}
 
-			m_worldShader->m_Textured->value = true;
+		for (auto e : m_entities)
+		{
+			e->Draw();
+		}
+
+		m_worldShader->m_Model->value = glm::identity<glm::mat4>();
+		m_worldShader->m_Model->ForwardToShader();
+
+		if (m_drawGrid)
+		{
+			m_worldShader->m_Textured->value = false;
+			m_worldShader->m_Color->value = { 1.0, 1.0, 1.0, 0.3 };
+
 			m_worldShader->m_Textured->ForwardToShader();
 			m_worldShader->m_Color->ForwardToShader();
 
-			m_tilemap.Draw();
-			house.mesh->Draw();
-
-			for (auto& s : m_structureData)
-			{
-				s.mesh->Draw();
-			}
-
-			for (auto e : m_entities)
-			{
-				e->Draw();
-			}
-
-			if (m_drawGrid)
-			{
-				m_worldShader->m_Textured->value = false;
-				m_worldShader->m_Color->value = { 1.0, 1.0, 1.0, 0.3 };
-
-				m_worldShader->m_Textured->ForwardToShader();
-				m_worldShader->m_Color->ForwardToShader();
-
-				m_gridMesh.Draw(GL_LINES);
-			}
+			m_gridMesh.Draw(GL_LINES);
 		}
+
+		if (InBattle())
+		{
+			m_battle->Draw();
+		}
+		
 
 		// Draw the UI no matter what
 		glDisable(GL_DEPTH_TEST);

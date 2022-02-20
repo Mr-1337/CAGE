@@ -5,11 +5,29 @@ cmake_minimum_required (VERSION 3.10)
 
 set (SRC_FILES
     "Main.cpp"
-     "V2.cpp" 
-     "V2.hpp"
-     "Menu.cpp"
-     "Menu.hpp"
-     )
+    "V2.cpp" 
+    "V2.hpp"
+    "Menu.cpp"
+    "Menu.hpp"
+    "Song.cpp"
+    "Song.hpp"
+     
+    "UI/MenuButton.hpp" 
+    "Playfield.hpp" 
+    "Playfield.cpp"
+    "UI/SongWheel.hpp"
+    "UI/PlaybackBar.hpp" 
+    "Entity.cpp"
+    "Entity.hpp"
+    "Enemy.cpp"
+    "Enemy.hpp"
+    "GameShader.hpp" 
+    "Player.cpp"
+    "Player.hpp" 
+    "Bullet.cpp"
+    "Bullet.hpp" 
+    "Editor.cpp"
+    "Editor.hpp")
     
 
 set (CMAKE_CXX_EXTENSIONS OFF)
@@ -26,7 +44,7 @@ endif()
 
 add_custom_command(TARGET V2 PRE_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy_directory
-                       ${CMAKE_SOURCE_DIR}/UB/Assets $<TARGET_FILE_DIR:V2>/Assets)
+                       ${CMAKE_SOURCE_DIR}/V2/Assets $<TARGET_FILE_DIR:V2>/Assets)
 
 add_custom_command(TARGET V2 PRE_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy_directory

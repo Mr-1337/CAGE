@@ -1,11 +1,18 @@
 #pragma once
 
 #include <Core/GameState.hpp>
+#include "UI/MenuButton.hpp"
+#include "UI/SongWheel.hpp"
+#include "Playfield.hpp"
 
 namespace v2
 {
     class Menu : public cage::GameState
     {
+		cage::ui::UIElement m_root;
+		std::shared_ptr<SongWheel> m_songWheel;
+		std::shared_ptr<cage::ui::UIElement> m_scrollPane;
+		Playfield* m_playfield;
 	public:
 		Menu(cage::Game& game);
 		// Please free your resources!

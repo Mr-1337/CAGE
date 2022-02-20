@@ -39,7 +39,8 @@ namespace cage
 					{
 						if (m_hovering && OnUnHover)
 							OnUnHover();
-						onUnHover();
+						if (m_hovering)
+							onUnHover();
 						m_hovering = false;
 					}
 				}
@@ -67,13 +68,18 @@ namespace cage
 				SetActiveTexture(m_idleTexture.value_or(nullptr));
 			}
 
-			inline bool inBounds(int x, int y)
+			inline glm::vec2 toLocalSpace(int x, int y)
 			{
 				auto mat = glm::inverse(GetTransform());
 				glm::vec4 temp{ (float)x, (float)y, 0.f, 1.0f };
 				temp = mat * temp;
 				temp /= glm::vec4{ GetSize(), 1.0f, 1.0f };
+				return temp;
+			}
 
+			inline bool inBounds(int x, int y)
+			{
+				auto temp = toLocalSpace(x, y);
 				return (temp.x >= -0.5 && temp.x <= 0.5) && (temp.y >= -0.5 && temp.y <= 0.5);
 			}
 

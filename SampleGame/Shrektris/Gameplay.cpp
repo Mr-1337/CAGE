@@ -30,7 +30,7 @@ Gameplay::Gameplay(cage::Game& game, int w, int h, Mode mode) :
 	BOARD_WIDTH(w),
 	BOARD_HEIGHT(h),
 	m_mode(mode),
-	m_vrMode(((Shrektris&)game).vrMode),
+	m_vrMode(((Shrektris&)game).IsVR()),
 	m_spin(false),
 	skybox(std::filesystem::current_path().append("Assets/skybox")),
 	//m_w2(*new cage::Window("2", 200, 200)),
@@ -181,7 +181,7 @@ Gameplay::Gameplay(cage::Game& game, int w, int h, Mode mode) :
 	sfx[3] = Mix_LoadWAV("Assets/Sounds/rotcw.ogg");
 	sfx[4] = Mix_LoadWAV("Assets/Sounds/rotccw.ogg");
 
-	//Mix_PlayChannel(2, music, -1);
+	Mix_PlayChannel(2, music, -1);
 
 	currentPiece.shape = 0;
 	currentPiece.y = 1;
@@ -313,8 +313,7 @@ void Gameplay::ProcessEvents()
 			}
 			else if (e.key.keysym.scancode == SDL_SCANCODE_S)
 			{
-				if (!movePieceDown(currentPiece))
-					m_fallTimer = levelTime;
+				slamBlock(currentPiece);
 			}
 			else if (e.key.keysym.scancode == SDL_SCANCODE_E)
 			{
@@ -432,7 +431,7 @@ void Gameplay::logic()
 
 			if (currentPiece.y == 0) // You lost :(
 			{
-				//gameOver();
+				gameOver();
 			}
 
 			//Clear any rows we should
@@ -689,7 +688,7 @@ void Gameplay::Update(float delta)
 
 			error = vr::VRInput()->GetDigitalActionData(m_moveBlockDownAct, &dData, sizeof(dData), vr::k_ulInvalidInputValueHandle);
 			if (dData.bState && dData.bChanged)
-				movePieceDown(currentPiece);
+				slamBlock(currentPiece);
 
 			velocity = velocity * speed;
 
@@ -716,6 +715,13 @@ void Gameplay::shake(float strength, float duration)
 	m_shakeTimer = 0;
 	m_shakeStrength = strength;
 	m_shaking = true;
+}
+
+void Gameplay::slamBlock(Tetromino& t)
+{
+	while (movePieceDown(t));
+	m_fallTimer = levelTime;
+	Mix_PlayChannel(-1, sfx[0], 0);
 }
 
 void Gameplay::applyShake()

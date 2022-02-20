@@ -16,6 +16,8 @@ namespace ub
 		Character(World* world, std::string name);
 		~Character();
 
+		void Serialize(std::ostream& os) override;
+
 		void Update(float dt) override;
 		bool OnInteract() override;
 

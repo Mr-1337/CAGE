@@ -6,16 +6,13 @@ namespace ub
 {
 	cage::Game* Battle::s_Game = nullptr;
 
-	Battle::Battle(Player* player, Enemy* enemy, std::shared_ptr<WorldShader> shader) : m_player(player), m_enemy(enemy), m_complete(false), m_shader(shader), m_turnCount(1), m_currentTurn(0), m_rng(5, 1), m_timer(nullptr)
+	Battle::Battle(Player* player, Enemy* enemy, std::shared_ptr<WorldShader> shader) : m_player(player), m_enemy(enemy), m_complete(false), m_shader(shader), m_turnCount(1), m_currentTurn(0), m_rng(5, 1), m_timer(nullptr), k_introTime(1.f), m_introTimer(0.f)
 	{
 		using cage::ui::MountPoint;
 
-		m_enemy->LoadTexture("battle.png");
+		//m_enemy->LoadTexture("battle.png");
 		m_playerPos = player->GetPosition();
 		m_enemyPos = enemy->GetPosition();
-
-		m_player->SetPosition({ 100, 500 });
-		m_enemy->SetPosition({ 600, 25 });
 
 		m_battleUI = std::make_shared<cage::ui::UIElement>();
 		m_battleUI->SetParentMounting(cage::ui::MountPoint::TOP_LEFT);
@@ -54,28 +51,7 @@ namespace ub
 		};
 
 		m_timer = new cage::Timer(std::chrono::duration<float>(2.0f), changeTurn);
-		m_timer->Start();
-
-		/*
-		std::map<int, int> hist;
-
-		for (int i = 0; i < 10000; i++)
-		{
-			hist[static_cast<int>(std::round(m_rng(s_Game->GetRNG())))]++;
-		}
-
-		for (auto& f : hist)
-		{
-			auto newBar = std::make_shared<ProgressBar>(glm::vec2{ f.second * 0.05, 40.f });
-			newBar->Rotate(glm::radians(-90.f));
-			newBar->MoveTo({ f.first * 40.f - 50.f, 900.f });
-			m_battleUI->Add(newBar);
-		}
-
-		std::uniform_int_distribution<int> rngesus(1, 422);
-		std::cout << rngesus(s_Game->GetRNG()) << std::endl;
-		
-		*/
+		m_timer->Start();	
 
 	}
 
@@ -105,9 +81,9 @@ namespace ub
 
 	void Battle::Draw()
 	{
-		m_shader->Use();
-		m_player->Draw();
-		m_enemy->Draw();
+		//m_shader->Use();
+		//m_player->Draw();
+		//m_enemy->Draw();
 	}
 
 	void Battle::updateHPBar(Character* contestant)

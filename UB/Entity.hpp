@@ -35,6 +35,8 @@ namespace ub
 		Entity(World* world, const std::string& name);
 		void LoadTexture(const std::string& name);
 
+		virtual void Serialize(std::ostream& os) = 0;
+
 		virtual void Update(float dt);
 		void Draw();
 

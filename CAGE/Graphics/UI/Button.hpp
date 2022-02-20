@@ -10,9 +10,13 @@ namespace cage
 	{
 		class Button : public Clickable
 		{
+
+			SDL_Cursor* m_clickCursor;
+			SDL_Cursor* m_defaultCursor;
+
 		public:
 			Button(std::optional<std::shared_ptr<Texture>> idleTexture, std::optional<std::shared_ptr<Texture>> hoverTexture, std::optional<std::shared_ptr<Texture>> clickTexture)
-				: Clickable(idleTexture, hoverTexture), m_clickTexture(clickTexture)
+				: Clickable(idleTexture, hoverTexture), m_clickTexture(clickTexture), m_defaultCursor(SDL_GetDefaultCursor()), m_clickCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND))
 			{
 				m_clickStart = false;
 			}
@@ -22,7 +26,7 @@ namespace cage
 				return "Button";
 			}
 
-			std::function<void(void)> OnClick;
+			std::function<void(void)> OnClick, OnRelease;
 
 		protected:
 
@@ -30,6 +34,7 @@ namespace cage
 
 			virtual void onHover() override
 			{
+				SDL_SetCursor(m_clickCursor);
 				if (!m_clickStart)
 					SetActiveTexture(m_hoverTexture.value_or(m_idleTexture.value_or(nullptr)));
 				//SDL_SetCursor(s_cursor);
@@ -37,6 +42,7 @@ namespace cage
 
 			virtual void onUnHover() override
 			{
+				SDL_SetCursor(m_defaultCursor);
 				if (!m_clickStart)
 					SetActiveTexture(m_idleTexture.value_or(nullptr));
 				//SDL_SetCursor(s_cursor2);
@@ -46,8 +52,11 @@ namespace cage
 			{
 				if (hovering())
 				{
+					if (OnClick)
+						OnClick();
 					m_clickStart = true;
 					SetActiveTexture(m_clickTexture.value_or(m_idleTexture.value_or(nullptr)));
+					SDL_SetCursor(m_defaultCursor);
 					return true;
 				}
 				return false;
@@ -57,8 +66,8 @@ namespace cage
 			{
 				if (hovering() && m_clickStart)
 				{
-					if (OnClick)
-						OnClick();
+					if (OnRelease)
+						OnRelease();
 					m_clickStart = false;
 					SetActiveTexture(m_hoverTexture.value_or(m_idleTexture.value_or(nullptr)));
 					return true;

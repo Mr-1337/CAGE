@@ -174,6 +174,8 @@ private:
 		return true;
 	};
 
+	void slamBlock(Tetromino& t);
+
 	auto movePieceLR(Tetromino& t, int dx)
 	{
 		// removes current piece from board

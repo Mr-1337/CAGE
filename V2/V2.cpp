@@ -16,6 +16,8 @@ namespace v2
 
     void V2::Init()
     {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         m_stateMachine.Push(new Menu(*this));
     }
 
@@ -32,8 +34,8 @@ namespace v2
             m_stateMachine.Update(frameTime.count());
             m_stateMachine.Draw();
             m_running = !m_stateMachine.Quit();
-            frameTime = Clock::now() - startTime;
             m_window->SwapBuffers();
+            frameTime = Clock::now() - startTime;
         }
     }
 }

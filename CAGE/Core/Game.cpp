@@ -117,6 +117,7 @@ namespace cage
 		platform::Init();
 		cage::Texture::s_MissingTexture = new cage::Texture(IMG_Load("Assets/Textures/missing.png"));
 		cage::ui::UIElement::s_DefaultFont = new cage::Font("Assets/Fonts/consola.ttf", 18);
+		cage::ui::UIElement::shader = std::make_shared<cage::SpriteShader>();
 	}
 
 	Game::~Game()

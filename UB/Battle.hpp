@@ -41,6 +41,9 @@ namespace ub
 		int m_turnCount;
 		unsigned char m_currentTurn;
 
+		const float k_introTime;
+		float m_introTimer;
+
 		std::normal_distribution<float> m_rng;
 		cage::Timer* m_timer;
 

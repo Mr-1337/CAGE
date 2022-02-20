@@ -33,9 +33,30 @@ namespace ub
 
 	}
 
+	void Character::Serialize(std::ostream& os)
+	{
+
+		const unsigned int size = 4 + GetName().length() + 1 + 4 + 4 + 1;
+		unsigned int bufferPos = 0;
+		char* buffer = new char[size];
+
+		std::memcpy(buffer, &size, sizeof(unsigned int));
+		bufferPos += sizeof(int);
+		std::strcpy(&buffer[bufferPos], GetName().c_str());
+		bufferPos += GetName().length() + 1;
+		std::memcpy(&buffer[bufferPos], &m_hp, sizeof(int));
+		bufferPos += sizeof(int);
+		std::memcpy(&buffer[bufferPos], &m_maxHP, sizeof(int));
+		bufferPos += sizeof(int);
+
+		os.write(buffer, bufferPos);
+
+		delete[] buffer;
+	}
+
 	void Character::SetHP(int hp)
 	{
-		m_hp = std::max(hp, 0);
+		m_hp = std::max(0, hp);
 		if (m_hp == 0)
 		{
 			m_hp = 0;

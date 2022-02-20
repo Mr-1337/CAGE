@@ -12,14 +12,13 @@ namespace ub
 		cage::GameState(game), 
 		m_playback(false),
 		m_currentTool(nullptr),
-		m_world(std::make_unique<World>(std::pair{ 16, 16 })),
+		m_world(std::make_unique<World>(std::pair{ 64, 64 })),
 		m_font("Assets/Fonts/consola.ttf", 18)
 	{
 		const auto size = getGame().GetWindow().GetSize();
 
 		auto& lang = getGame().GetLanguage();
 		lang.LoadFile("editor.lang");
-
 		m_world->SetWinSize(size);
 		m_rightPanel = std::make_shared<cage::ui::LayoutGroup>(new cage::ui::FlowLayout({ 0.f, 0.f }, cage::ui::FlowLayout::Orientation::VERTICAL, false));
 		m_rightPanel->SetParentMounting(cage::ui::MountPoint::TOP_RIGHT);
@@ -262,11 +261,11 @@ namespace ub
 		}
 
 		std::ifstream file;
-		file.open("Assets/Worlds/shrek.txt");
+		file.open("Assets/Worlds/gorbo.txt");
 
-		for (int i = 0; i < 48; i++)
+		for (int i = 0; i < 64; i++)
 		{
-			for (int j = 0; j < 48; j++)
+			for (int j = 0; j < 64; j++)
 			{
 				std::string s;
 				file >> s;
@@ -288,9 +287,9 @@ namespace ub
 		m_gameRoot->SetLocalMounting(cage::ui::MountPoint::TOP_LEFT);
 		m_gameRoot->SetParentMounting(cage::ui::MountPoint::TOP_LEFT);
 
-		m_debugVisualizer = std::make_shared<cage::ui::DebugVisualizer>(&m_root);
+		//m_debugVisualizer = std::make_shared<cage::ui::DebugVisualizer>(&m_root);
 
-		m_root.Add(m_debugVisualizer);
+		//m_root.Add(m_debugVisualizer);
 		m_input.Subscribe(&m_root);
 
 		glViewport(0, 0, size.first, size.second);
@@ -405,6 +404,7 @@ namespace ub
 
 	void Editor::toggleSaveUI()
 	{
-		m_saveDialogue->SetVisible(!m_saveDialogue->IsVisible());
+		bool visible = m_saveDialogue->IsVisible();
+		m_saveDialogue->SetVisible(!visible);
 	}
 }

@@ -9,6 +9,13 @@ namespace ub
 		SetHP(GetMaxHP());
 	}
 
+	void Player::Serialize(std::ostream& os)
+	{
+		Character::Serialize(os);
+		auto buffer = "Player Object";
+		os.write(buffer, std::strlen(buffer));
+	}
+
 	void Player::ProcessInput(cage::Event& event)
 	{
 		if (auto ke = std::get_if<cage::KeyDownEvent>(&event))

@@ -1,10 +1,13 @@
 #include "Font.hpp"
+#include <stdexcept>
 
 namespace cage
 {
 	Font::Font(const std::string& fontName, int ptSize)
 	{
 		m_font = TTF_OpenFont(fontName.c_str(), ptSize);
+		if (m_font == nullptr)
+			throw std::runtime_error("Font file " + fontName + " not found");
 	}
 
 	Font::~Font()

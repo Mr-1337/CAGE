@@ -79,7 +79,7 @@ namespace cage::ui::transforms
 		}
 	}
 
-	FadeTo::FadeTo(glm::vec4 endColor, float startTime, float endTime) : Transform(startTime, endTime, Interpolation::LINEAR), m_end(endColor)
+	FadeTo::FadeTo(glm::vec4 endColor, float startTime, float endTime) : Transform(startTime, endTime, Interpolation::CUBIC), m_end(endColor)
 	{
 
 	}
