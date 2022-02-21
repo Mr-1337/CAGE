@@ -88,7 +88,7 @@ namespace cage
 
 	void Game::EngineInit()
 	{
-
+		std::cout << "Initializing CAGE, hang tight!" << std::endl;
 		std::vector<std::string> names;
 		names = {
 			"Considerably Average Game Engine",
@@ -107,7 +107,8 @@ namespace cage
 			"Conventionally Astray Game Engine",
 			"Clumsily Adapted Game Engine",
 			"Computer Antagonizing Game Engine",
-			"Carelessly Authored Game Engine"
+			"Carelessly Authored Game Engine",
+			"Crypto-jacking At Gamers' Expense"
 		};
 
 		initSDL();

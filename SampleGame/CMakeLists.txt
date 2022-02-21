@@ -47,5 +47,8 @@ set (SDL_LIBS SDL2 SDL2main SDL2_mixer SDL2_image SDL2_ttf SDL2_net)
 # Steam libraries
 set (STEAM_LIBS phonon openvr_api)
 
+# Vulkan libraries
+set (VULKAN_LIBS vulkan-1)
+
 # link against CAGE, SDL and its extensions
-target_link_libraries (Shrektris PUBLIC CAGE ${SDL_LIBS} ${STEAM_LIBS} assimp-vc142-mt)
+target_link_libraries (Shrektris PUBLIC CAGE ${SDL_LIBS} ${STEAM_LIBS} ${VULKAN_LIBS} assimp-vc142-mt)

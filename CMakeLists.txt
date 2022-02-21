@@ -10,7 +10,7 @@ project ("CAGE"
 		)
 
 include_directories ("include" "CAGE")
-link_directories ("lib" "lib/SDL2" "lib/Steam" "lib/assimp")
+link_directories ("lib" "lib/SDL2" "lib/Steam" "lib/assimp" "lib/vulkan")
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
