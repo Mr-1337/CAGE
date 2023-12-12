@@ -8,10 +8,14 @@ namespace cage
 {
 	namespace ui
 	{
+
+		bool Vulkan = true;
+
 		// shared geometry for all UIElement instances
 		bool UIElement::init = false;
 		std::shared_ptr<SpriteShader> UIElement::shader = nullptr;
 		int UIElement::s_maskLayer = 0;
+		std::vector<UIElement*> UIElement::s_DirtyTexture;
 
 		Font* UIElement::s_DefaultFont = nullptr;
 
@@ -41,19 +45,20 @@ namespace cage
 
 		void UIElement::initSharedData()
 		{
-			sharedVBO = new VertexBuffer<Vertex2>();
-
 			std::vector<cage::Vertex2> masterQuad;
-			masterQuad.emplace_back(cage::Vertex2{ -0.5f, 0.5f });
-			masterQuad.emplace_back(cage::Vertex2{ 0.5f, 0.5f });
-			masterQuad.emplace_back(cage::Vertex2{ -0.5f, -0.5f });
-			masterQuad.emplace_back(cage::Vertex2{ -0.5f, -0.5f });
-			masterQuad.emplace_back(cage::Vertex2{ 0.5f, -0.5f });
-			masterQuad.emplace_back(cage::Vertex2{ 0.5f, 0.5f });
+			if (!Vulkan)
+			{
+				masterQuad.push_back(cage::Vertex2{ -0.5f, 0.5f });
+				masterQuad.push_back(cage::Vertex2{ 0.5f, 0.5f });
+				masterQuad.push_back(cage::Vertex2{ -0.5f, -0.5f });
+				masterQuad.push_back(cage::Vertex2{ -0.5f, -0.5f });
+				masterQuad.push_back(cage::Vertex2{ 0.5f, -0.5f });
+				masterQuad.push_back(cage::Vertex2{ 0.5f, 0.5f });
+				sharedVBO = new VertexBuffer<Vertex2>();
 
-			sharedVBO->Fill(masterQuad);
-			sharedVAO = new VertexArray<Vertex2>(*sharedVBO);
-
+				sharedVBO->Fill(masterQuad);
+				sharedVAO = new VertexArray<Vertex2>(*sharedVBO);
+			}
 			UIElement::init = true;
 		}
 

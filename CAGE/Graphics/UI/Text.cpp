@@ -1,4 +1,5 @@
 #include "Text.hpp"
+#include <SDL2/SDL_image.h>
 
 namespace cage
 {
@@ -17,7 +18,8 @@ namespace cage
 		void Text::SetText(const std::string& text)
 		{
 			m_text = text.empty() ? " " : text;
-			SetActiveTexture(m_font.Render(m_text, m_color));
+			SetActiveTexture(m_font.RenderVk(m_text, m_color));
+			//SetActiveTexture(m_font.Render(m_text, m_color));
 		}
 
 		void Text::SetColor(glm::vec4 color)

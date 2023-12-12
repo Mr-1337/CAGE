@@ -23,7 +23,7 @@ namespace cage
 
 		Model() : m_TransformNode(nullptr), m_currentAnimation(0)
 		{
-			m_TransformNode = new scene::Node("Model");
+			m_TransformNode = new graphics::Node("Model");
 		};
 
 		Model(const Model& other) : m_TransformNode(nullptr)
@@ -31,7 +31,7 @@ namespace cage
 			m_TransformNode = other.m_TransformNode;	
 		}
 
-		scene::Node* m_TransformNode;
+		graphics::Node* m_TransformNode;
 
 		~Model()
 		{
@@ -51,14 +51,14 @@ namespace cage
 			{
 				auto newMesh = new Mesh<Vertex3UVNormal>("Bone");
 				newMesh->SetGeometry(LoadObjVertices("Assets/bone.obj"));
-				newMesh->m_TransformNode = new scene::Node("Bone");
+				newMesh->m_TransformNode = new graphics::Node("Bone");
 				newMesh->m_TransformNode->m_LocalTransform = b.m_LocalTransform;
 				m_boneMeshes.push_back(newMesh);
 			}
 
 			for (int i = 1; i < m_bones.size(); i++)
 			{
-				m_boneMeshes[m_bones[i].m_Parent]->m_TransformNode->Add(m_boneMeshes[i]->m_TransformNode);
+				//m_boneMeshes[m_bones[i].m_Parent]->m_TransformNode->Add(m_boneMeshes[i]->m_TransformNode);
 			}
 		}
 

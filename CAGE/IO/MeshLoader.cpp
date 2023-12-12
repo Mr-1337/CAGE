@@ -193,18 +193,18 @@ namespace cage
 		(meshesOut[meshCount - 1])->SetGeometry(verticesOut);
 	}
 
-	void recurseScene(aiNode* node, const aiScene* scene, Model* model, scene::Node* parent, int depth, std::unordered_map<std::string, aiBone*>& bones, std::vector<animation::Bone>& bonesOut)
+	void recurseScene(aiNode* node, const aiScene* scene, Model* model, graphics::Node* parent, int depth, std::unordered_map<std::string, aiBone*>& bones, std::vector<animation::Bone>& bonesOut)
 	{
 		std::cout << "|" << std::setw(depth) << " " << "Node Name: " << node->mName.C_Str() << std::endl;
 
-		scene::Node* cageNode = new scene::Node(node->mName.C_Str());
+		auto cageNode = std::make_unique<graphics::Node>(node->mName.C_Str());
 		
 		for (int x = 0; x < 4; x++)
 			for (int y = 0; y < 4; y++)
 				cageNode->m_LocalTransform[x][y] = node->mTransformation[y][x];
 
 		if (parent)
-			parent->Add(cageNode);
+			parent->Add(std::move(cageNode));
 
 		if (auto bone = bones.find(node->mName.C_Str()); bone != bones.end())
 		{
@@ -279,12 +279,12 @@ namespace cage
 
 					for (int vi = 0; vi < 4; vi++)
 					{
-						if (verts[weightInfo.mVertexId].boneIDs[vi] == -1)
+						/*if (verts[weightInfo.mVertexId].boneIDs[vi] == -1)
 						{
 							verts[weightInfo.mVertexId].weights[vi] = weightInfo.mWeight;
 							verts[weightInfo.mVertexId].boneIDs[vi] = j;
 							break;
-						}
+						}*/
 					}
 				}
 			}
@@ -312,11 +312,11 @@ namespace cage
 				SDL_FreeSurface(sdlImg);
 			}
 
-			cageMesh->m_TransformNode = cageNode;
+			cageMesh->m_TransformNode = cageNode.get();
 			model->AddMesh(cageMesh);
 		}
 		for (int i = 0; i < node->mNumChildren; i++)
-			recurseScene(node->mChildren[i], scene, model, cageNode, depth+1, bones, bonesOut);
+			recurseScene(node->mChildren[i], scene, model, cageNode.get(), depth + 1, bones, bonesOut);
 	}
 
 	void findBones(const aiScene* scene, aiNode* node, std::unordered_map<std::string, aiBone*>& bones)

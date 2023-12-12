@@ -20,7 +20,7 @@ namespace cage
 
 		// Use this to reconfigure any state when we swap back to this state from another
 		virtual void OnRevealed() = 0;
-		// Use thsi to configure any needed state when about to move to a new state
+		// Use this to configure any needed state when about to move to a new state
 		virtual void OnHidden() = 0;
 
 		virtual void ProcessEvents() = 0;
@@ -31,7 +31,7 @@ namespace cage
 		static StateMachine* s_stateMachine;
 
 	protected:
-		InputManager m_input;
+		io::InputManager m_input;
 		inline void quit() { m_quit = true; };
 		inline Game& getGame() { return m_game; };
 

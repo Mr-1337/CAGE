@@ -20,8 +20,9 @@ namespace cage
 			FIXED = GL_FIXED
 		};
 
+
 		VertexAttribute(int dimensions, Type type, bool normalized, unsigned int offset) 
-			: dimensions(dimensions), type(type), offset(offset), normalized(normalized)
+			: dimensions(dimensions), type(type), offset(offset), normalized(normalized), Format(vk::Format::eR8G8B8A8Srgb)
 		{
 
 		}
@@ -37,5 +38,8 @@ namespace cage
 
 		// Is this value normalized
 		bool normalized;
+
+		// Vulkan format of the type, renders dimension count useless, replace with this
+		vk::Format Format;
 	};
 }

@@ -1,0 +1,23 @@
+#pragma once
+
+// CMake version file
+
+#define CAGE_VERSION_MAJOR @CAGE_VERSION_MAJOR@
+#define CAGE_VERSION_MINOR @CAGE_VERSION_MINOR@
+#define CAGE_VERSION_PATCH @CAGE_VERSION_PATCH@
+
+namespace cage
+{
+	// Represents a version of the engine or an application.
+	struct Version_t
+	{
+		unsigned char major;
+		unsigned char minor;
+		unsigned char patch;
+
+		operator unsigned int() const;
+
+	};
+
+	const Version_t EngineVersion = { CAGE_VERSION_MAJOR, CAGE_VERSION_MINOR, CAGE_VERSION_PATCH };
+}

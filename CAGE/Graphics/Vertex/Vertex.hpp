@@ -28,6 +28,7 @@ namespace cage
 		std::vector<VertexAttribute> layout;
 
 		layout.emplace_back(2, VertexAttribute::Type::FLOAT, false, offsetof(Vertex2, position));
+		layout[0].Format = vk::Format::eR32G32Sfloat;
 
 		return layout;
 	}
@@ -60,6 +61,9 @@ namespace cage
 		layout.emplace_back(2, VertexAttribute::Type::FLOAT, false, offsetof(Vertex2UV, position));
 		layout.emplace_back(2, VertexAttribute::Type::FLOAT, false, offsetof(Vertex2UV, uv));
 
+		layout[0].Format = vk::Format::eR32G32Sfloat;
+		layout[1].Format = vk::Format::eR32G32Sfloat;
+
 		return layout;
 	}
 
@@ -91,6 +95,7 @@ namespace cage
 
 	struct Vertex3Color
 	{
+		Vertex3Color(const glm::vec3& pos, const glm::vec4& col) : position(pos), color(col) {};
 		Vertex3Color(const glm::vec3&& pos, const glm::vec4&& col) : position(pos), color(col) {};
 		glm::vec3 position;
 		glm::vec4 color;
@@ -103,6 +108,9 @@ namespace cage
 
 		layout.emplace_back(3, VertexAttribute::Type::FLOAT, false, offsetof(Vertex3Color, position));
 		layout.emplace_back(4, VertexAttribute::Type::FLOAT, false, offsetof(Vertex3Color, color));
+
+		layout[0].Format = vk::Format::eR32G32B32Sfloat;
+		layout[1].Format = vk::Format::eR32G32B32A32Sfloat;
 
 		return layout;
 	}
@@ -170,6 +178,12 @@ namespace cage
 		layout.emplace_back(3, VertexAttribute::Type::FLOAT, false, offsetof(Vertex3UVNormal, normal));
 		layout.emplace_back(4, VertexAttribute::Type::FLOAT, false, offsetof(Vertex3UVNormal, boneIDs));
 		layout.emplace_back(4, VertexAttribute::Type::FLOAT, false, offsetof(Vertex3UVNormal, weights));
+
+		layout[0].Format = vk::Format::eR32G32B32Sfloat;
+		layout[1].Format = vk::Format::eR32G32Sfloat;
+		layout[2].Format = vk::Format::eR32G32B32Sfloat;
+		layout[3].Format = vk::Format::eR32G32B32A32Sfloat;
+		layout[4].Format = vk::Format::eR32G32B32A32Sfloat;
 
 		return layout;
 	}

@@ -1,7 +1,7 @@
 ﻿# CMakeList.txt : CMake project for CAGE, include source and define
 # project specific logic here.
 #
-cmake_minimum_required (VERSION 3.10)
+cmake_minimum_required (VERSION 3.20)
 
 # All of the C++ files to compile
 
@@ -11,13 +11,12 @@ set(SRC_FILES
 	"Core/Game.cpp"
 	"Core/Game.hpp"
 	"Core/GameState.hpp"
-	 "Core/GameState.cpp"
+	"Core/GameState.cpp"
 	"Core/StateMachine.hpp"
 	"Core/StateMachine.cpp"
 	"Core/Window.cpp"
 	"Core/Window.hpp"
 	"Audio/PlaybackEngine.hpp"
-	"Glad/glad.c"
 	"Graphics/Camera/Camera.hpp"
 	"Graphics/Camera/Camera.cpp"
 	"Graphics/Vertex/Vertex.hpp"
@@ -36,6 +35,7 @@ set(SRC_FILES
 	"Graphics/VertexLayouts/VertexAttribute.hpp"
 	"Graphics/VertexArrays/VertexArray.hpp"
 	"Graphics/Buffers/VertexBuffer.hpp"
+	"Graphics/Buffers/VkVertexBuffer.hpp"
 	"Graphics/Buffers/FrameBuffer.hpp"
 	"Graphics/Buffers/FrameBuffer.cpp"
 	"Graphics/Textures/Texture.hpp"
@@ -97,8 +97,8 @@ set(SRC_FILES
 	"IO/Networking/Packets.hpp" 
 	"Graphics/UI/Transforms.hpp" 
 	"Graphics/UI/Transforms.cpp" 
-	"Graphics/UI/DebugVisualizer.hpp" 
-	"Graphics/UI/DebugVisualizer.cpp" 
+	"Graphics/UI/Debug/DebugVisualizer.hpp" 
+	"Graphics/UI/Debug/DebugVisualizer.cpp" 
 	"Graphics/UI/ListLayout.hpp" 
 	"Graphics/UI/ListLayout.cpp" 
 	"IO/Events/WindowEvents.hpp" 
@@ -109,9 +109,7 @@ set(SRC_FILES
 	"Graphics/Buffers/IndexBuffer.hpp" 
 	"Graphics/Animation/Bone.hpp"
 	"Graphics/Animation/Animation.hpp"
-
 	"Graphics/Animation/Animation.cpp"
-	"Graphics/UI/DebugVisualizer.cpp" 
 	"Graphics/UI/ListLayout.hpp" 
 	"Graphics/UI/ListLayout.cpp" 
 	"IO/Events/WindowEvents.hpp" 
@@ -119,13 +117,32 @@ set(SRC_FILES
 	"Util/Timer.cpp" 
 	"Graphics/Textures/TextureArray.hpp" 
 	"Graphics/Textures/TextureArray.cpp"
-	"Graphics/UI/ScrollField.hpp")
-
-set (CMAKE_CXX_EXTENSIONS OFF)
-
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
+	"Graphics/UI/ScrollField.hpp" 
+	"Graphics/Context/Context.hpp" 
+	"Graphics/Context/Device.hpp" 
+	"Graphics/Context/Context.cpp"
+	"Graphics/Context/Device.cpp"
+	"Graphics/Pipeline/PipelineBuilder.hpp"
+	"Graphics/Pipeline/PipelineBuilder.cpp"
+	"Graphics/Renderer/Renderer.cpp"
+	"Graphics/Renderer/Renderer.hpp"
+	"Graphics/Shaders/VkShader.hpp"
+	"Graphics/Shaders/VkShader.cpp"
+	"Graphics/Textures/VkTexture.hpp"
+	"Graphics/Textures/VkTexture.cpp" 
+	"Graphics/Buffers/Buffer.cpp"
+	"Graphics/Buffers/Buffer.hpp"
+	"IO/VkMeshLoader.cpp"
+	"IO/VkMeshLoader.hpp"
+	"Graphics/Scene/Scene.cpp"
+	"Graphics/Scene/Scene.hpp"
+	"Graphics/Renderer/DrawCmd.hpp"
+	"Graphics/Models/MeshFactory.hpp"
+	"Graphics/Models/MeshFactory.cpp"
+	"Graphics/Materials/Material.hpp"
+	"Graphics/Descriptors/DescriptorManager.cpp"
+	"Graphics/Descriptors/DescriptorManager.hpp"
+)
 # Add source to this project's library.
 add_library (CAGE STATIC ${SRC_FILES})
 

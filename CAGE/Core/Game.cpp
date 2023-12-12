@@ -73,12 +73,25 @@ MessageCallback(GLenum source,
 
 namespace cage
 {
-	Game::Game(const char* title) :
+	Game::Game(const char* title, Version_t version) :
+		m_running(true),
 		m_language("en-US"),
 		m_title(title),
-		m_rng(1337)
+		m_rng(1337),
+		m_gameVersion(version)
 	{
-		
+
+	}
+
+	Game::~Game()
+	{
+		m_input = nullptr;
+		m_graphicsContext->m_device->operator vk::Device().waitIdle();
+		m_scene = nullptr;
+		m_renderer = nullptr;
+		m_graphicsContext->operator vk::Instance().destroySurfaceKHR(m_surface);
+		m_graphicsContext = nullptr;
+		unloadSDL();
 	}
 
 	void Game::HandleCMDArgs(int argc, char** argv)
@@ -86,45 +99,51 @@ namespace cage
 
 	}
 
-	void Game::EngineInit()
+	void Game::Run2()
 	{
-		std::cout << "Initializing CAGE, hang tight!" << std::endl;
-		std::vector<std::string> names;
-		names = {
-			"Considerably Average Game Engine",
-			"Consistently Awful Game Engine",
-			"Categorically Atrocious Game Engine",
-			"Choose Another Game Engine",
-			"Confusingly Atypical Game Engine",
-			"Contentious Architecture Game Engine",
-			"Conceptually Abysmal Game Engine",
-			"Cordially Advertised Game Engine",
-			"Completely Antithetical Game Engine",
-			"Criminal Authored Game Engine",
-			"Consistently Avoided Game Engine",
-			"Crimes Against Game Engines",
-			"Creatively Aimless Game Engine",
-			"Conventionally Astray Game Engine",
-			"Clumsily Adapted Game Engine",
-			"Computer Antagonizing Game Engine",
-			"Carelessly Authored Game Engine",
-			"Crypto-jacking At Gamers' Expense"
-		};
+		using namespace std::chrono;
+		duration<float> frameTime(1.f / 60.f);
+		time_point<high_resolution_clock> startTime;
 
-		initSDL();
-		m_window = std::make_unique<Window>(m_title.c_str(), 1024, 720);
-		initGL();
-
-		platform::Init();
-		cage::Texture::s_MissingTexture = new cage::Texture(IMG_Load("Assets/Textures/missing.png"));
-		cage::ui::UIElement::s_DefaultFont = new cage::Font("Assets/Fonts/consola.ttf", 18);
-		cage::ui::UIElement::shader = std::make_shared<cage::SpriteShader>();
+		while (m_running)
+		{
+			startTime = high_resolution_clock::now();
+			processEvents();
+			m_input->PollInput();
+			m_renderer->m_Time += frameTime.count();
+			Update(frameTime.count());
+			m_scene->ComputeTransforms();
+			m_renderer->Render(*m_scene);
+			frameTime = (high_resolution_clock::now() - startTime);
+		}
+		io::Logger::Log("bye bye :(");
 	}
 
-	Game::~Game()
+	void Game::processEvents()
 	{
-		unloadSDL();
+		SDL_Event event;
+		while (SDL_PollEvent(&event))
+		{
+			m_input->Raise(event);
+			switch (event.type)
+			{
+			case SDL_QUIT:
+				m_running = false;
+				break;
+			case SDL_WINDOWEVENT:
+				if (event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
+				{
+					auto newsize = std::make_pair(event.window.data1, event.window.data2);
+					m_renderer->OnResize(newsize);
+					m_scene->m_MainCam.SetWinSize(newsize);
+				}
+				break;
+			}
+
+		}
 	}
+
+#pragma region Getters
 
 	Window& Game::GetWindow()
 	{
@@ -146,6 +165,11 @@ namespace cage
 		return m_language;
 	}
 
+	graphics::Scene& Game::GetScene()
+	{
+		return *m_scene;
+	}
+
 	audio::PlaybackEngine& Game::GetPlaybackEngine()
 	{
 		return m_playbackEngine;
@@ -154,6 +178,64 @@ namespace cage
 	std::mt19937& Game::GetRNG()
 	{
 		return m_rng;
+	}
+
+#pragma endregion
+#pragma region Init
+	void Game::EngineInit()
+	{
+		const bool vulkan = true;
+		io::Logger::Logf("Launching CAGE v{}.{}.{}", EngineVersion.major, EngineVersion.minor, EngineVersion.patch);
+		std::vector<std::string> names;
+		names =
+		{
+			"Considerably Average Game Engine",
+			"Consistently Awkward Game Engine",
+			"Categorically Atrocious Game Engine",
+			"Cacophonous Audio Game Engine",
+			"Ceaseless Assault of Grotesque Exceptions",
+			"Chronically Abstract Game Engine",
+			"C++ Agony and Grief Engine",
+			"Chungus Amongus Game Engine",
+			"Combative API Game Engine",
+			"Complex And Generally Egregious",
+			"Choose Another Game Engine",
+			"Confusingly Atypical Game Engine",
+			"Cordially Advertised Game Engine",
+			"Criminally Authored Game Engine",
+			"Consistently Avoided Game Engine",
+			"Crimes Against Game Engines",
+			"Creatively Aimless Game Engine",
+			"Conventionally Astray Game Engine",
+			"Clumsily Adapted Game Engine",
+			"CPU Antagonizing Game Engine",
+			"Carelessly Arranged Game Engine",
+			"Crypto At Gamers' Expense"
+		};
+
+		m_rng.seed(std::chrono::system_clock::now().time_since_epoch().count());
+		io::Logger::Log(names[m_rng() % names.size()]);
+		initSDL();
+		io::Logger::Log("SDL started successfully");
+		m_input = std::make_unique<io::InputManager>();
+
+		m_window = std::make_unique<Window>(m_title.c_str(), Window::upair{ 1024u, 720u }, vulkan);
+		if (vulkan)
+		{
+			initVulkan();
+		}
+		else
+		{
+			initGL();
+			cage::Texture::s_MissingTexture = new cage::Texture(IMG_Load("Assets/Textures/missing.png"));
+			cage::ui::UIElement::s_DefaultFont = new cage::Font("Assets/Fonts/consola.ttf", 18);
+			cage::ui::UIElement::shader = std::make_shared<cage::SpriteShader>();
+		}
+
+		platform::Init();
+		m_scene = std::make_unique<graphics::Scene>(*m_graphicsContext->m_device);
+		m_scene->m_MainCam.SetWinSize(m_window->GetPixelSize());
+
 	}
 
 	void Game::initGL()
@@ -165,6 +247,18 @@ namespace cage
 		printf("Version:  %s\n", glGetString(GL_VERSION));
 		glEnable(GL_DEBUG_OUTPUT);
 		glDebugMessageCallback(MessageCallback, 0);
+	}
+
+	void Game::initVulkan()
+	{
+		auto windowExtensions = m_window->GetVulkanExtensions();
+		m_graphicsContext = std::make_unique<graphics::Context>(m_title, m_gameVersion, windowExtensions);
+		m_surface = m_window->GetVulkanSurface(*m_graphicsContext);
+		vk::PhysicalDevice device = m_graphicsContext->m_device->GetPhysical();
+		//cap.surfaceCapabilities.supportedCompositeAlpha
+
+		m_renderer = std::make_unique<graphics::Renderer>(*m_graphicsContext->m_device, m_window->GetPixelSize(), m_surface);
+		m_renderer->Init();
 	}
 
 	void Game::initSDL()
@@ -201,6 +295,7 @@ namespace cage
 		if (SDLNet_Init() != 0)
 			throw std::runtime_error("Failed to initialize SDL_net.");
 	}
+#pragma endregion
 
 	void Game::unloadSDL()
 	{

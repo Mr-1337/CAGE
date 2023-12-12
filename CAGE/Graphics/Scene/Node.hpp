@@ -8,28 +8,37 @@
 
 namespace cage
 {
-	namespace scene
+	namespace graphics
 	{
 		/*
-			Represents a node in the CAGE scene graph
-			Stores transform information
+			Represents a node in the CAGE scene graph.
+			Stores transform information, and in the future bounding information for culling purposes.
 		*/
+		class Node;
+		using NodeRef = std::shared_ptr<Node>;
+
 		class Node
 		{
 			const std::string m_name;
 
-			std::vector<Node*> m_children;
+			std::vector<NodeRef> m_children;
 			Node* m_parent;
 
 		public:
+
+			static NodeRef Make(const std::string& name);
+
 			Node(const std::string& name);
 			~Node();
-			void Add(Node* c);
+			void Add(NodeRef c);
 
 			inline std::string GetName() { return m_name; }
-			glm::mat4 GetTotalTransform();
+			inline std::vector<NodeRef>& GetChildren() { return m_children; }
+			inline Node* GetParent() { return m_parent; }
 
-			glm::mat4 m_LocalTransform, m_InvTransform;
+			glm::mat4 m_LocalTransform, m_GlobalTransform, m_InvTransform;
+
 		};
+
 	}
 }

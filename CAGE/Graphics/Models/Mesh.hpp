@@ -35,7 +35,7 @@ namespace cage
 
 		}
 
-		scene::Node* m_TransformNode;
+		graphics::Node* m_TransformNode;
 
 		Mesh(const Mesh& other) = delete;
 		Mesh(Mesh&& other) = delete;
@@ -107,7 +107,7 @@ namespace cage
 			else
 				Texture::s_MissingTexture->Bind();
 
-			shader->Model->value = m_TransformNode->GetTotalTransform();
+			//shader->Model->value = m_TransformNode->GetTotalTransform();
 			shader->Model->ForwardToShader();
 
 			m_vao.Bind();

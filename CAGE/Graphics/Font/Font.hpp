@@ -5,6 +5,7 @@
 #include <memory>
 
 #include "../Textures/Texture.hpp"
+#include "../Textures/VkTexture.hpp"
 
 namespace cage
 {
@@ -14,6 +15,7 @@ namespace cage
 	public:
 		Font(const std::string& fontName, int ptSize);
 		std::shared_ptr<cage::Texture> Render(const std::string& text, SDL_Color color) const;
+		std::shared_ptr<cage::graphics::VkTexture> RenderVk(const std::string& text, SDL_Color color) const;
 		~Font();
 	};
 }

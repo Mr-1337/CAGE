@@ -7,11 +7,13 @@
 #include <algorithm>
 #include <GLM/glm/glm.hpp>
 
+#include "../Textures/VkTexture.hpp"
 #include "../../IO/Events/EventListener.hpp"
 #include "../ShaderProgram/SpriteShader.hpp"
 #include "../Textures/Texture.hpp"
 #include "Transforms.hpp"
 #include "../Font/Font.hpp"
+#include "../Buffers/VkVertexBuffer.hpp"
 
 namespace cage
 {
@@ -105,6 +107,17 @@ namespace cage
 				}
 			}
 
+			virtual inline void SetActiveTexture(std::shared_ptr<graphics::VkTexture> texture)
+			{
+				if (texture == nullptr) return;
+				if (m_VkTexture != nullptr && m_VkTexture != texture)
+				{
+					s_DirtyTexture.push_back(this);
+				}
+				m_VkTexture = texture;
+				Resize({ texture->GetSize().first, texture->GetSize().second });
+			}
+
 			inline glm::vec4 GetColor() const { return m_color; }
 
 			virtual void SetColor(glm::vec4 color)
@@ -129,7 +142,6 @@ namespace cage
 
 			virtual void Update(float deltaTime);
 			virtual void Draw(); 
-
 
 			// Sets what part of this element will be used as the local origin
 			inline void SetLocalMounting(MountPoint mounting) { m_localMount = mounting; recalcTransform(); }
@@ -198,8 +210,9 @@ namespace cage
 
 			static std::shared_ptr<SpriteShader> shader;
 			static Font* s_DefaultFont;
-			
+			static std::vector<UIElement*> s_DirtyTexture;
 
+			std::shared_ptr<graphics::VkTexture> m_VkTexture;
 		private:
 
 			static void initSharedData();

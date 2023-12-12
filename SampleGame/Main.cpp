@@ -1,45 +1,29 @@
 /*
- *	Welcome to the CAGE
- *
- *	Include the header for your game and make it the template argument for PlayGame<T>
- *
- */
+	A sample project showing how to utilize CAGE
+*/
 
-#include <iostream>
-#include "Shrektris/Shrektris.hpp"
-
-#include <GLM/glm/glm.hpp>
-#include <vulkan/vulkan.hpp>
+#include <CAGE.hpp>
 #include <SDL2/SDL_vulkan.h>
+#include <SDL2/SDL_ttf.h>
+#include <Graphics/Context/Context.hpp>
+#include <Graphics/Pipeline/PipelineBuilder.hpp>
+#include <Graphics/Renderer/Renderer.hpp>
+#include <Graphics/Buffers/VkVertexBuffer.hpp>
+#include <GLM/glm/glm.hpp>
+#include <GLM/glm/gtx/io.hpp>
+#include <IO/InputManager.hpp>
+#include <Graphics/UI/Button.hpp>
+#include <Graphics/UI/TextField.hpp>
+#include <Graphics/UI/Debug/InputDebugger.hpp>
+#include <GLM/glm/gtx/string_cast.hpp>
+#include <format>
+#include "SampleGame.hpp"
 
-int main(int argc, char** argv)
+template <typename T>
+using Ref = std::shared_ptr<T>;
+
+auto main(int argc, char** argv) -> int
 {
-	//cage::PlayGame<Shrektris>(argc, argv);
-
-	SDL_Init(SDL_INIT_EVERYTHING);
-
-	auto window = SDL_CreateWindow("Vulkan Test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1600, 900, SDL_WINDOW_SHOWN | SDL_WINDOW_VULKAN);
-
-	unsigned int count = 0;
-	SDL_Vulkan_GetInstanceExtensions(window, &count, nullptr);
-	std::vector<const char*> extensions(count);
-	SDL_Vulkan_GetInstanceExtensions(window, &count, extensions.data());
-
-	vk::ApplicationInfo appInfo("Shrektris", 1, "CAGE", 1, 1);
-	vk::InstanceCreateInfo info({}, &appInfo);
-	vk::Instance instance = vk::createInstance(info);
-
-	vk::PhysicalDevice gpu = instance.enumeratePhysicalDevices().front();
-
-	for (auto ext : extensions)
-	{
-		std::cout << ext << std::endl;
-	}
-
-	std::cout << count << std::endl;
-
-	SDL_Delay(5000);
-
-	std::cout << "It's not ogre, it's never ogre" << std::endl;
+	cage::PlayGame<SampleGame>(argc, argv);
 	return 0;
 }
